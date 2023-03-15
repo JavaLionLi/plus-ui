@@ -1,16 +1,15 @@
 ## 平台简介
 
 * 本仓库为前端技术栈 [Vue3](https://v3.cn.vuejs.org) + [Element Plus](https://element-plus.org/zh-CN) + [Vite](https://cn.vitejs.dev) 版本。
-* 配套后端代码仓库地址[RuoYi-Vue-Plus](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus)
+* 配套后端代码仓库地址 
+* [RuoYi-Vue-Plus 5.X(注意版本号)](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus)
+* [RuoYi-Cloud-Plus 2.X(注意版本号)](https://gitee.com/JavaLionLi/RuoYi-Cloud-Plus)
 
 ## 前端运行
 
 ```bash
 # 克隆项目
-git clone https://gitee.com/JavaLionLi/RuoYi-Vue-Plus-UI.git
-
-# 进入项目目录
-cd RuoYi-Vue-Plus-UI
+git clone https://gitee.com/JavaLionLi/plus-ui.git
 
 # 安装依赖
 npm install --registry=https://registry.npmmirror.com
@@ -24,7 +23,7 @@ npm run dev
 ```
 
 ## 后端改造
-参考后端代码内 `ruoyi-generator/resources/vm/vue/v3/readme.txt` 说明
+参考后端代码内 `ruoyi-gen/resources/vm/vue/v3/readme.txt` 说明
 
 ## 内置功能
 
