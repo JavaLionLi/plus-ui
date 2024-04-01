@@ -10,7 +10,7 @@
             <el-input v-model="queryParams.productName" placeholder="请输入商品名称" clearable style="width: 240px" @keyup.enter="handleQuery" />
           </el-form-item>
           <el-form-item label="商品单价/￥" prop="productPrice">
-            <el-input v-model="queryParams.productPrice" placeholder="请输入商品单价/￥" clearable style="width: 240px" @keyup.enter="handleQuery" />
+            <el-input v-model="queryParams.productPrice" placeholder="请输入商品单价" clearable style="width: 240px" @keyup.enter="handleQuery" />
           </el-form-item>
           <el-form-item>
             <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
@@ -44,7 +44,7 @@
         <el-table-column label="商品id" align="center" prop="productId" v-if="true" />
         <el-table-column label="商品名称" align="center" prop="productName" />
         <el-table-column label="商品规格" align="center" prop="productSpecification" />
-        <el-table-column label="商品单价/￥" align="center" prop="productPrice" />
+        <el-table-column label="商品单价" align="center" prop="productPrice" />
         <el-table-column label="备注" align="center" prop="productRemarks" />
         <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
           <template #default="scope">
@@ -75,8 +75,8 @@
         <el-form-item label="商品规格" prop="productSpecification">
           <el-input v-model="form.productSpecification" placeholder="请输入商品规格" />
         </el-form-item>
-        <el-form-item label="商品单价/￥" prop="productPrice">
-          <el-input v-model="form.productPrice" placeholder="请输入商品单价/￥" />
+        <el-form-item label="商品单价" prop="productPrice">
+          <el-input v-model="form.productPrice" placeholder="请输入商品单价" />
         </el-form-item>
         <el-form-item label="备注" prop="productRemarks">
             <el-input v-model="form.productRemarks" type="textarea" placeholder="请输入内容" />
@@ -137,7 +137,7 @@ const data = reactive<PageData<ProductForm, ProductQuery>>({
       { required: true, message: "商品名称不能为空", trigger: "blur" }
     ],
     productPrice: [
-      { required: true, message: "商品单价/￥不能为空", trigger: "blur" }
+      { required: true, message: "商品单价不能为空", trigger: "blur" }
     ],
   }
 });

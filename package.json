@@ -1,8 +1,8 @@
 {
-  "name": "ruoyi-vue-plus",
+  "name": "FMS",
   "version": "5.1.2",
-  "description": "RuoYi-Vue-Plus多租户管理系统",
-  "author": "LionLi",
+  "description": "连锁加盟商户管理系统",
+  "author": "2D_fish",
   "license": "MIT",
   "scripts": {
     "dev": "vite serve --mode development",
@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://gitee.com/JavaLionLi/plus-ui.git"
+    "url": "https://github.com/2Dfish/plus-ui.git"
   },
   "dependencies": {
     "@element-plus/icons-vue": "2.1.0",

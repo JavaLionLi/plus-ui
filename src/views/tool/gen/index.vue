@@ -193,7 +193,7 @@ const handleGenTable = async (row?: TableVO) => {
     await genCode(row.tableId);
     proxy?.$modal.msgSuccess('成功生成到自定义路径：' + row.genPath);
   } else {
-    proxy?.$download.zip('/tool/gen/batchGenCode?tableIdStr=' + tbIds, 'ruoyi.zip');
+    proxy?.$download.zip('/tool/gen/batchGenCode?tableIdStr=' + tbIds, 'FMS.zip');
   }
 }
 /** 同步数据库操作 */

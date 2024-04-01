@@ -6,8 +6,8 @@
           <el-form-item label="订单id" prop="orderId">
             <el-input v-model="queryParams.orderId" placeholder="请输入订单id" clearable style="width: 240px" @keyup.enter="handleQuery" />
           </el-form-item>
-          <el-form-item label="商品id" prop="productId">
-            <el-select v-model="queryParams.productId" placeholder="请选择商品id" clearable>
+          <el-form-item label="商品名称" prop="productId">
+            <el-select v-model="queryParams.productId" placeholder="请选择商品" clearable>
               <el-option
                 v-for="dict in fms_product_name"
                 :key="dict.value"
@@ -63,7 +63,7 @@
       <el-table v-loading="loading" :data="orderList" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center" />
         <el-table-column label="订单id" align="center" prop="orderId" v-if="true" />
-        <el-table-column label="商品id" align="center" prop="productId">
+        <el-table-column label="商品名称" align="center" prop="productId">
           <template #default="scope">
             <dict-tag :options="fms_product_name" :value="scope.row.productId"/>
           </template>
@@ -98,8 +98,8 @@
     <!-- 添加或修改订单对话框 -->
     <el-dialog :title="dialog.title" v-model="dialog.visible" width="500px" append-to-body>
       <el-form ref="orderFormRef" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="商品id" prop="productId">
-          <el-select v-model="form.productId" placeholder="请选择商品id">
+        <el-form-item label="商品名称" prop="productId">
+          <el-select v-model="form.productId" placeholder="请选择商品">
             <el-option
                 v-for="dict in fms_product_name"
                 :key="dict.value"
