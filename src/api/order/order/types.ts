@@ -20,9 +20,14 @@ export interface OrderVO {
   productNum: number;
 
   /**
-   * 创建时间
+   * 订单状态
    */
-  createTime: string;
+  orderStatus: string;
+
+  /**
+   * 备注
+   */
+  orderRemark: string;
 
 }
 
@@ -46,6 +51,16 @@ export interface OrderForm extends BaseEntity {
    * 商品数量
    */
   productNum?: number;
+
+  /**
+   * 订单状态
+   */
+  orderStatus?: string;
+
+  /**
+   * 备注
+   */
+  orderRemark?: string;
 
 }
 
@@ -72,9 +87,9 @@ export interface OrderQuery extends PageQuery {
   productNum?: number;
 
   /**
-   * 创建时间
+   * 订单状态
    */
-  createTime?: string;
+  orderStatus?: string;
 
     /**
      * 日期范围参数

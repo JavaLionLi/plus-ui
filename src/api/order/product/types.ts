@@ -15,7 +15,7 @@ export interface ProductVO {
   productSpecification: string;
 
   /**
-   * 商品单价/￥
+   * 商品单价
    */
   productPrice: number;
 
@@ -28,6 +28,11 @@ export interface ProductVO {
 
 export interface ProductForm extends BaseEntity {
   /**
+   * 商品id
+   */
+  productId?: string | number;
+
+  /**
    * 商品名称
    */
   productName?: string;
@@ -38,7 +43,7 @@ export interface ProductForm extends BaseEntity {
   productSpecification?: string;
 
   /**
-   * 商品单价/￥
+   * 商品单价
    */
   productPrice?: number;
 
@@ -62,7 +67,12 @@ export interface ProductQuery extends PageQuery {
   productName?: string;
 
   /**
-   * 商品单价/￥
+   * 商品规格
+   */
+  productSpecification?: string;
+
+  /**
+   * 商品单价
    */
   productPrice?: number;
 

@@ -3,7 +3,7 @@ import { AxiosPromise } from 'axios';
 import { ProductVO, ProductForm, ProductQuery } from '@/api/order/product/types';
 
 /**
- * 查询商品列表
+ * 查询商品管理列表
  * @param query
  * @returns {*}
  */
@@ -17,7 +17,7 @@ export const listProduct = (query?: ProductQuery): AxiosPromise<ProductVO[]> => 
 };
 
 /**
- * 查询商品详细
+ * 查询商品管理详细
  * @param productId
  */
 export const getProduct = (productId: string | number): AxiosPromise<ProductVO> => {
@@ -28,7 +28,7 @@ export const getProduct = (productId: string | number): AxiosPromise<ProductVO> 
 };
 
 /**
- * 新增商品
+ * 新增商品管理
  * @param data
  */
 export const addProduct = (data: ProductForm) => {
@@ -40,7 +40,7 @@ export const addProduct = (data: ProductForm) => {
 };
 
 /**
- * 修改商品
+ * 修改商品管理
  * @param data
  */
 export const updateProduct = (data: ProductForm) => {
@@ -52,7 +52,7 @@ export const updateProduct = (data: ProductForm) => {
 };
 
 /**
- * 删除商品
+ * 删除商品管理
  * @param productId
  */
 export const delProduct = (productId: string | number | Array<string | number>) => {

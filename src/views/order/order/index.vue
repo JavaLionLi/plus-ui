@@ -6,8 +6,8 @@
           <el-form-item label="订单id" prop="orderId">
             <el-input v-model="queryParams.orderId" placeholder="请输入订单id" clearable style="width: 240px" @keyup.enter="handleQuery" />
           </el-form-item>
-          <el-form-item label="商品名称" prop="productId">
-            <el-select v-model="queryParams.productId" placeholder="请选择商品" clearable>
+          <el-form-item label="商品id" prop="productId">
+            <el-select v-model="queryParams.productId" placeholder="请选择商品id" clearable>
               <el-option
                 v-for="dict in fms_product_name"
                 :key="dict.value"
@@ -17,21 +17,27 @@
             </el-select>
           </el-form-item>
           <el-form-item label="用户id" prop="usrId">
-            <el-input v-model="queryParams.usrId" placeholder="请输入用户id" clearable style="width: 240px" @keyup.enter="handleQuery" />
+            <el-select v-model="queryParams.usrId" placeholder="请选择用户id" clearable>
+              <el-option
+                v-for="dict in fms_user_name"
+                :key="dict.value"
+                :label="dict.label"
+                :value="dict.value"
+              />
+            </el-select>
           </el-form-item>
           <el-form-item label="商品数量" prop="productNum">
             <el-input v-model="queryParams.productNum" placeholder="请输入商品数量" clearable style="width: 240px" @keyup.enter="handleQuery" />
           </el-form-item>
-          <el-form-item label="创建时间" style="width: 308px">
-            <el-date-picker
-                v-model="dateRangeCreateTime"
-                value-format="YYYY-MM-DD HH:mm:ss"
-                type="daterange"
-                range-separator="-"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                :default-time="[new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 1, 1, 23, 59, 59)]"
-            />
+          <el-form-item label="订单状态" prop="orderStatus">
+            <el-select v-model="queryParams.orderStatus" placeholder="请选择订单状态" clearable>
+              <el-option
+                v-for="dict in fms_order_status"
+                :key="dict.value"
+                :label="dict.label"
+                :value="dict.value"
+              />
+            </el-select>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
@@ -63,18 +69,23 @@
       <el-table v-loading="loading" :data="orderList" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center" />
         <el-table-column label="订单id" align="center" prop="orderId" v-if="true" />
-        <el-table-column label="商品名称" align="center" prop="productId">
+        <el-table-column label="商品id" align="center" prop="productId">
           <template #default="scope">
             <dict-tag :options="fms_product_name" :value="scope.row.productId"/>
           </template>
         </el-table-column>
-        <el-table-column label="用户id" align="center" prop="usrId" />
-        <el-table-column label="商品数量" align="center" prop="productNum" />
-        <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+        <el-table-column label="用户id" align="center" prop="usrId">
           <template #default="scope">
-            <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
+            <dict-tag :options="fms_user_name" :value="scope.row.usrId"/>
           </template>
         </el-table-column>
+        <el-table-column label="商品数量" align="center" prop="productNum" />
+        <el-table-column label="订单状态" align="center" prop="orderStatus">
+          <template #default="scope">
+            <dict-tag :options="fms_order_status" :value="scope.row.orderStatus"/>
+          </template>
+        </el-table-column>
+        <el-table-column label="备注" align="center" prop="orderRemark" />
         <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
           <template #default="scope">
             <el-tooltip content="修改" placement="top">
@@ -95,24 +106,43 @@
           @pagination="getList"
       />
     </el-card>
-    <!-- 添加或修改订单对话框 -->
+    <!-- 添加或修改订单管理对话框 -->
     <el-dialog :title="dialog.title" v-model="dialog.visible" width="500px" append-to-body>
       <el-form ref="orderFormRef" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="商品名称" prop="productId">
-          <el-select v-model="form.productId" placeholder="请选择商品">
+        <el-form-item label="商品id" prop="productId">
+          <el-select v-model="form.productId" placeholder="请选择商品id">
             <el-option
                 v-for="dict in fms_product_name"
                 :key="dict.value"
                 :label="dict.label"
-                :value="parseInt(dict.value)"
+                :value="dict.value"
             ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="用户id" prop="usrId">
-          <el-input v-model="form.usrId" placeholder="请输入用户id" />
+          <el-select v-model="form.usrId" placeholder="请选择用户id">
+            <el-option
+                v-for="dict in fms_user_name"
+                :key="dict.value"
+                :label="dict.label"
+                :value="dict.value"
+            ></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="商品数量" prop="productNum">
           <el-input v-model="form.productNum" placeholder="请输入商品数量" />
+        </el-form-item>
+        <el-form-item label="订单状态" prop="orderStatus">
+          <el-radio-group v-model="form.orderStatus">
+            <el-radio
+                v-for="dict in fms_order_status"
+                :key="dict.value"
+                :label="dict.value"
+            >{{dict.label}}</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="备注" prop="orderRemark">
+            <el-input v-model="form.orderRemark" type="textarea" placeholder="请输入内容" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -130,7 +160,7 @@ import { listOrder, getOrder, delOrder, addOrder, updateOrder } from '@/api/orde
 import { OrderVO, OrderQuery, OrderForm } from '@/api/order/order/types';
 
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
-const { fms_product_name } = toRefs<any>(proxy?.useDict('fms_product_name'));
+const { fms_product_name, fms_user_name, fms_order_status } = toRefs<any>(proxy?.useDict('fms_product_name', 'fms_user_name', 'fms_order_status'));
 
 const orderList = ref<OrderVO[]>([]);
 const buttonLoading = ref(false);
@@ -140,7 +170,6 @@ const ids = ref<Array<string | number>>([]);
 const single = ref(true);
 const multiple = ref(true);
 const total = ref(0);
-const dateRangeCreateTime = ref<[DateModelType, DateModelType]>(['', '']);
 
 const queryFormRef = ref<ElFormInstance>();
 const orderFormRef = ref<ElFormInstance>();
@@ -155,6 +184,8 @@ const initFormData: OrderForm = {
   productId: undefined,
   usrId: undefined,
   productNum: undefined,
+  orderStatus: undefined,
+  orderRemark: undefined
 }
 const data = reactive<PageData<OrderForm, OrderQuery>>({
   form: {...initFormData},
@@ -165,8 +196,8 @@ const data = reactive<PageData<OrderForm, OrderQuery>>({
     productId: undefined,
     usrId: undefined,
     productNum: undefined,
+    orderStatus: undefined,
     params: {
-      createTime: undefined,
     }
   },
   rules: {
@@ -177,18 +208,16 @@ const data = reactive<PageData<OrderForm, OrderQuery>>({
       { required: true, message: "商品id不能为空", trigger: "change" }
     ],
     usrId: [
-      { required: true, message: "用户id不能为空", trigger: "blur" }
+      { required: true, message: "用户id不能为空", trigger: "change" }
     ],
   }
 });
 
 const { queryParams, form, rules } = toRefs(data);
 
-/** 查询订单列表 */
+/** 查询订单管理列表 */
 const getList = async () => {
   loading.value = true;
-  queryParams.value.params = {};
-  proxy?.addDateRange(queryParams.value, dateRangeCreateTime.value, 'CreateTime');
   const res = await listOrder(queryParams.value);
   orderList.value = res.rows;
   total.value = res.total;
@@ -215,7 +244,6 @@ const handleQuery = () => {
 
 /** 重置按钮操作 */
 const resetQuery = () => {
-  dateRangeCreateTime.value = ['', ''];
   queryFormRef.value?.resetFields();
   handleQuery();
 }
@@ -264,7 +292,7 @@ const submitForm = () => {
 /** 删除按钮操作 */
 const handleDelete = async (row?: OrderVO) => {
   const _orderIds = row?.orderId || ids.value;
-  await proxy?.$modal.confirm('是否确认删除订单编号为"' + _orderIds + '"的数据项？').finally(() => loading.value = false);
+  await proxy?.$modal.confirm('是否确认删除订单编号为"' + _orderIds + '"的订单？').finally(() => loading.value = false);
   await delOrder(_orderIds);
   proxy?.$modal.msgSuccess("删除成功");
   await getList();

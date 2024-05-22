@@ -9,7 +9,10 @@
           <el-form-item label="商品名称" prop="productName">
             <el-input v-model="queryParams.productName" placeholder="请输入商品名称" clearable style="width: 240px" @keyup.enter="handleQuery" />
           </el-form-item>
-          <el-form-item label="商品单价/￥" prop="productPrice">
+          <el-form-item label="商品规格" prop="productSpecification">
+            <el-input v-model="queryParams.productSpecification" placeholder="请输入商品规格" clearable style="width: 240px" @keyup.enter="handleQuery" />
+          </el-form-item>
+          <el-form-item label="商品单价" prop="productPrice">
             <el-input v-model="queryParams.productPrice" placeholder="请输入商品单价" clearable style="width: 240px" @keyup.enter="handleQuery" />
           </el-form-item>
           <el-form-item>
@@ -66,7 +69,7 @@
           @pagination="getList"
       />
     </el-card>
-    <!-- 添加或修改商品对话框 -->
+    <!-- 添加或修改商品管理对话框 -->
     <el-dialog :title="dialog.title" v-model="dialog.visible" width="500px" append-to-body>
       <el-form ref="productFormRef" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="商品名称" prop="productName">
@@ -116,6 +119,7 @@ const dialog = reactive<DialogOption>({
 });
 
 const initFormData: ProductForm = {
+  productId: undefined,
   productName: undefined,
   productSpecification: undefined,
   productPrice: undefined,
@@ -128,11 +132,15 @@ const data = reactive<PageData<ProductForm, ProductQuery>>({
     pageSize: 10,
     productId: undefined,
     productName: undefined,
+    productSpecification: undefined,
     productPrice: undefined,
     params: {
     }
   },
   rules: {
+    productId: [
+      { required: true, message: "商品id不能为空", trigger: "blur" }
+    ],
     productName: [
       { required: true, message: "商品名称不能为空", trigger: "blur" }
     ],
@@ -144,7 +152,7 @@ const data = reactive<PageData<ProductForm, ProductQuery>>({
 
 const { queryParams, form, rules } = toRefs(data);
 
-/** 查询商品列表 */
+/** 查询商品管理列表 */
 const getList = async () => {
   loading.value = true;
   const res = await listProduct(queryParams.value);
@@ -221,7 +229,7 @@ const submitForm = () => {
 /** 删除按钮操作 */
 const handleDelete = async (row?: ProductVO) => {
   const _productIds = row?.productId || ids.value;
-  await proxy?.$modal.confirm('是否确认删除商品编号为"' + _productIds + '"的数据项？').finally(() => loading.value = false);
+  await proxy?.$modal.confirm('是否确认删除商品管理编号为"' + _productIds + '"的数据项？').finally(() => loading.value = false);
   await delProduct(_productIds);
   proxy?.$modal.msgSuccess("删除成功");
   await getList();

@@ -3,7 +3,7 @@ import { AxiosPromise } from 'axios';
 import { OrderVO, OrderForm, OrderQuery } from '@/api/order/order/types';
 
 /**
- * 查询订单列表
+ * 查询订单管理列表
  * @param query
  * @returns {*}
  */
@@ -17,7 +17,7 @@ export const listOrder = (query?: OrderQuery): AxiosPromise<OrderVO[]> => {
 };
 
 /**
- * 查询订单详细
+ * 查询订单管理详细
  * @param orderId
  */
 export const getOrder = (orderId: string | number): AxiosPromise<OrderVO> => {
@@ -28,7 +28,7 @@ export const getOrder = (orderId: string | number): AxiosPromise<OrderVO> => {
 };
 
 /**
- * 新增订单
+ * 新增订单管理
  * @param data
  */
 export const addOrder = (data: OrderForm) => {
@@ -40,7 +40,7 @@ export const addOrder = (data: OrderForm) => {
 };
 
 /**
- * 修改订单
+ * 修改订单管理
  * @param data
  */
 export const updateOrder = (data: OrderForm) => {
@@ -52,7 +52,7 @@ export const updateOrder = (data: OrderForm) => {
 };
 
 /**
- * 删除订单
+ * 删除订单管理
  * @param orderId
  */
 export const delOrder = (orderId: string | number | Array<string | number>) => {
