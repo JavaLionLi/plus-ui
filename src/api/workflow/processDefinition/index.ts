@@ -112,3 +112,15 @@ export const migrationDefinition = (currentProcessDefinitionId: string, fromProc
     method: 'put'
   });
 };
+
+/**
+ * 查询流程定义配置
+ * @param processDefinitionId 流程定义id
+ * @returns
+ */
+export const getUserTaskSetting = (processDefinitionId: string) => {
+  return request({
+    url: `/workflow/processDefinition/getUserTaskSetting/${processDefinitionId}`,
+    method: 'get'
+  });
+};

@@ -139,10 +139,9 @@
 
 <script lang="ts" setup name="Model">
 import Design from '../../../components/BpmnDesign/index.vue';
-import { listModel, addModel, delModel, modelDeploy, getInfo, update } from '@/api/workflow/model';
-import { ModelQuery, ModelForm, ModelVO } from '@/api/workflow/model/types';
+import { listModel, addModel, delModel, modelDeploy, getInfo, update, copyModel } from '@/api/workflow/model';
+import { ModelQuery, ModelForm, ModelVO, ModelDeployBo } from '@/api/workflow/model/types';
 import { listCategory } from '@/api/workflow/category';
-import { copyModel } from '@/api/workflow/model';
 
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
 
@@ -266,9 +265,13 @@ const handleDelete = async (row?: ModelVO) => {
 };
 // 流程部署
 const clickDeploy = async (id: string, key: string) => {
+  let param = reactive<ModelDeployBo>({
+    modelId: id,
+    tenantId: '000000'
+  });
   await proxy?.$modal.confirm('是否部署模型key为【' + key + '】流程？');
   loading.value = true;
-  await modelDeploy(id).finally(() => (loading.value = false));
+  await modelDeploy(param).finally(() => (loading.value = false));
   await getList();
   proxy?.$modal.msgSuccess('部署成功');
 };

@@ -83,7 +83,7 @@
                 </span>
               </template>
             </el-table-column>
-            <el-table-column fixed="right" label="操作" align="center" width="220" class-name="small-padding fixed-width">
+            <el-table-column fixed="right" label="操作" align="center" width="250" class-name="small-padding fixed-width">
               <template #default="scope">
                 <el-row :gutter="10" class="mb8">
                   <el-col :span="1.5">
@@ -113,6 +113,9 @@
                   <el-col :span="1.5">
                     <el-button link type="primary" size="small" icon="Tickets" @click="handleDefinitionConfigOpen(scope.row)">绑定业务</el-button>
                   </el-col>
+                  <el-col :span="1.5">
+                    <el-button link type="primary" size="small" icon="Tickets" @click="clickUserTaskSetting(scope.row.id)">人员设置</el-button>
+                  </el-col>
                 </el-row>
               </template>
             </el-table-column>
@@ -129,6 +132,8 @@
     </el-row>
     <!-- 预览图片或xml -->
     <process-preview ref="previewRef" />
+    <!-- 预览图片或xml -->
+    <user-task-setting ref="userTaskSettingRef" />
 
     <!-- 部署文件 -->
     <el-dialog v-if="uploadDialog.visible" v-model="uploadDialog.visible" :title="uploadDialog.title" width="30%">
@@ -253,7 +258,6 @@
 <script lang="ts" setup name="processDefinition">
 import {
   listProcessDefinition,
-  definitionImage,
   definitionXml,
   deleteProcessDefinition,
   updateDefinitionState,
@@ -263,6 +267,7 @@ import {
 } from '@/api/workflow/processDefinition';
 import { getByTableNameNotDefId, getByDefId, saveOrUpdate } from '@/api/workflow/definitionConfig';
 import ProcessPreview from './components/processPreview.vue';
+import UserTaskSetting from './components/userTaskSetting.vue';
 import { listCategory } from '@/api/workflow/category';
 import { CategoryVO } from '@/api/workflow/category/types';
 import { ProcessDefinitionQuery, ProcessDefinitionVO } from '@/api/workflow/processDefinition/types';
@@ -272,6 +277,7 @@ import { UploadRequestOptions, ElMessage, ElMessageBox } from 'element-plus';
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
 
 const previewRef = ref<InstanceType<typeof ProcessPreview>>();
+const userTaskSettingRef = ref<InstanceType<typeof UserTaskSetting>>();
 const queryFormRef = ref<ElFormInstance>();
 const categoryTreeRef = ref<ElTreeInstance>();
 const definitionConfigForm = ref<DefinitionConfigForm>({});
@@ -513,5 +519,11 @@ const handlerSaveForm = async () => {
       });
     }
   });
+};
+//人员设置
+const clickUserTaskSetting = async (id: string) => {
+  if (userTaskSettingRef.value) {
+    userTaskSettingRef.value.openDialog(id);
+  }
 };
 </script>
