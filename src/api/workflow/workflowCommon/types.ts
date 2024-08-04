@@ -5,7 +5,7 @@ export interface RouterJumpVo {
   wfNodeConfigVo: NodeConfigVO;
   wfDefinitionConfigVo: DefinitionConfigVO;
   businessKey: string;
-  taskId: string;
+  taskId: string | number;
   type: string;
 }
 

@@ -118,7 +118,7 @@ export const getPageByCurrent = (query: ProcessInstanceQuery): AxiosPromise<Proc
 export const cancelProcessApply = (businessKey: string) => {
   return request({
     url: `/workflow/processInstance/cancelProcessApply/${businessKey}`,
-    method: 'post'
+    method: 'put'
   });
 };
 

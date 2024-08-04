@@ -5,16 +5,14 @@ export interface ProcessDefinitionQuery extends PageQuery {
   categoryCode?: string;
 }
 
-export interface ProcessDefinitionVO extends BaseEntity {
+export interface FlowDefinitionVo extends BaseEntity {
   id: string;
-  name: string;
-  key: string;
-  version: number;
-  suspensionState: number;
-  resourceName: string;
-  diagramResourceName: string;
-  deploymentId: string;
-  deploymentTime: string;
+  flowName: string;
+  flowCode: string;
+  version: string;
+  isPublish: number;
+  createTime: Date;
+  updateTime: Date;
   wfDefinitionConfigVo: DefinitionConfigVO;
 }
 

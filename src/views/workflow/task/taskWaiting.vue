@@ -36,9 +36,9 @@
             <span>{{ scope.row.processDefinitionName }}v{{ scope.row.processDefinitionVersion }}.0</span>
           </template>
         </el-table-column>
-        <el-table-column align="center" prop="processDefinitionKey" label="流程定义KEY"></el-table-column>
-        <el-table-column align="center" prop="name" label="任务名称"></el-table-column>
-        <el-table-column align="center" prop="assigneeName" label="办理人">
+        <el-table-column align="center" prop="flowCode" label="流程定义编码"></el-table-column>
+        <el-table-column align="center" prop="nodeName" label="任务名称"></el-table-column>
+        <!-- <el-table-column align="center" prop="assigneeName" label="办理人">
           <template #default="scope">
             <template v-if="scope.row.participantVo && scope.row.assignee === null">
               <el-tag v-for="(item, index) in scope.row.participantVo.candidateName" :key="index" type="success">
@@ -51,7 +51,7 @@
               </el-tag>
             </template>
           </template>
-        </el-table-column>
+        </el-table-column> -->
         <el-table-column align="center" label="流程状态" min-width="70">
           <template #default="scope">
             <dict-tag :options="wf_business_status" :value="scope.row.businessStatus"></dict-tag>
@@ -77,7 +77,7 @@
 
 <script lang="ts" setup>
 import { getPageByTaskWait } from '@/api/workflow/task';
-import { TaskQuery, TaskVO } from '@/api/workflow/task/types';
+import { TaskQuery, FlowTaskVO } from '@/api/workflow/task/types';
 import workflowCommon from '@/api/workflow/workflowCommon';
 import { RouterJumpVo } from '@/api/workflow/workflowCommon/types';
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
@@ -136,11 +136,11 @@ const getWaitingList = () => {
   });
 };
 //办理
-const handleOpen = async (row: TaskVO) => {
+const handleOpen = async (row: FlowTaskVO) => {
   const routerJumpVo = reactive<RouterJumpVo>({
     wfDefinitionConfigVo: row.wfDefinitionConfigVo,
     wfNodeConfigVo: row.wfNodeConfigVo,
-    businessKey: row.businessKey,
+    businessKey: row.businessId,
     taskId: row.id,
     type: 'approval'
   });

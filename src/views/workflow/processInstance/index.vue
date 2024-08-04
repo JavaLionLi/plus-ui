@@ -151,7 +151,7 @@ import {
   deleteFinishAndHisInstance,
   deleteRunInstance
 } from '@/api/workflow/processInstance';
-import { getListByKey, migrationDefinition } from '@/api/workflow/processDefinition';
+import { getListByKey, migrationDefinition } from '@/api/workflow/definition';
 import { listCategory } from '@/api/workflow/category';
 import { CategoryVO } from '@/api/workflow/category/types';
 import { ProcessInstanceQuery, ProcessInstanceVO } from '@/api/workflow/processInstance/types';

@@ -54,8 +54,8 @@
           <el-table v-loading="loading" border :data="processDefinitionList" @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55" align="center" />
             <el-table-column align="center" type="index" label="序号" width="60"></el-table-column>
-            <el-table-column align="center" prop="name" label="流程定义名称" :show-overflow-tooltip="true"></el-table-column>
-            <el-table-column align="center" prop="key" label="标识KEY" width="80"></el-table-column>
+            <el-table-column align="center" prop="flowName" label="流程定义名称" :show-overflow-tooltip="true"></el-table-column>
+            <el-table-column align="center" prop="flowCode" label="标识KEY" width="120" :show-overflow-tooltip="true"></el-table-column>
             <el-table-column align="center" prop="version" label="版本号" width="80">
               <template #default="scope"> v{{ scope.row.version }}.0</template>
             </el-table-column>
@@ -167,8 +167,8 @@
       <el-table v-loading="loading" :data="processDefinitionHistoryList" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center" />
         <el-table-column align="center" type="index" label="序号" width="60"></el-table-column>
-        <el-table-column align="center" prop="name" label="流程定义名称" :show-overflow-tooltip="true" min-width="80"></el-table-column>
-        <el-table-column align="center" prop="key" label="标识KEY"></el-table-column>
+        <el-table-column align="center" prop="flowName" label="流程定义名称" :show-overflow-tooltip="true" min-width="80"></el-table-column>
+        <el-table-column align="center" prop="flowCode" label="标识KEY"></el-table-column>
         <el-table-column align="center" prop="version" label="版本号" width="90">
           <template #default="scope"> v{{ scope.row.version }}.0</template>
         </el-table-column>
@@ -252,20 +252,20 @@
 
 <script lang="ts" setup name="processDefinition">
 import {
-  listProcessDefinition,
+  listDefinition,
   definitionImage,
   definitionXml,
-  deleteProcessDefinition,
+  deleteDefinition,
   updateDefinitionState,
   convertToModel,
   deployProcessFile,
   getListByKey
-} from '@/api/workflow/processDefinition';
+} from '@/api/workflow/definition';
 import { getByTableNameNotDefId, getByDefId, saveOrUpdate } from '@/api/workflow/definitionConfig';
 import ProcessPreview from './components/processPreview.vue';
 import { listCategory } from '@/api/workflow/category';
 import { CategoryVO } from '@/api/workflow/category/types';
-import { ProcessDefinitionQuery, ProcessDefinitionVO } from '@/api/workflow/processDefinition/types';
+import { ProcessDefinitionQuery, FlowDefinitionVo } from '@/api/workflow/definition/types';
 import { DefinitionConfigForm } from '@/api/workflow/definitionConfig/types';
 import { UploadRequestOptions, ElMessage, ElMessageBox } from 'element-plus';
 
@@ -291,8 +291,8 @@ const multiple = ref(true);
 const showSearch = ref(true);
 const total = ref(0);
 const uploadDialogLoading = ref(false);
-const processDefinitionList = ref<ProcessDefinitionVO[]>([]);
-const processDefinitionHistoryList = ref<ProcessDefinitionVO[]>([]);
+const processDefinitionList = ref<FlowDefinitionVo[]>([]);
+const processDefinitionHistoryList = ref<FlowDefinitionVo[]>([]);
 const categoryOptions = ref<CategoryOption[]>([]);
 const categoryName = ref('');
 /** 部署文件分类选择 */
@@ -383,7 +383,7 @@ const handleSelectionChange = (selection: any) => {
 //分页
 const getList = async () => {
   loading.value = true;
-  const resp = await listProcessDefinition(queryParams.value);
+  const resp = await listDefinition(queryParams.value);
   processDefinitionList.value = resp.rows;
   total.value = resp.total;
   loading.value = false;
@@ -412,18 +412,18 @@ const clickPreview = async (id: string, type: PreviewType) => {
 };
 
 /** 删除按钮操作 */
-const handleDelete = async (row?: ProcessDefinitionVO) => {
+const handleDelete = async (row?: FlowDefinitionVo) => {
   const id = row?.id || ids.value;
   const deployIds = row?.deploymentId || deploymentIds.value;
   const defKeys = row?.key || keys.value;
   await proxy?.$modal.confirm('是否确认删除流程定义KEY为【' + defKeys + '】的数据项？');
   loading.value = true;
-  await deleteProcessDefinition(deployIds, id).finally(() => (loading.value = false));
+  await deleteDefinition(deployIds, id).finally(() => (loading.value = false));
   await getList();
   proxy?.$modal.msgSuccess('删除成功');
 };
 /** 挂起/激活 */
-const handleProcessDefState = async (row: ProcessDefinitionVO) => {
+const handleProcessDefState = async (row: FlowDefinitionVo) => {
   let msg: string;
   if (row.suspensionState === 1) {
     msg = `暂停后，此流程下的所有任务都不允许往后流转，您确定挂起【${row.name || row.key}】吗？`;
@@ -437,7 +437,7 @@ const handleProcessDefState = async (row: ProcessDefinitionVO) => {
   proxy?.$modal.msgSuccess('操作成功');
 };
 /** 流程定义转换为模型 */
-const handleConvertToModel = async (row: ProcessDefinitionVO) => {
+const handleConvertToModel = async (row: FlowDefinitionVo) => {
   await proxy?.$modal.confirm('是否确认转换流程定义key为【' + row.key + '】的数据项？');
   await convertToModel(row.id).finally(() => (loading.value = false));
   getList();
@@ -473,9 +473,9 @@ const handerDeployProcessFile = (data: UploadRequestOptions): XMLHttpRequest => 
   return;
 };
 //打开流程定义配置
-const handleDefinitionConfigOpen = async (row: ProcessDefinitionVO) => {
+const handleDefinitionConfigOpen = async (row: FlowDefinitionVo) => {
   definitionConfigDialog.visible = true;
-  definitionConfigForm.value.processKey = row.key;
+  definitionConfigForm.value.processKey = row.flowCode;
   definitionConfigForm.value.definitionId = row.id;
   definitionConfigForm.value.version = row.version;
   const resp = await getByDefId(row.id);

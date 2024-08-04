@@ -12,33 +12,20 @@ export interface ParticipantVo {
   candidateName: string[];
   claim: boolean;
 }
-
-export interface TaskVO extends BaseEntity {
-  id: string;
-  name: string;
-  description?: string;
-  priority: number;
-  owner?: string;
-  assignee?: string | number;
-  assigneeName?: string;
-  processInstanceId: string;
-  executionId: string;
-  taskDefinitionId?: any;
-  processDefinitionId: string;
-  endTime?: string;
-  taskDefinitionKey: string;
-  dueDate?: string;
-  category?: any;
-  parentTaskId?: any;
-  tenantId: string;
-  claimTime?: string;
-  businessStatus?: string;
-  businessStatusName?: string;
-  processDefinitionName?: string;
-  processDefinitionKey?: string;
-  participantVo?: ParticipantVo;
-  multiInstance?: boolean;
-  businessKey?: string;
+export interface FlowTaskVO {
+  id: string | number;
+  createTime?: Date;
+  updateTime?: Date;
+  tenantId?: string;
+  definitionId?: string;
+  instanceId: string;
+  flowName: string;
+  businessId: string;
+  nodeCode: string;
+  nodeName: string;
+  flowCode: string;
+  flowStatus: string;
+  nodeType: number;
   wfNodeConfigVo?: NodeConfigVO;
   wfDefinitionConfigVo?: DefinitionConfigVO;
 }
