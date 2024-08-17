@@ -69,10 +69,11 @@
                 <el-link type="primary" @click="clickPreview(scope.row.id, 'bpmn')">{{ scope.row.diagramResourceName }}</el-link>
               </template>
             </el-table-column>
-            <el-table-column align="center" prop="suspensionState" label="状态" width="80">
+            <el-table-column align="center" prop="isPublish" label="状态" width="80">
               <template #default="scope">
-                <el-tag v-if="scope.row.suspensionState == 1" type="success">激活</el-tag>
-                <el-tag v-else type="danger">挂起</el-tag>
+                <el-tag v-if="scope.row.isPublish == 0" type="danger">未发布</el-tag>
+                <el-tag v-else-if="scope.row.isPublish == 1" type="success">已发布</el-tag>
+                <el-tag v-else type="danger">失效</el-tag>
               </template>
             </el-table-column>
             <el-table-column align="center" prop="deploymentTime" label="部署时间" width="120" :show-overflow-tooltip="true"></el-table-column>
@@ -98,7 +99,13 @@
                     </el-button>
                   </el-col>
                   <el-col :span="1.5">
-                    <el-button link type="primary" size="small" icon="Document" @click="getProcessDefinitionHitoryList(scope.row.id, scope.row.key)">
+                    <el-button
+                      link
+                      type="primary"
+                      size="small"
+                      icon="Document"
+                      @click="getProcessDefinitionHitoryList(scope.row.id, scope.row.flowCode)"
+                    >
                       历史版本
                     </el-button>
                   </el-col>
@@ -152,7 +159,7 @@
           multiple
           accept="application/zip,application/xml,.bpmn"
           :before-upload="handlerBeforeUpload"
-          :http-request="handerDeployProcessFile"
+          :http-request="handlerImportDefinition"
         >
           <el-icon class="UploadFilled"><upload-filled /></el-icon>
           <div class="el-upload__text"><em>点击上传，选择BPMN流程文件</em></div>
@@ -172,7 +179,7 @@
         <el-table-column align="center" prop="version" label="版本号" width="90">
           <template #default="scope"> v{{ scope.row.version }}.0</template>
         </el-table-column>
-        <el-table-column align="center" prop="resourceName" label="流程XML" min-width="80" :show-overflow-tooltip="true">
+        <!-- <el-table-column align="center" prop="resourceName" label="流程XML" min-width="80" :show-overflow-tooltip="true">
           <template #default="scope">
             <el-link type="primary" @click="clickPreviewXML(scope.row.id)">{{ scope.row.resourceName }}</el-link>
           </template>
@@ -181,15 +188,16 @@
           <template #default="scope">
             <el-link type="primary" @click="clickPreviewImg(scope.row.id)">{{ scope.row.diagramResourceName }}</el-link>
           </template>
-        </el-table-column>
-        <el-table-column align="center" prop="suspensionState" label="状态" min-width="70">
+        </el-table-column> -->
+        <el-table-column align="center" prop="isPublish" label="状态" width="80">
           <template #default="scope">
-            <el-tag v-if="scope.row.suspensionState == 1" type="success">激活</el-tag>
-            <el-tag v-else type="danger">挂起</el-tag>
+            <el-tag v-if="scope.row.isPublish == 0" type="danger">未发布</el-tag>
+            <el-tag v-else-if="scope.row.isPublish == 1" type="success">已发布</el-tag>
+            <el-tag v-else type="danger">失效</el-tag>
           </template>
         </el-table-column>
         <el-table-column align="center" prop="deploymentTime" label="部署时间" :show-overflow-tooltip="true"></el-table-column>
-        <el-table-column fixed="right" label="操作" align="center" width="200" class-name="small-padding fixed-width">
+        <el-table-column fixed="right" label="操作" align="center" width="240" class-name="small-padding fixed-width">
           <template #default="scope">
             <el-row :gutter="10" class="mb8">
               <el-col :span="1.5">
@@ -205,6 +213,18 @@
               </el-col>
               <el-col :span="1.5">
                 <el-button type="text" size="small" icon="Tickets" @click="handleDefinitionConfigOpen(scope.row)">绑定业务</el-button>
+              </el-col>
+              <el-col :span="1.5">
+                <el-button
+                  v-if="scope.row.isPublish === 0 || scope.row.isPublish === 9"
+                  link
+                  type="primary"
+                  size="small"
+                  icon="CircleCheck"
+                  @click="handlePublish(scope.row)"
+                  >发布流程</el-button
+                >
+                <el-button v-else link type="primary" size="small" icon="CircleClose" @click="handleUnPublish(scope.row)">取消发布</el-button>
               </el-col>
             </el-row>
             <el-row :gutter="10" class="mb8">
@@ -258,8 +278,10 @@ import {
   deleteDefinition,
   updateDefinitionState,
   convertToModel,
-  deployProcessFile,
-  getListByKey
+  importDefinition,
+  getHisListByKey,
+  publish,
+  unPublish
 } from '@/api/workflow/definition';
 import { getByTableNameNotDefId, getByDefId, saveOrUpdate } from '@/api/workflow/definitionConfig';
 import ProcessPreview from './components/processPreview.vue';
@@ -319,7 +341,8 @@ const queryParams = ref<ProcessDefinitionQuery>({
   pageSize: 10,
   name: undefined,
   key: undefined,
-  categoryCode: undefined
+  categoryCode: undefined,
+  isPublish: 1
 });
 
 onMounted(() => {
@@ -392,7 +415,7 @@ const getList = async () => {
 const getProcessDefinitionHitoryList = async (id: string, key: string) => {
   processDefinitionDialog.visible = true;
   loading.value = true;
-  const resp = await getListByKey(key);
+  const resp = await getHisListByKey(key);
   if (resp.data && resp.data.length > 0) {
     processDefinitionHistoryList.value = resp.data.filter((item: any) => item.id !== id);
   }
@@ -414,13 +437,32 @@ const clickPreview = async (id: string, type: PreviewType) => {
 /** 删除按钮操作 */
 const handleDelete = async (row?: FlowDefinitionVo) => {
   const id = row?.id || ids.value;
-  const deployIds = row?.deploymentId || deploymentIds.value;
-  const defKeys = row?.key || keys.value;
-  await proxy?.$modal.confirm('是否确认删除流程定义KEY为【' + defKeys + '】的数据项？');
+  await proxy?.$modal.confirm('是否确认删除流程定义KEY为【' + row.flowCode + '】的数据项？');
   loading.value = true;
-  await deleteDefinition(deployIds, id).finally(() => (loading.value = false));
+  await deleteDefinition(id).finally(() => (loading.value = false));
   await getList();
   proxy?.$modal.msgSuccess('删除成功');
+};
+
+/** 发布流程定义 */
+const handlePublish = async (row?: FlowDefinitionVo) => {
+  const id = row?.id || ids.value;
+  await proxy?.$modal.confirm(
+    '是否确认发布流程定义KEY为【' + row.flowCode + '】版本为【' + row.version + '】的数据项？，发布后会将已发布流程定义改为失效！'
+  );
+  loading.value = true;
+  await publish(row.id).finally(() => (loading.value = false));
+  processDefinitionDialog.visible = false;
+  await getList();
+  proxy?.$modal.msgSuccess('发布成功');
+};
+/** 取消发布流程定义 */
+const handleUnPublish = async (row?: FlowDefinitionVo) => {
+  await proxy?.$modal.confirm('是否确认取消发布流程定义KEY为【' + row.flowCode + '】的数据项？');
+  loading.value = true;
+  await unPublish(row.id).finally(() => (loading.value = false));
+  await getList();
+  proxy?.$modal.msgSuccess('取消发布成功');
 };
 /** 挂起/激活 */
 const handleProcessDefState = async (row: FlowDefinitionVo) => {
@@ -456,12 +498,12 @@ const handlerBeforeUpload = () => {
   }
 };
 //部署文件
-const handerDeployProcessFile = (data: UploadRequestOptions): XMLHttpRequest => {
+const handlerImportDefinition = (data: UploadRequestOptions): XMLHttpRequest => {
   let formData = new FormData();
   uploadDialogLoading.value = true;
   formData.append('file', data.file);
   formData.append('categoryCode', selectCategory.value);
-  deployProcessFile(formData)
+  importDefinition(formData)
     .then(() => {
       uploadDialog.visible = false;
       proxy?.$modal.msgSuccess('部署成功');

@@ -3,6 +3,7 @@ export interface ProcessDefinitionQuery extends PageQuery {
   key?: string;
   name?: string;
   categoryCode?: string;
+  isPublish?: number;
 }
 
 export interface FlowDefinitionVo extends BaseEntity {

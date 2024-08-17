@@ -16,12 +16,12 @@ export const listDefinition = (query: definitionQuery): AxiosPromise<definitionV
 };
 /**
  * 按照流程定义key获取流程定义
- * @param processInstanceId 流程实例id
+ * @param flowCode 流程编码
  * @returns
  */
-export const getListByKey = (key: string) => {
+export const getHisListByKey = (flowCode: string) => {
   return request({
-    url: `/workflow/definition/getListByKey/${key}`,
+    url: `/workflow/definition/getHisListByKey/${flowCode}`,
     method: 'get'
   });
 };
@@ -50,13 +50,12 @@ export const definitionXml = (definitionId: string): AxiosPromise<definitionXmlV
 
 /**
  * 删除流程定义
- * @param deploymentId 部署id
- * @param definitionId 流程定义id
+ * @param id 流程定义id
  * @returns
  */
-export const deleteDefinition = (deploymentId: string | string[], definitionId: string | string[]) => {
+export const deleteDefinition = (id: string | string[]) => {
   return request({
-    url: `/workflow/definition/${deploymentId}/${definitionId}`,
+    url: `/workflow/definition/${id}`,
     method: 'delete'
   });
 };
@@ -89,9 +88,9 @@ export const convertToModel = (definitionId: string) => {
  * 通过zip或xml部署流程定义
  * @returns
  */
-export function deployProcessFile(data: any) {
+export function importDefinition(data: any) {
   return request({
-    url: '/workflow/definition/deployByFile',
+    url: '/workflow/definition/importDefinition',
     method: 'post',
     data: data,
     headers: {
@@ -109,6 +108,30 @@ export function deployProcessFile(data: any) {
 export const migrationDefinition = (currentdefinitionId: string, fromdefinitionId: string) => {
   return request({
     url: `/workflow/definition/migrationDefinition/${currentdefinitionId}/${fromdefinitionId}`,
+    method: 'put'
+  });
+};
+
+/**
+ * 发布流程定义
+ * @param id 流程定义id
+ * @returns
+ */
+export const publish = (id: string) => {
+  return request({
+    url: `/workflow/definition/publish/${id}`,
+    method: 'put'
+  });
+};
+
+/**
+ * 取消发布流程定义
+ * @param id 流程定义id
+ * @returns
+ */
+export const unPublish = (id: string) => {
+  return request({
+    url: `/workflow/definition/unPublish/${id}`,
     method: 'put'
   });
 };
