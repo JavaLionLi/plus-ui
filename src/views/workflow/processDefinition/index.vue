@@ -55,7 +55,7 @@
             <el-table-column type="selection" width="55" align="center" />
             <el-table-column align="center" type="index" label="序号" width="60"></el-table-column>
             <el-table-column align="center" prop="flowName" label="流程定义名称" :show-overflow-tooltip="true"></el-table-column>
-            <el-table-column align="center" prop="flowCode" label="标识KEY" width="120" :show-overflow-tooltip="true"></el-table-column>
+            <el-table-column align="center" prop="flowCode" label="标识KEY" :show-overflow-tooltip="true"></el-table-column>
             <el-table-column align="center" prop="version" label="版本号" width="80">
               <template #default="scope"> v{{ scope.row.version }}.0</template>
             </el-table-column>
@@ -166,7 +166,7 @@
       <el-table v-loading="loading" :data="processDefinitionHistoryList" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center" />
         <el-table-column align="center" type="index" label="序号" width="60"></el-table-column>
-        <el-table-column align="center" prop="flowName" label="流程定义名称" :show-overflow-tooltip="true" min-width="80"></el-table-column>
+        <el-table-column align="center" prop="flowName" label="流程定义名称" :show-overflow-tooltip="true"></el-table-column>
         <el-table-column align="center" prop="flowCode" label="标识KEY"></el-table-column>
         <el-table-column align="center" prop="version" label="版本号" width="90">
           <template #default="scope"> v{{ scope.row.version }}.0</template>
@@ -326,8 +326,8 @@ const queryParams = ref<ProcessDefinitionQuery>({
   pageSize: 10,
   name: undefined,
   key: undefined,
-  categoryCode: undefined
-  // isPublish: 1
+  categoryCode: undefined,
+  isPublish: 1
 });
 
 onMounted(() => {
