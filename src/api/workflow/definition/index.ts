@@ -65,9 +65,9 @@ export const deleteDefinition = (id: string | string[]) => {
  * @param definitionId 流程定义id
  * @returns
  */
-export const updateDefinitionState = (definitionId: string) => {
+export const updateDefinitionState = (definitionId: string, activityStatus: boolean) => {
   return request({
-    url: `/workflow/definition/updateDefinitionState/${definitionId}`,
+    url: `/workflow/definition/updateDefinitionState/${definitionId}/${activityStatus}`,
     method: 'put'
   });
 };

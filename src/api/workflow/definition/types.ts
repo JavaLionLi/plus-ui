@@ -12,6 +12,7 @@ export interface FlowDefinitionVo extends BaseEntity {
   flowCode: string;
   version: string;
   isPublish: number;
+  activityStatus: boolean;
   createTime: Date;
   updateTime: Date;
   wfDefinitionConfigVo: DefinitionConfigVO;

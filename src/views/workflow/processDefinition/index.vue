@@ -59,24 +59,19 @@
             <el-table-column align="center" prop="version" label="版本号" width="80">
               <template #default="scope"> v{{ scope.row.version }}.0</template>
             </el-table-column>
-            <el-table-column align="center" prop="resourceName" label="流程XML" width="100" :show-overflow-tooltip="true">
+            <el-table-column align="center" prop="isPublish" label="状态" width="130">
               <template #default="scope">
-                <el-link type="primary" @click="clickPreview(scope.row.id, 'xml')">{{ scope.row.resourceName }}</el-link>
+                <el-tag v-if="scope.row.activityStatus == 0" type="danger">挂起</el-tag>
+                <el-tag v-else-if="scope.row.activityStatus == 1" type="success">激活</el-tag>
               </template>
             </el-table-column>
-            <el-table-column align="center" prop="diagramResourceName" label="流程图片" width="100" :show-overflow-tooltip="true">
-              <template #default="scope">
-                <el-link type="primary" @click="clickPreview(scope.row.id, 'bpmn')">{{ scope.row.diagramResourceName }}</el-link>
-              </template>
-            </el-table-column>
-            <el-table-column align="center" prop="isPublish" label="状态" width="80">
+            <el-table-column align="center" prop="isPublish" label="发布状态" width="80">
               <template #default="scope">
                 <el-tag v-if="scope.row.isPublish == 0" type="danger">未发布</el-tag>
                 <el-tag v-else-if="scope.row.isPublish == 1" type="success">已发布</el-tag>
                 <el-tag v-else type="danger">失效</el-tag>
               </template>
             </el-table-column>
-            <el-table-column align="center" prop="deploymentTime" label="部署时间" width="120" :show-overflow-tooltip="true"></el-table-column>
             <el-table-column align="center" label="表名/表单KEY" width="120" :show-overflow-tooltip="true">
               <template #default="scope">
                 <span v-if="scope.row.wfDefinitionConfigVo">
@@ -92,10 +87,10 @@
                       link
                       type="primary"
                       size="small"
-                      :icon="scope.row.suspensionState === 1 ? 'Lock' : 'Unlock'"
+                      :icon="!scope.row.activityStatus ? 'Lock' : 'Unlock'"
                       @click="handleProcessDefState(scope.row)"
                     >
-                      {{ scope.row.suspensionState === 1 ? '挂起流程' : '激活流程' }}
+                      {{ scope.row.activityStatus ? '挂起流程' : '激活流程' }}
                     </el-button>
                   </el-col>
                   <el-col :span="1.5">
@@ -109,16 +104,13 @@
                       历史版本
                     </el-button>
                   </el-col>
-                  <el-col :span="1.5">
-                    <el-button link type="primary" size="small" icon="Delete" @click="handleDelete(scope.row)">删除</el-button>
-                  </el-col>
                 </el-row>
                 <el-row :gutter="10" class="mb8">
                   <el-col :span="1.5">
-                    <el-button link type="primary" size="small" icon="Sort" @click="handleConvertToModel(scope.row)"> 转换模型 </el-button>
+                    <el-button link type="primary" size="small" icon="Tickets" @click="handleDefinitionConfigOpen(scope.row)">绑定业务</el-button>
                   </el-col>
                   <el-col :span="1.5">
-                    <el-button link type="primary" size="small" icon="Tickets" @click="handleDefinitionConfigOpen(scope.row)">绑定业务</el-button>
+                    <el-button link type="primary" size="small" icon="Delete" @click="handleDelete(scope.row)">删除</el-button>
                   </el-col>
                 </el-row>
               </template>
@@ -179,16 +171,12 @@
         <el-table-column align="center" prop="version" label="版本号" width="90">
           <template #default="scope"> v{{ scope.row.version }}.0</template>
         </el-table-column>
-        <!-- <el-table-column align="center" prop="resourceName" label="流程XML" min-width="80" :show-overflow-tooltip="true">
+        <el-table-column align="center" prop="isPublish" label="挂起/激活" width="80">
           <template #default="scope">
-            <el-link type="primary" @click="clickPreviewXML(scope.row.id)">{{ scope.row.resourceName }}</el-link>
+            <el-tag v-if="scope.row.activityStatus == 0" type="danger">挂起</el-tag>
+            <el-tag v-else-if="scope.row.activityStatus == 1" type="success">激活</el-tag>
           </template>
         </el-table-column>
-        <el-table-column align="center" prop="diagramResourceName" label="流程图片" min-width="80" :show-overflow-tooltip="true">
-          <template #default="scope">
-            <el-link type="primary" @click="clickPreviewImg(scope.row.id)">{{ scope.row.diagramResourceName }}</el-link>
-          </template>
-        </el-table-column> -->
         <el-table-column align="center" prop="isPublish" label="状态" width="80">
           <template #default="scope">
             <el-tag v-if="scope.row.isPublish == 0" type="danger">未发布</el-tag>
@@ -205,15 +193,17 @@
                   link
                   type="primary"
                   size="small"
-                  :icon="scope.row.suspensionState === 1 ? 'Lock' : 'Unlock'"
+                  :icon="!scope.row.activityStatus ? 'Lock' : 'Unlock'"
                   @click="handleProcessDefState(scope.row)"
                 >
-                  {{ scope.row.suspensionState === 1 ? '挂起流程' : '激活流程' }}
+                  {{ scope.row.activityStatus ? '挂起流程' : '激活流程' }}
                 </el-button>
               </el-col>
               <el-col :span="1.5">
                 <el-button type="text" size="small" icon="Tickets" @click="handleDefinitionConfigOpen(scope.row)">绑定业务</el-button>
               </el-col>
+            </el-row>
+            <el-row :gutter="10" class="mb8">
               <el-col :span="1.5">
                 <el-button
                   v-if="scope.row.isPublish === 0 || scope.row.isPublish === 9"
@@ -225,11 +215,6 @@
                   >发布流程</el-button
                 >
                 <el-button v-else link type="primary" size="small" icon="CircleClose" @click="handleUnPublish(scope.row)">取消发布</el-button>
-              </el-col>
-            </el-row>
-            <el-row :gutter="10" class="mb8">
-              <el-col :span="1.5">
-                <el-button link type="primary" icon="Sort" size="small" @click="handleConvertToModel(scope.row)"> 转换模型 </el-button>
               </el-col>
               <el-col :span="1.5">
                 <el-button link type="primary" icon="Delete" size="small" @click="handleDelete(scope.row)">删除</el-button>
@@ -341,8 +326,8 @@ const queryParams = ref<ProcessDefinitionQuery>({
   pageSize: 10,
   name: undefined,
   key: undefined,
-  categoryCode: undefined,
-  isPublish: 1
+  categoryCode: undefined
+  // isPublish: 1
 });
 
 onMounted(() => {
@@ -467,22 +452,15 @@ const handleUnPublish = async (row?: FlowDefinitionVo) => {
 /** 挂起/激活 */
 const handleProcessDefState = async (row: FlowDefinitionVo) => {
   let msg: string;
-  if (row.suspensionState === 1) {
-    msg = `暂停后，此流程下的所有任务都不允许往后流转，您确定挂起【${row.name || row.key}】吗？`;
+  if (row.activityStatus) {
+    msg = `暂停后，此流程下的所有任务都不允许往后流转，您确定挂起【${row.flowName || row.flowCode}】吗？`;
   } else {
-    msg = `启动后，此流程下的所有任务都允许往后流转，您确定激活【${row.name || row.key}】吗？`;
+    msg = `启动后，此流程下的所有任务都允许往后流转，您确定激活【${row.flowName || row.flowCode}】吗？`;
   }
   await proxy?.$modal.confirm(msg);
   loading.value = true;
-  await updateDefinitionState(row.id).finally(() => (loading.value = false));
+  await updateDefinitionState(row.id, row.activityStatus).finally(() => (loading.value = false));
   await getList();
-  proxy?.$modal.msgSuccess('操作成功');
-};
-/** 流程定义转换为模型 */
-const handleConvertToModel = async (row: FlowDefinitionVo) => {
-  await proxy?.$modal.confirm('是否确认转换流程定义key为【' + row.key + '】的数据项？');
-  await convertToModel(row.id).finally(() => (loading.value = false));
-  getList();
   proxy?.$modal.msgSuccess('操作成功');
 };
 
