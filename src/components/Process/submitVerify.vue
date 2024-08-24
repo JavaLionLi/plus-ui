@@ -8,7 +8,7 @@
           <el-checkbox label="3" name="type">短信</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
-      <el-form-item v-if="task.businessStatus === 'waiting'" label="附件">
+      <el-form-item v-if="task.flowStatus === 1" label="附件">
         <fileUpload v-model="form.fileId" :file-type="['doc', 'xls', 'ppt', 'txt', 'pdf', 'xlsx', 'docx', 'zip']" :file-size="'20'" />
       </el-form-item>
       <el-form-item label="抄送">
@@ -17,33 +17,23 @@
           {{ user.userName }}
         </el-tag>
       </el-form-item>
-      <el-form-item v-if="task.businessStatus === 'waiting'" label="审批意见">
+      <el-form-item v-if="task.flowStatus === 1" label="审批意见">
         <el-input v-model="form.message" type="textarea" resize="none" />
       </el-form-item>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
         <el-button :disabled="buttonDisabled" type="primary" @click="handleCompleteTask"> 提交 </el-button>
-        <el-button v-if="task.businessStatus === 'waiting'" :disabled="buttonDisabled" type="primary" @click="openDelegateTask"> 委托 </el-button>
-        <el-button v-if="task.businessStatus === 'waiting'" :disabled="buttonDisabled" type="primary" @click="openTransferTask"> 转办 </el-button>
-        <el-button
-          v-if="task.businessStatus === 'waiting' && task.multiInstance"
-          :disabled="buttonDisabled"
-          type="primary"
-          @click="addMultiInstanceUser"
-        >
+        <el-button v-if="task.flowStatus === 1" :disabled="buttonDisabled" type="primary" @click="openDelegateTask"> 委托 </el-button>
+        <el-button v-if="task.flowStatus === 1" :disabled="buttonDisabled" type="primary" @click="openTransferTask"> 转办 </el-button>
+        <el-button v-if="task.flowStatus === 1 && task.multiInstance" :disabled="buttonDisabled" type="primary" @click="addMultiInstanceUser">
           加签
         </el-button>
-        <el-button
-          v-if="task.businessStatus === 'waiting' && task.multiInstance"
-          :disabled="buttonDisabled"
-          type="primary"
-          @click="deleteMultiInstanceUser"
-        >
+        <el-button v-if="task.flowStatus === 1 && task.multiInstance" :disabled="buttonDisabled" type="primary" @click="deleteMultiInstanceUser">
           减签
         </el-button>
-        <el-button v-if="task.businessStatus === 'waiting'" :disabled="buttonDisabled" type="danger" @click="handleTerminationTask"> 终止 </el-button>
-        <el-button v-if="task.businessStatus === 'waiting'" :disabled="buttonDisabled" type="danger" @click="handleBackProcessOpen"> 退回 </el-button>
+        <el-button v-if="task.flowStatus === 1" :disabled="buttonDisabled" type="danger" @click="handleTerminationTask"> 终止 </el-button>
+        <el-button v-if="task.flowStatus === 1" :disabled="buttonDisabled" type="danger" @click="handleBackProcessOpen"> 退回 </el-button>
         <el-button :disabled="buttonDisabled" @click="cancel">取消</el-button>
       </span>
     </template>
@@ -58,7 +48,7 @@
 
     <!-- 驳回开始 -->
     <el-dialog v-model="backVisible" draggable title="驳回" width="40%" :close-on-click-modal="false">
-      <el-form v-if="task.businessStatus === 'waiting'" v-loading="backLoading" :model="backForm" label-width="120px">
+      <el-form v-if="task.flowStatus === 1" v-loading="backLoading" :model="backForm" label-width="120px">
         <el-form-item label="驳回节点">
           <el-select v-model="backForm.targetActivityId" clearable placeholder="请选择" style="width: 300px">
             <el-option v-for="item in taskNodeList" :key="item.nodeId" :label="item.nodeName" :value="item.nodeId" />

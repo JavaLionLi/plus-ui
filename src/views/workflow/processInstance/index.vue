@@ -61,12 +61,12 @@
             <el-table-column align="center" type="index" label="序号" width="60"></el-table-column>
             <el-table-column :show-overflow-tooltip="true" align="center" label="流程定义名称">
               <template #default="scope">
-                <span>{{ scope.row.processDefinitionName }}v{{ scope.row.processDefinitionVersion }}.0</span>
+                <span>{{ scope.row.flowName }}v{{ scope.row.version }}</span>
               </template>
             </el-table-column>
-            <el-table-column align="center" prop="processDefinitionKey" label="流程定义KEY"></el-table-column>
+            <el-table-column align="center" prop="flowCode" label="流程定义KEY"></el-table-column>
             <el-table-column align="center" prop="processDefinitionVersion" label="版本号" width="90">
-              <template #default="scope"> v{{ scope.row.processDefinitionVersion }}.0</template>
+              <template #default="scope"> v{{ scope.row.version }}</template>
             </el-table-column>
             <el-table-column v-if="tab === 'running'" align="center" prop="isSuspended" label="状态" min-width="70">
               <template #default="scope">
@@ -151,7 +151,7 @@ import {
   deleteFinishAndHisInstance,
   deleteRunInstance
 } from '@/api/workflow/processInstance';
-import { getListByKey, migrationDefinition } from '@/api/workflow/definition';
+import { migrationDefinition } from '@/api/workflow/definition';
 import { listCategory } from '@/api/workflow/category';
 import { CategoryVO } from '@/api/workflow/category/types';
 import { ProcessInstanceQuery, ProcessInstanceVO } from '@/api/workflow/processInstance/types';

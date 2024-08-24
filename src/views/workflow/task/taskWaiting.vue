@@ -38,23 +38,21 @@
         </el-table-column>
         <el-table-column align="center" prop="flowCode" label="流程定义编码"></el-table-column>
         <el-table-column align="center" prop="nodeName" label="任务名称"></el-table-column>
-        <!-- <el-table-column align="center" prop="assigneeName" label="办理人">
+        <el-table-column align="center" prop="assigneeName" label="办理人">
           <template #default="scope">
-            <template v-if="scope.row.participantVo && scope.row.assignee === null">
-              <el-tag v-for="(item, index) in scope.row.participantVo.candidateName" :key="index" type="success">
-                {{ item }}
+            <template v-if="scope.row.userDTOList && scope.row.userDTOList.length > 0">
+              <el-tag v-for="(item, index) in scope.row.userDTOList" :key="index" type="success">
+                {{ item.nickName }}
               </el-tag>
             </template>
             <template v-else>
-              <el-tag type="success">
-                {{ scope.row.assigneeName || '无' }}
-              </el-tag>
+              <el-tag type="success"> 无 </el-tag>
             </template>
           </template>
-        </el-table-column> -->
+        </el-table-column>
         <el-table-column align="center" label="流程状态" min-width="70">
           <template #default="scope">
-            <dict-tag :options="wf_business_status" :value="scope.row.businessStatus"></dict-tag>
+            <dict-tag :options="wf_business_status" :value="scope.row.flowStatus"></dict-tag>
           </template>
         </el-table-column>
         <el-table-column align="center" prop="createTime" label="创建时间" width="160"></el-table-column>
