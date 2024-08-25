@@ -76,11 +76,11 @@
             </el-table-column>
             <el-table-column align="center" label="流程状态" min-width="70">
               <template #default="scope">
-                <dict-tag :options="wf_business_status" :value="scope.row.businessStatus"></dict-tag>
+                <dict-tag :options="wf_business_status" :value="scope.row.flowStatus"></dict-tag>
               </template>
             </el-table-column>
-            <el-table-column align="center" prop="startTime" label="启动时间" width="160"></el-table-column>
-            <el-table-column v-if="tab === 'finish'" align="center" prop="endTime" label="结束时间" width="160"></el-table-column>
+            <el-table-column align="center" prop="createTime" label="启动时间" width="160"></el-table-column>
+            <el-table-column v-if="tab === 'finish'" align="center" prop="updateTime" label="结束时间" width="160"></el-table-column>
             <el-table-column label="操作" align="center" :width="130">
               <template #default="scope">
                 <el-row v-if="tab === 'running'" :gutter="10" class="mb8">

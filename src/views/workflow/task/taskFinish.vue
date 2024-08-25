@@ -33,19 +33,19 @@
         <el-table-column align="center" type="index" label="序号" width="60"></el-table-column>
         <el-table-column :show-overflow-tooltip="true" align="center" label="流程定义名称">
           <template #default="scope">
-            <span>{{ scope.row.processDefinitionName }}v{{ scope.row.processDefinitionVersion }}.0</span>
+            <span>{{ scope.row.flowName }}v{{ scope.row.version }}</span>
           </template>
         </el-table-column>
-        <el-table-column align="center" prop="processDefinitionKey" label="流程定义KEY"></el-table-column>
-        <el-table-column align="center" prop="name" label="任务名称"></el-table-column>
-        <el-table-column align="center" prop="assigneeName" label="办理人">
+        <el-table-column align="center" prop="flowCode" label="流程定义编码"></el-table-column>
+        <el-table-column align="center" prop="nodeName" label="任务名称"></el-table-column>
+        <el-table-column align="center" prop="approverName" label="办理人">
           <template #default="scope">
             <el-tag type="success">
-              {{ scope.row.assigneeName || '无' }}
+              {{ scope.row.approverName || '无' }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column align="center" prop="startTime" label="创建时间" width="160"></el-table-column>
+        <el-table-column align="center" prop="createTime" label="创建时间" width="160"></el-table-column>
         <el-table-column label="操作" align="center" width="200">
           <template #default="scope">
             <el-button type="primary" size="small" icon="View" @click="handleView(scope.row)">查看</el-button>
@@ -123,7 +123,7 @@ const handleView = (row: TaskVO) => {
   const routerJumpVo = reactive<RouterJumpVo>({
     wfDefinitionConfigVo: row.wfDefinitionConfigVo,
     wfNodeConfigVo: row.wfNodeConfigVo,
-    businessKey: row.businessKey,
+    businessKey: row.businessId,
     taskId: row.id,
     type: 'view'
   });

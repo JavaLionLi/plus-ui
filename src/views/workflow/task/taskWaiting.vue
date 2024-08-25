@@ -33,7 +33,7 @@
         <el-table-column align="center" type="index" label="序号" width="60"></el-table-column>
         <el-table-column :show-overflow-tooltip="true" align="center" label="流程定义名称">
           <template #default="scope">
-            <span>{{ scope.row.processDefinitionName }}v{{ scope.row.processDefinitionVersion }}.0</span>
+            <span>{{ scope.row.flowName }}v{{ scope.row.version }}</span>
           </template>
         </el-table-column>
         <el-table-column align="center" prop="flowCode" label="流程定义编码"></el-table-column>
