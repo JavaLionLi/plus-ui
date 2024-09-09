@@ -19,13 +19,15 @@
       </el-form-item>
     </el-form>
     <el-row>
-      <el-table ref="tableRef" :data="dbTableList" height="260px" @row-click="clickRow" @selection-change="handleSelectionChange">
-        <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column prop="tableName" label="表名称" :show-overflow-tooltip="true"></el-table-column>
-        <el-table-column prop="tableComment" label="表描述" :show-overflow-tooltip="true"></el-table-column>
-        <el-table-column prop="createTime" label="创建时间"></el-table-column>
-        <el-table-column prop="updateTime" label="更新时间"></el-table-column>
-      </el-table>
+      <el-col :span="24">
+        <el-table ref="tableRef" :data="dbTableList" height="260px" @row-click="clickRow" @selection-change="handleSelectionChange">
+          <el-table-column type="selection" width="55"></el-table-column>
+          <el-table-column prop="tableName" label="表名称" :show-overflow-tooltip="true"></el-table-column>
+          <el-table-column prop="tableComment" label="表描述" :show-overflow-tooltip="true"></el-table-column>
+          <el-table-column prop="createTime" label="创建时间"></el-table-column>
+          <el-table-column prop="updateTime" label="更新时间"></el-table-column>
+        </el-table>
+      </el-col>
       <pagination v-show="total > 0" v-model:page="queryParams.pageNum" v-model:limit="queryParams.pageSize" :total="total" @pagination="getList" />
     </el-row>
     <template #footer>
