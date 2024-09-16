@@ -24,8 +24,8 @@
           <div v-show="showSearch" class="mb-[10px]">
             <el-card shadow="hover">
               <el-form v-show="showSearch" ref="queryFormRef" :model="queryParams" :inline="true" label-width="120px">
-                <el-form-item label="流程定义名称" prop="name">
-                  <el-input v-model="queryParams.name" placeholder="请输入流程定义名称" @keyup.enter="handleQuery" />
+                <el-form-item label="流程定义编码" prop="flowCode">
+                  <el-input v-model="queryParams.flowCode" placeholder="请输入流程定义编码" @keyup.enter="handleQuery" />
                 </el-form-item>
                 <el-form-item>
                   <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
@@ -46,14 +46,10 @@
             <el-table-column type="selection" width="55" align="center" />
             <el-table-column align="center" type="index" label="序号" width="60"></el-table-column>
             <el-table-column v-if="false" align="center" prop="id" label="id"></el-table-column>
-            <el-table-column :show-overflow-tooltip="true" align="center" label="流程定义名称">
-              <template #default="scope">
-                <span>{{ scope.row.processDefinitionName }}v{{ scope.row.processDefinitionVersion }}.0</span>
-              </template>
-            </el-table-column>
-            <el-table-column align="center" prop="processDefinitionKey" label="流程定义KEY"></el-table-column>
-            <el-table-column align="center" prop="processDefinitionVersion" label="版本号" width="90">
-              <template #default="scope"> v{{ scope.row.processDefinitionVersion }}.0</template>
+            <el-table-column :show-overflow-tooltip="true" prop="flowName" align="center" label="流程定义名称"> </el-table-column>
+            <el-table-column align="center" prop="flowCode" label="流程定义KEY"></el-table-column>
+            <el-table-column align="center" prop="version" label="版本号" width="90">
+              <template #default="scope"> v{{ scope.row.version }}</template>
             </el-table-column>
             <el-table-column v-if="tab === 'running'" align="center" prop="isSuspended" label="状态" min-width="70">
               <template #default="scope">
@@ -61,13 +57,8 @@
                 <el-tag v-else type="danger">挂起</el-tag>
               </template>
             </el-table-column>
-            <el-table-column align="center" label="流程状态" min-width="70">
-              <template #default="scope">
-                <dict-tag :options="wf_business_status" :value="scope.row.businessStatus"></dict-tag>
-              </template>
-            </el-table-column>
-            <el-table-column align="center" prop="startTime" label="启动时间" width="160"></el-table-column>
-            <el-table-column v-if="tab === 'finish'" align="center" prop="endTime" label="结束时间" width="160"></el-table-column>
+            <el-table-column align="center" prop="flowStatusName" label="流程状态" min-width="70"> </el-table-column>
+            <el-table-column align="center" prop="createTime" label="启动时间" width="160"></el-table-column>
             <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
               <template #default="scope">
                 <el-tooltip
@@ -123,7 +114,7 @@ const categoryTreeRef = ref<ElTreeInstance>();
 // 遮罩层
 const loading = ref(true);
 // 选中数组
-const businessKeys = ref<Array<any>>([]);
+const businessIds = ref<Array<any>>([]);
 // 非单个禁用
 const single = ref(true);
 // 非多个禁用
@@ -149,7 +140,7 @@ const tab = ref('running');
 const queryParams = ref<ProcessInstanceQuery>({
   pageNum: 1,
   pageSize: 10,
-  name: undefined,
+  flowCode: undefined,
   categoryCode: undefined
 });
 
@@ -204,7 +195,7 @@ const resetQuery = () => {
 };
 // 多选框选中数据
 const handleSelectionChange = (selection: ProcessInstanceVO[]) => {
-  businessKeys.value = selection.map((item: any) => item.businessKey);
+  businessIds.value = selection.map((item: any) => item.businessId);
   single.value = selection.length !== 1;
   multiple.value = !selection.length;
 };
@@ -220,7 +211,7 @@ const getList = () => {
 
 /** 删除按钮操作 */
 const handleDelete = async (row: ProcessInstanceVO) => {
-  const businessKey = row.businessKey || businessKeys.value;
+  const businessKey = row.businessId || businessIds.value;
   await proxy?.$modal.confirm('是否确认删除业务id为【' + businessKey + '】的数据项？');
   loading.value = true;
   if ('running' === tab.value) {
@@ -246,7 +237,7 @@ const handleOpen = async (row, type) => {
   const routerJumpVo = reactive<RouterJumpVo>({
     wfDefinitionConfigVo: row.wfDefinitionConfigVo,
     wfNodeConfigVo: row.wfNodeConfigVo,
-    businessKey: row.businessKey,
+    businessKey: row.businessId,
     taskId: row.id,
     type: type
   });

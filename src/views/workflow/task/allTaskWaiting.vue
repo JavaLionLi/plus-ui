@@ -42,40 +42,28 @@
       <el-table v-loading="loading" border :data="taskList" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center" />
         <el-table-column align="center" type="index" label="序号" width="60"></el-table-column>
-        <el-table-column :show-overflow-tooltip="true" align="center" label="流程定义名称">
+        <el-table-column :show-overflow-tooltip="true" prop="flowName" align="center" label="流程定义名称"> </el-table-column>
+        <el-table-column align="center" prop="flowCode" label="流程定义编码"></el-table-column>
+        <el-table-column align="center" prop="nodeName" label="任务名称"></el-table-column>
+        <el-table-column align="center" label="办理人">
           <template #default="scope">
-            <span>{{ scope.row.processDefinitionName }}v{{ scope.row.processDefinitionVersion }}.0</span>
-          </template>
-        </el-table-column>
-        <el-table-column align="center" prop="processDefinitionKey" label="流程定义KEY"></el-table-column>
-        <el-table-column align="center" prop="name" label="任务名称"></el-table-column>
-        <el-table-column align="center" prop="assigneeName" label="办理人">
-          <template v-if="tab === 'waiting'" #default="scope">
-            <template v-if="scope.row.participantVo && scope.row.assignee === null">
-              <el-tag v-for="(item, index) in scope.row.participantVo.candidateName" :key="index" type="success">
-                {{ item }}
-              </el-tag>
+            <template v-if="tab === 'waiting'">
+              <template v-if="scope.row.userDTOList && scope.row.userDTOList.length > 0">
+                <el-tag v-for="(item, index) in scope.row.userDTOList" :key="index" type="success">
+                  {{ item.nickName }}
+                </el-tag>
+              </template>
+              <template v-else>
+                <el-tag type="success"> 无 </el-tag>
+              </template>
             </template>
             <template v-else>
-              <el-tag type="success">
-                {{ scope.row.assigneeName || '无' }}
-              </el-tag>
+              <el-tag type="success"> {{ scope.row.approveName }} </el-tag>
             </template>
           </template>
-          <template v-else-if="tab === 'finish'" #default="scope">
-            <el-tag type="success">
-              {{ scope.row.assigneeName || '无' }}
-            </el-tag>
-          </template>
         </el-table-column>
-        <el-table-column align="center" label="流程状态" min-width="70">
-          <template #default="scope">
-            <dict-tag v-if="tab === 'waiting'" :options="wf_business_status" :value="scope.row.businessStatus"></dict-tag>
-            <el-tag v-else type="success">已完成</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column v-if="tab === 'waiting'" align="center" prop="createTime" label="创建时间" width="160"></el-table-column>
-        <el-table-column v-if="tab === 'finish'" align="center" prop="startTime" label="创建时间" width="160"></el-table-column>
+        <el-table-column align="center" label="流程状态" prop="flowStatusName" min-width="70"> </el-table-column>
+        <el-table-column align="center" prop="createTime" label="创建时间" width="160"></el-table-column>
         <el-table-column label="操作" align="center" :width="tab === 'finish' ? '80' : '151'">
           <template #default="scope">
             <el-row :gutter="10" class="mb8">

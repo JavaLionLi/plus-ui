@@ -1,27 +1,24 @@
-import { TaskVO } from '@/api/workflow/task/types';
+import { FlowTaskVO } from '@/api/workflow/task/types';
 
 export interface ProcessInstanceQuery extends PageQuery {
   categoryCode?: string;
-  name?: string;
-  key?: string;
-  startUserId?: string;
-  businessKey?: string;
+  flowCode?: string;
+  createBy?: string;
+  businessId?: string;
 }
 
 export interface ProcessInstanceVO extends BaseEntity {
   id: string;
-  processDefinitionId: string;
-  processDefinitionName: string;
-  processDefinitionKey: string;
-  processDefinitionVersion: string;
-  deploymentId: string;
-  businessKey: string;
-  isSuspended?: any;
+  definitionId: string;
+  flowNmae: string;
+  flowCode: string;
+  version: string;
+  businessId: string;
+  activityStatus?: any;
   tenantId: string;
-  startTime: string;
-  endTime?: string;
-  startUserId: string;
-  businessStatus: string;
-  businessStatusName: string;
-  taskVoList: TaskVO[];
+  createTime: string;
+  createBy: string;
+  flowStatus: string;
+  flowStatusName: string;
+  flowTaskList: FlowTaskVO[];
 }

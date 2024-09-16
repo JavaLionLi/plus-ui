@@ -31,14 +31,10 @@
       <el-table v-loading="loading" border :data="taskList" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center" />
         <el-table-column align="center" type="index" label="序号" width="60"></el-table-column>
-        <el-table-column :show-overflow-tooltip="true" align="center" label="流程定义名称">
-          <template #default="scope">
-            <span>{{ scope.row.flowName }}v{{ scope.row.version }}</span>
-          </template>
-        </el-table-column>
+        <el-table-column :show-overflow-tooltip="true" prop="flowName" align="center" label="流程定义名称"> </el-table-column>
         <el-table-column align="center" prop="flowCode" label="流程定义编码"></el-table-column>
         <el-table-column align="center" prop="nodeName" label="任务名称"></el-table-column>
-        <el-table-column align="center" prop="assigneeName" label="办理人">
+        <el-table-column align="center" label="办理人">
           <template #default="scope">
             <template v-if="scope.row.userDTOList && scope.row.userDTOList.length > 0">
               <el-tag v-for="(item, index) in scope.row.userDTOList" :key="index" type="success">
@@ -50,11 +46,7 @@
             </template>
           </template>
         </el-table-column>
-        <el-table-column align="center" label="流程状态" min-width="70">
-          <template #default="scope">
-            <dict-tag :options="wf_business_status" :value="scope.row.flowStatus"></dict-tag>
-          </template>
-        </el-table-column>
+        <el-table-column align="center" label="流程状态" prop="flowStatusName" min-width="70"> </el-table-column>
         <el-table-column align="center" prop="createTime" label="创建时间" width="160"></el-table-column>
         <el-table-column label="操作" align="center" width="200">
           <template #default="scope">
