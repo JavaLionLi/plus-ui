@@ -41,7 +41,7 @@
         <el-table-column align="center" prop="approverName" label="办理人">
           <template #default="scope">
             <el-tag type="success">
-              {{ scope.row.approverName || '无' }}
+              {{ scope.row.approveName || '无' }}
             </el-tag>
           </template>
         </el-table-column>
@@ -65,7 +65,7 @@
 
 <script lang="ts" setup>
 import { getPageByTaskFinish } from '@/api/workflow/task';
-import { TaskQuery, TaskVO } from '@/api/workflow/task/types';
+import { TaskQuery, FlowTaskVO } from '@/api/workflow/task/types';
 import workflowCommon from '@/api/workflow/workflowCommon';
 import { RouterJumpVo } from '@/api/workflow/workflowCommon/types';
 //审批记录组件
@@ -119,7 +119,7 @@ const getFinishList = () => {
   });
 };
 /** 查看按钮操作 */
-const handleView = (row: TaskVO) => {
+const handleView = (row: FlowTaskVO) => {
   const routerJumpVo = reactive<RouterJumpVo>({
     wfDefinitionConfigVo: row.wfDefinitionConfigVo,
     wfNodeConfigVo: row.wfNodeConfigVo,
