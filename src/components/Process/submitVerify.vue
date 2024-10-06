@@ -24,16 +24,16 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button :disabled="buttonDisabled" type="primary" @click="handleCompleteTask"> 提交 </el-button>
-        <el-button v-if="task.flowStatus === 1" :disabled="buttonDisabled" type="primary" @click="openDelegateTask"> 委托 </el-button>
-        <el-button v-if="task.flowStatus === 1" :disabled="buttonDisabled" type="primary" @click="openTransferTask"> 转办 </el-button>
-        <el-button v-if="task.flowStatus === 1 && task.multiInstance" :disabled="buttonDisabled" type="primary" @click="addMultiInstanceUser">
+        <el-button v-if="task.flowStatus === '1'" :disabled="buttonDisabled" type="primary" @click="openDelegateTask"> 委托 </el-button>
+        <el-button v-if="task.flowStatus === '1'" :disabled="buttonDisabled" type="primary" @click="openTransferTask"> 转办 </el-button>
+        <el-button v-if="task.flowStatus === '1' && task.multiInstance" :disabled="buttonDisabled" type="primary" @click="addMultiInstanceUser">
           加签
         </el-button>
-        <el-button v-if="task.flowStatus === 1 && task.multiInstance" :disabled="buttonDisabled" type="primary" @click="deleteMultiInstanceUser">
+        <el-button v-if="task.flowStatus === '1' && task.multiInstance" :disabled="buttonDisabled" type="primary" @click="deleteMultiInstanceUser">
           减签
         </el-button>
-        <el-button v-if="task.flowStatus === 1" :disabled="buttonDisabled" type="danger" @click="handleTerminationTask"> 终止 </el-button>
-        <el-button v-if="task.flowStatus === 1" :disabled="buttonDisabled" type="danger" @click="handleBackProcessOpen"> 退回 </el-button>
+        <el-button v-if="task.flowStatus === '1'" :disabled="buttonDisabled" type="danger" @click="handleTerminationTask"> 终止 </el-button>
+        <el-button v-if="task.flowStatus === '1'" :disabled="buttonDisabled" type="danger" @click="handleBackProcessOpen"> 退回 </el-button>
         <el-button :disabled="buttonDisabled" @click="cancel">取消</el-button>
       </span>
     </template>
@@ -48,10 +48,10 @@
 
     <!-- 驳回开始 -->
     <el-dialog v-model="backVisible" draggable title="驳回" width="40%" :close-on-click-modal="false">
-      <el-form v-if="task.flowStatus === 1" v-loading="backLoading" :model="backForm" label-width="120px">
+      <el-form v-if="task.flowStatus === '1'" v-loading="backLoading" :model="backForm" label-width="120px">
         <el-form-item label="驳回节点">
-          <el-select v-model="backForm.targetActivityId" clearable placeholder="请选择" style="width: 300px">
-            <el-option v-for="item in taskNodeList" :key="item.nodeId" :label="item.nodeName" :value="item.nodeId" />
+          <el-select v-model="backForm.nodeCode" clearable placeholder="请选择" style="width: 300px">
+            <el-option v-for="item in taskNodeList" :key="item.nodeCode" :label="item.nodeName" :value="item.nodeCode" />
           </el-select>
         </el-form-item>
         <el-form-item label="消息提醒">
@@ -80,12 +80,12 @@
 import { ref } from 'vue';
 import { ComponentInternalInstance } from 'vue';
 import { ElForm } from 'element-plus';
-import { completeTask, backProcess, getTaskById, transferTask, terminationTask, getTaskNodeList, delegateTask } from '@/api/workflow/task';
+import { completeTask, backProcess, getTaskById, transferTask, terminationTask, getBackTaskNode, delegateTask } from '@/api/workflow/task';
 import UserSelect from '@/components/UserSelect';
 import MultiInstanceUser from '@/components/Process/multiInstanceUser.vue';
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
 import { UserVO } from '@/api/system/user/types';
-import { TaskVO } from '@/api/workflow/task/types';
+import { FlowTaskVO } from '@/api/workflow/task/types';
 const userSelectCopyRef = ref<InstanceType<typeof UserSelect>>();
 const transferTaskRef = ref<InstanceType<typeof UserSelect>>();
 const delegateTaskRef = ref<InstanceType<typeof UserSelect>>();
@@ -116,33 +116,22 @@ const backButtonDisabled = ref(true);
 // 可驳回得任务节点
 const taskNodeList = ref([]);
 //任务
-const task = ref<TaskVO>({
+const task = ref<FlowTaskVO>({
   id: undefined,
-  name: undefined,
-  description: undefined,
-  priority: undefined,
-  owner: undefined,
-  assignee: undefined,
-  assigneeName: undefined,
-  processInstanceId: undefined,
-  executionId: undefined,
-  taskDefinitionId: undefined,
-  processDefinitionId: undefined,
-  endTime: undefined,
-  taskDefinitionKey: undefined,
-  dueDate: undefined,
-  category: undefined,
-  parentTaskId: undefined,
+  createTime: undefined,
+  updateTime: undefined,
   tenantId: undefined,
-  claimTime: undefined,
-  businessStatus: undefined,
-  businessStatusName: undefined,
-  processDefinitionName: undefined,
-  processDefinitionKey: undefined,
-  participantVo: undefined,
-  multiInstance: undefined,
-  businessKey: undefined,
-  wfNodeConfigVo: undefined
+  definitionId: undefined,
+  instanceId: undefined,
+  flowName: undefined,
+  businessId: undefined,
+  nodeCode: undefined,
+  nodeName: undefined,
+  flowCode: undefined,
+  flowStatus: undefined,
+  nodeType: undefined,
+  wfNodeConfigVo: undefined,
+  wfDefinitionConfigVo: undefined
 });
 //加签 减签标题
 const title = ref('');
@@ -160,7 +149,7 @@ const form = ref<Record<string, any>>({
 });
 const backForm = ref<Record<string, any>>({
   taskId: undefined,
-  targetActivityId: undefined,
+  nodeCode: undefined,
   message: undefined,
   variables: {},
   messageType: ['1']
@@ -226,11 +215,11 @@ const handleBackProcessOpen = async () => {
   backVisible.value = true;
   backLoading.value = true;
   backButtonDisabled.value = true;
-  let data = await getTaskNodeList(task.value.processInstanceId);
+  let data = await getBackTaskNode(task.value.instanceId);
   taskNodeList.value = data.data;
   backLoading.value = false;
   backButtonDisabled.value = false;
-  backForm.value.targetActivityId = taskNodeList.value[0].nodeId;
+  backForm.value.nodeCode = taskNodeList.value[0].nodeCode;
 };
 /** 驳回流程 */
 const handleBackProcess = async () => {

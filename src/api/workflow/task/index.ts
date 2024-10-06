@@ -220,9 +220,9 @@ export const getInstanceVariable = (taskId: string) => {
  * 获取可驳回得任务节点
  * @returns
  */
-export const getTaskNodeList = (processInstanceId: string) => {
+export const getBackTaskNode = (processInstanceId: string) => {
   return request({
-    url: `/workflow/task/getTaskNodeList/${processInstanceId}`,
+    url: `/workflow/task/getBackTaskNode/${processInstanceId}`,
     method: 'get'
   });
 };

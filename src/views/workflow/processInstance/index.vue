@@ -350,7 +350,7 @@ const handleView = (row) => {
   const routerJumpVo = reactive<RouterJumpVo>({
     wfDefinitionConfigVo: row.wfDefinitionConfigVo,
     wfNodeConfigVo: row.wfNodeConfigVo,
-    businessKey: row.businessKey,
+    businessKey: row.businessId,
     taskId: row.id,
     type: 'view'
   });
