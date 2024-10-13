@@ -203,8 +203,7 @@ const deleteReason = ref('');
 const queryParams = ref<ProcessInstanceQuery>({
   pageNum: 1,
   pageSize: 10,
-  name: undefined,
-  key: undefined,
+  flowCode: undefined,
   categoryCode: undefined
 });
 
@@ -307,11 +306,11 @@ const changeTab = async (data: string) => {
 };
 /** 作废按钮操作 */
 const handleInvalid = async (row: ProcessInstanceVO) => {
-  await proxy?.$modal.confirm('是否确认作废业务id为【' + row.businessKey + '】的数据项？');
+  await proxy?.$modal.confirm('是否确认作废业务id为【' + row.businessId + '】的数据项？');
   loading.value = true;
   if ('running' === tab.value) {
     let param = {
-      businessKey: row.businessKey,
+      businessKey: row.businessId,
       deleteReason: deleteReason.value
     };
     await deleteRunInstance(param).finally(() => (loading.value = false));
@@ -321,18 +320,6 @@ const handleInvalid = async (row: ProcessInstanceVO) => {
 };
 const cancelPopover = async (index: any) => {
   (proxy?.$refs[`popoverRef${index}`] as any).hide(); //关闭弹窗
-};
-//获取流程定义
-const getProcessDefinitionHitoryList = (id: string, key: string) => {
-  processDefinitionDialog.visible = true;
-  processDefinitionId.value = id;
-  loading.value = true;
-  getListByKey(key).then((resp) => {
-    if (resp.data && resp.data.length > 0) {
-      processDefinitionHistoryList.value = resp.data.filter((item: any) => item.id !== id);
-    }
-    loading.value = false;
-  });
 };
 //切换流程版本
 const handleChange = async (id: string) => {

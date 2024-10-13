@@ -27,16 +27,6 @@ export const getHisListByKey = (flowCode: string) => {
 };
 
 /**
- * 通过流程定义id获取流程图
- */
-export const definitionImage = (definitionId: string): AxiosPromise<any> => {
-  return request({
-    url: `/workflow/definition/definitionImage/${definitionId}` + '?t' + Math.random(),
-    method: 'get'
-  });
-};
-
-/**
  * 通过流程定义id获取xml
  * @param definitionId 流程定义id
  * @returns
@@ -73,18 +63,6 @@ export const updateDefinitionState = (definitionId: string, activityStatus: bool
 };
 
 /**
- * 流程定义转换为模型
- * @param definitionId 流程定义id
- * @returns
- */
-export const convertToModel = (definitionId: string) => {
-  return request({
-    url: `/workflow/definition/convertToModel/${definitionId}`,
-    method: 'put'
-  });
-};
-
-/**
  * 通过zip或xml部署流程定义
  * @returns
  */
@@ -98,19 +76,6 @@ export function importDefinition(data: any) {
     }
   });
 }
-
-/**
- * 迁移流程
- * @param currentdefinitionId
- * @param fromdefinitionId
- * @returns
- */
-export const migrationDefinition = (currentdefinitionId: string, fromdefinitionId: string) => {
-  return request({
-    url: `/workflow/definition/migrationDefinition/${currentdefinitionId}/${fromdefinitionId}`,
-    method: 'put'
-  });
-};
 
 /**
  * 发布流程定义
@@ -133,5 +98,17 @@ export const unPublish = (id: string) => {
   return request({
     url: `/workflow/definition/unPublish/${id}`,
     method: 'put'
+  });
+};
+
+/**
+ * 获取流程定义xml字符串
+ * @param id 流程定义id
+ * @returns
+ */
+export const xmlString = (id: string) => {
+  return request({
+    url: `/workflow/definition/xmlString/${id}`,
+    method: 'get'
   });
 };

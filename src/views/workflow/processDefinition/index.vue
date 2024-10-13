@@ -112,6 +112,9 @@
                   <el-col :span="1.5">
                     <el-button link type="primary" size="small" icon="Delete" @click="handleDelete(scope.row)">删除</el-button>
                   </el-col>
+                  <el-col :span="1.5">
+                    <el-button link type="primary" icon="Delete" size="small" @click="design(scope.row)">设计</el-button>
+                  </el-col>
                 </el-row>
               </template>
             </el-table-column>
@@ -531,6 +534,14 @@ const handlerSaveForm = async () => {
           getList();
         }
       });
+    }
+  });
+};
+const design = async (row: FlowDefinitionVo) => {
+  proxy.$router.push({
+    path: `/workflow/modelDesign/index`,
+    query: {
+      id: row.id
     }
   });
 };

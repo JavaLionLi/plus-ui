@@ -11,6 +11,17 @@ export const listDept = (query?: DeptQuery) => {
   });
 };
 
+/**
+ * 通过deptIds查询部门
+ * @param deptIds
+ */
+export const optionSelect = (deptIds: (number | string)[]): AxiosPromise<DeptVO[]> => {
+  return request({
+    url: '/system/dept/optionselect?deptIds=' + deptIds,
+    method: 'get'
+  });
+};
+
 // 查询部门列表（排除节点）
 export const listDeptExcludeChild = (deptId: string | number): AxiosPromise<DeptVO[]> => {
   return request({
