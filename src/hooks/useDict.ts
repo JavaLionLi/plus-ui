@@ -11,10 +11,10 @@ export function useDict(...types: string[]) {
     queryKey: ['dict', dictTypeKey],
     queryFn: () => loadDicts(dictTypes),
     enabled: dictTypes.length > 0,
-    initialData: {},
+    placeholderData: {},
     staleTime: 10 * 60 * 1000,
     gcTime: 30 * 60 * 1000
   });
 
-  return data;
+  return data || {};
 }
