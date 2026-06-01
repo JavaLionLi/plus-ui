@@ -1,0 +1,168 @@
+﻿.layout-action-button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+}
+
+.layout-brand-link {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  height: 100%;
+  color: var(--layout-nav-title-react, #172033) !important;
+  text-decoration: none;
+}
+
+.layout-brand-title {
+  min-width: 0;
+  margin-left: 8px;
+  overflow: hidden;
+  color: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ant-pro-layout .ant-pro-layout-header,
+.ant-pro-layout .ant-layout-header.ant-pro-layout-header,
+.ant-pro-layout .ant-pro-sider,
+.ant-pro-layout .ant-layout-sider,
+.ant-pro-layout .ant-layout-sider-children,
+.ant-pro-layout .ant-pro-top-nav-header,
+.ant-pro-layout .ant-pro-top-nav-header-main {
+  color: var(--layout-nav-text-react, #5d6b82) !important;
+  background: var(--layout-nav-bg-react, #fff) !important;
+}
+
+.ant-pro-layout .ant-pro-layout-header {
+  border-bottom-color: var(--layout-nav-border-react, #edf0f5) !important;
+}
+
+.ant-pro-layout .ant-pro-layout-header .layout-action-button,
+.ant-pro-layout .ant-pro-layout-header .message-box-trigger,
+.ant-pro-layout .ant-pro-layout-header .message-box-trigger .anticon,
+.ant-pro-layout .ant-pro-global-header-header-actions-avatar,
+.ant-pro-layout .ant-pro-global-header-header-actions-avatar *,
+.ant-pro-layout .ant-pro-top-nav-header-header-actions-avatar,
+.ant-pro-layout .ant-pro-top-nav-header-header-actions-avatar * {
+  color: var(--layout-nav-text-react, #5d6b82) !important;
+}
+
+.ant-pro-layout .ant-pro-layout-header .layout-action-button:hover,
+.ant-pro-layout .ant-pro-layout-header .layout-action-button:focus-visible,
+.ant-pro-layout .ant-pro-layout-header .message-box-trigger:hover,
+.ant-pro-layout .ant-pro-global-header-header-actions-avatar:hover,
+.ant-pro-layout .ant-pro-top-nav-header-header-actions-avatar:hover {
+  color: var(--layout-nav-title-react, #172033) !important;
+  background: var(--layout-nav-action-hover-bg-react, rgba(23, 32, 51, 0.04)) !important;
+}
+
+.ant-pro-layout .ant-pro-layout-header .ant-badge-count {
+  box-shadow: 0 0 0 1px var(--layout-nav-badge-shadow-react, #fff);
+}
+
+.ant-pro-layout .ant-pro-sider-logo,
+.ant-pro-layout .ant-pro-global-header-logo,
+.ant-pro-layout .ant-pro-top-nav-header-logo,
+.ant-pro-layout #logo {
+  color: var(--layout-nav-title-react, #172033) !important;
+}
+
+.ant-pro-layout .ant-pro-sider .ant-menu,
+.ant-pro-layout .ant-pro-sider .ant-menu-submenu-title,
+.ant-pro-layout .ant-pro-sider .ant-menu-item,
+.ant-pro-layout .ant-pro-sider .layout-menu-link,
+.ant-pro-layout .ant-pro-layout-header .ant-menu,
+.ant-pro-layout .ant-pro-layout-header .ant-menu-submenu-title,
+.ant-pro-layout .ant-pro-layout-header .ant-menu-item,
+.ant-pro-layout .ant-pro-layout-header .layout-menu-link,
+.ant-pro-layout .ant-pro-top-nav-header .ant-menu,
+.ant-pro-layout .ant-pro-top-nav-header .ant-menu-submenu-title,
+.ant-pro-layout .ant-pro-top-nav-header .ant-menu-item,
+.ant-pro-layout .ant-pro-top-nav-header .layout-menu-link {
+  color: var(--layout-nav-text-react, #5d6b82) !important;
+}
+
+.ant-pro-layout .ant-pro-sider .ant-menu-submenu-selected > .ant-menu-submenu-title,
+.ant-pro-layout .ant-pro-sider .ant-menu-submenu-open > .ant-menu-submenu-title,
+.ant-pro-layout .ant-pro-sider .ant-menu-item-selected,
+.ant-pro-layout .ant-pro-sider .ant-menu-item-selected .layout-menu-link,
+.ant-pro-layout .ant-pro-sider .ant-menu-item:hover,
+.ant-pro-layout .ant-pro-sider .ant-menu-submenu-title:hover,
+.ant-pro-layout .ant-pro-layout-header .ant-menu-submenu-selected > .ant-menu-submenu-title,
+.ant-pro-layout .ant-pro-layout-header .ant-menu-submenu-open > .ant-menu-submenu-title,
+.ant-pro-layout .ant-pro-layout-header .ant-menu-item-selected,
+.ant-pro-layout .ant-pro-layout-header .ant-menu-item-selected .layout-menu-link,
+.ant-pro-layout .ant-pro-layout-header .ant-menu-item:hover,
+.ant-pro-layout .ant-pro-layout-header .ant-menu-submenu-title:hover,
+.ant-pro-layout .ant-pro-top-nav-header .ant-menu-submenu-selected > .ant-menu-submenu-title,
+.ant-pro-layout .ant-pro-top-nav-header .ant-menu-submenu-open > .ant-menu-submenu-title,
+.ant-pro-layout .ant-pro-top-nav-header .ant-menu-item-selected,
+.ant-pro-layout .ant-pro-top-nav-header .ant-menu-item-selected .layout-menu-link,
+.ant-pro-layout .ant-pro-top-nav-header .ant-menu-item:hover,
+.ant-pro-layout .ant-pro-top-nav-header .ant-menu-submenu-title:hover {
+  color: var(--layout-nav-active-text-react, #409eff) !important;
+}
+
+.ant-pro-layout .ant-pro-sider .ant-menu-item-selected,
+.ant-pro-layout .ant-pro-layout-header .ant-menu-item-selected,
+.ant-pro-layout .ant-pro-top-nav-header .ant-menu-item-selected {
+  background: var(--layout-nav-menu-selected-bg-react, #eaf3ff) !important;
+}
+
+.ant-pro-layout .ant-pro-sider .ant-menu-item:not(.ant-menu-item-selected):hover,
+.ant-pro-layout .ant-pro-sider .ant-menu-submenu-title:hover,
+.ant-pro-layout .ant-pro-layout-header .ant-menu-item:not(.ant-menu-item-selected):hover,
+.ant-pro-layout .ant-pro-layout-header .ant-menu-submenu-title:hover,
+.ant-pro-layout .ant-pro-top-nav-header .ant-menu-item:not(.ant-menu-item-selected):hover,
+.ant-pro-layout .ant-pro-top-nav-header .ant-menu-submenu-title:hover {
+  background: var(--layout-nav-menu-hover-bg-react, rgba(23, 32, 51, 0.04)) !important;
+}
+
+html.dark .page-surface,
+html.dark .tree-panel,
+html.dark .table-panel,
+html.dark .tags-view-react,
+html.dark .tags-context-menu-react,
+html.dark .permission-tree,
+html.dark .rich-editor-shell,
+html.dark .cache-overview-table-react,
+html.dark .user-select-tree-react,
+html.dark .user-select-main-react {
+  color: var(--app-text-react);
+  background: var(--app-surface-react);
+  border-color: var(--app-border-react) !important;
+}
+
+html.dark .tags-item-react,
+html.dark .tags-nav-btn-react,
+html.dark .tags-action-btn-react,
+html.dark .tags-refresh-btn-react,
+html.dark .right-toolbar-react .ant-btn-circle,
+html.dark .tree-panel-react.is-collapsed .ant-btn,
+html.dark .icon-select-item-react,
+html.dark .preview-box-react,
+html.dark .image-preview-empty,
+html.dark .cache-overview-label-react {
+  color: var(--app-text-secondary-react);
+  background: var(--app-surface-muted-react);
+  border-color: var(--app-border-react) !important;
+}
+
+html.dark .tags-item-react.active,
+html.dark .dict-row-current > td,
+html.dark .icon-select-item-react.active {
+  color: var(--layout-primary-react, #409eff);
+  background: var(--app-primary-soft-react);
+  border-color: var(--layout-primary-react, #409eff) !important;
+}
+
+html.dark .layout-settings-title,
+html.dark .layout-settings-row,
+html.dark .tree-panel-title,
+html.dark .notice-detail-content,
+html.dark .cache-overview-table-react td,
+html.dark .preview-box-react {
+  color: var(--app-text-react);
+}

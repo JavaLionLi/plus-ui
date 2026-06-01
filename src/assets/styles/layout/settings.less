@@ -1,0 +1,121 @@
+﻿.layout-logo-mark {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  background: transparent;
+  border-radius: 0;
+}
+
+.layout-header-static-react .ant-pro-layout-container > .ant-layout-header:not(.ant-pro-layout-header) {
+  display: none;
+}
+
+.layout-header-static-react .ant-layout-header.ant-pro-layout-header-fixed-header {
+  position: relative;
+  inset-block-start: auto;
+  inset-inline-end: auto;
+  z-index: 19;
+}
+
+.layout-settings-drawer .ant-drawer-body {
+  padding: 18px;
+}
+
+.layout-settings-title {
+  margin: 0 0 12px;
+  color: var(--app-text-react);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.layout-settings-title:not(:first-child) {
+  margin-top: 22px;
+}
+
+.layout-theme-preview {
+  margin-bottom: 10px;
+}
+
+.layout-theme-card {
+  position: relative;
+  width: 56px;
+  height: 48px;
+  overflow: hidden;
+  color: var(--layout-primary-react, #409eff);
+  background: var(--app-surface-muted-react);
+  border: 2px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.layout-theme-card::before,
+.layout-theme-card::after {
+  position: absolute;
+  content: '';
+}
+
+.layout-theme-card::before {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 14px;
+}
+
+.layout-theme-card::after {
+  top: 14px;
+  left: 0;
+  width: 18px;
+  height: 34px;
+}
+
+.layout-theme-card.dark::before,
+.layout-theme-card.dark::after {
+  background: var(--app-text-react);
+}
+
+.layout-theme-card.light::before {
+  background: var(--app-surface-react);
+  border-bottom: 1px solid var(--app-border-react);
+}
+
+.layout-theme-card.light::after {
+  background: var(--app-surface-react);
+  border-right: 1px solid var(--app-border-react);
+}
+
+.layout-theme-card.active {
+  border-color: var(--layout-primary-react, #409eff);
+}
+
+.layout-theme-card .anticon {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  z-index: 1;
+}
+
+.layout-settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  color: var(--app-text-react);
+  font-size: 14px;
+  border-bottom: 1px solid var(--app-border-react);
+}
+
+.layout-settings-control {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 120px;
+}
+
+.layout-color-input {
+  width: 42px;
+  padding: 3px;
+}
+
+.layout-radius-slider {
+  width: 128px;
+  margin: 0;
+}

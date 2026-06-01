@@ -1,0 +1,82 @@
+﻿.icon-select-custom-react {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.icon-select-list-react {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
+  gap: 8px;
+  max-height: 220px;
+  padding: 4px;
+  margin-top: 12px;
+  overflow: auto;
+}
+
+.icon-select-item-react {
+  display: grid;
+  min-height: 42px;
+  place-items: center;
+  color: var(--app-text-secondary-react);
+  background: var(--app-surface-react);
+  border: 1px solid var(--app-border-react);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.icon-select-item-react:hover,
+.icon-select-item-react.active {
+  color: var(--app-link-react);
+  background: var(--app-primary-soft-react);
+  border-color: var(--app-link-border-react);
+}
+
+.user-select-react {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 12px;
+  min-height: 480px;
+}
+
+.user-select-react.is-tree-collapsed {
+  grid-template-columns: 64px minmax(0, 1fr);
+}
+
+.user-select-tree-react,
+.user-select-main-react {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--app-border-react);
+  border-radius: 8px;
+}
+
+.user-select-tree-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.user-select-search-react {
+  row-gap: 10px;
+  margin-bottom: 12px;
+}
+
+.user-select-tags-react {
+  margin-bottom: 10px;
+}
+
+.role-select-react {
+  min-height: 480px;
+}
+
+.role-select-search-react {
+  row-gap: 10px;
+  margin-bottom: 12px;
+}
+
+.role-select-tags-react {
+  margin-bottom: 10px;
+}

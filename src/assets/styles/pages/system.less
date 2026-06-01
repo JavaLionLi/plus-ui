@@ -1,0 +1,128 @@
+﻿.tree-table-page {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 16px;
+}
+
+.tree-table-page:has(.tree-panel-react.is-collapsed) {
+  grid-template-columns: 48px minmax(0, 1fr);
+}
+
+.tree-panel,
+.table-panel {
+  min-width: 0;
+}
+
+.tree-panel {
+  padding: 16px;
+  background: var(--app-surface-react);
+  border: 1px solid var(--app-border-react);
+  border-radius: 8px;
+}
+
+.tree-panel-title {
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.tree-panel .ant-tree {
+  margin-top: 12px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 16px;
+}
+
+.permission-tree {
+  max-height: 360px;
+  padding: 8px;
+  overflow: auto;
+  border: 1px solid var(--app-border-react);
+  border-radius: 8px;
+}
+
+.permission-tree .ant-tree-node-content-wrapper {
+  min-width: 0;
+  flex: 1;
+}
+
+.menu-permission-row {
+  display: grid;
+  grid-template-columns: minmax(160px, 0.8fr) minmax(260px, 1.2fr);
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+}
+
+.menu-permission-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menu-permission-name.is-hidden {
+  color: var(--app-text-muted-react);
+}
+
+.menu-permission-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 5px;
+  color: var(--app-text-muted-react);
+  font-size: 12px;
+  line-height: 18px;
+  background: var(--app-surface-muted-react);
+  border: 1px solid var(--app-border-strong-react);
+  border-radius: 4px;
+}
+
+.menu-permission-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+.menu-permission-buttons .ant-checkbox-wrapper {
+  margin-inline-start: 0;
+}
+
+.dict-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.dict-panel {
+  min-width: 0;
+}
+
+.dict-row-current > td {
+  background: var(--app-primary-soft-react) !important;
+}
+
+.notice-detail h2 {
+  margin: 0 0 16px;
+  font-size: 22px;
+  line-height: 1.4;
+}
+
+.notice-detail-content {
+  max-height: 60vh;
+  margin-top: 16px;
+  padding-top: 16px;
+  overflow: auto;
+  color: var(--app-text-react);
+  font-family: inherit;
+  line-height: 1.8;
+  white-space: normal;
+  word-break: break-word;
+  border-top: 1px solid var(--app-border-react);
+}
+
+.notice-detail-content img,
+.notice-detail-content video {
+  max-width: 100%;
+}

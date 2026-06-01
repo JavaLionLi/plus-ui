@@ -1,0 +1,144 @@
+﻿.result-page {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  background: #f5f7fb;
+}
+
+.home-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.home-hero {
+  padding: 30px;
+  background:
+    radial-gradient(circle at top left, var(--app-link-soft-react), transparent 30%), var(--app-surface-react);
+  border: 1px solid var(--app-border-react);
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(23, 32, 51, 0.05);
+}
+
+.home-hero h1 {
+  margin: 0 0 14px;
+  color: var(--app-text-react);
+  font-size: 42px;
+  line-height: 1.08;
+}
+
+.home-hero p {
+  max-width: 760px;
+  margin: 0 0 22px;
+  color: var(--app-text-secondary-react);
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.home-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+  gap: 20px;
+}
+
+.home-product-list,
+.home-capability-list {
+  display: grid;
+  gap: 16px;
+}
+
+.home-product-card,
+.home-capability-card {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  background: var(--app-surface-muted-react);
+  border: 1px solid var(--app-border-react);
+  border-radius: 8px;
+}
+
+.home-product-top {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.home-product-top h3,
+.home-capability-card h3 {
+  margin: 0 0 8px;
+  color: var(--app-text-react);
+}
+
+.home-product-top p {
+  margin: 0;
+  color: var(--app-text-secondary-react);
+  line-height: 1.8;
+}
+
+.home-product-top span {
+  flex-shrink: 0;
+  padding: 6px 10px;
+  color: var(--app-link-react);
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--app-link-soft-react);
+  border-radius: 999px;
+}
+
+.home-capability-card ul {
+  display: grid;
+  gap: 10px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.home-capability-card li {
+  position: relative;
+  padding-left: 16px;
+  color: var(--app-text-secondary-react);
+  line-height: 1.7;
+}
+
+.home-capability-card li::before {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  content: '';
+  background: var(--app-link-react);
+  border-radius: 50%;
+}
+
+.captcha-row {
+  display: grid;
+  grid-template-columns: 1fr 116px;
+  gap: 8px;
+}
+
+.captcha-image {
+  height: 40px;
+  object-fit: cover;
+}
+
+.captcha-button {
+  height: 40px;
+  padding: 0;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.dynamic-placeholder-title {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
+.dynamic-placeholder-path {
+  color: #697386;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}

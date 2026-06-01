@@ -1,0 +1,11 @@
+{
+  "extends": "./src/.umi/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./src/.umi",
+    "ignoreDeprecations": "6.0",
+    "strict": true,
+    "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": false,
+    "exactOptionalPropertyTypes": false
+  }
+}
