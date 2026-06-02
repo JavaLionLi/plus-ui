@@ -71,6 +71,8 @@ const iconOptions: Array<[string, IconComponent]> = [
   ['ai', RobotOutlined]
 ];
 
+const getIconTooltipContainer = (triggerNode: HTMLElement) => triggerNode.parentElement ?? document.body;
+
 export interface IconSelectProps {
   value?: string;
   onChange?: (value: string) => void;
@@ -125,7 +127,13 @@ export default function IconSelect({ value, onChange, width = '100%' }: IconSele
           <div className="icon-select-list-react">
             {matchedIcons.map(([name, Icon]) => {
               return (
-                <Tooltip key={name} title={name}>
+                <Tooltip
+                  key={name}
+                  title={name}
+                  placement="bottom"
+                  getPopupContainer={getIconTooltipContainer}
+                  styles={{ root: { pointerEvents: 'none' } }}
+                >
                   <button
                     type="button"
                     className={`icon-select-item-react${value === name ? ' active' : ''}`}
