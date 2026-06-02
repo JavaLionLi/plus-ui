@@ -211,14 +211,6 @@ export default function AiChatPage() {
   }, [agents, currentAgentId]);
 
   useEffect(() => {
-    abortRef.current?.abort();
-    finishSending();
-    if (!currentConversationId) {
-      setMessages([]);
-    }
-  }, [currentConversationId, finishSending]);
-
-  useEffect(() => {
     if (currentConversationId && conversationMessagesQuery.data && !sending) {
       setMessages(conversationMessagesQuery.data);
     }
@@ -242,15 +234,41 @@ export default function AiChatPage() {
   );
 
   const selectAgent = (agentId: string | number) => {
-    setCurrentAgentId(Number(agentId));
+    const nextAgentId = Number(agentId);
+    if (currentAgentId === nextAgentId) return;
+    abortRef.current?.abort();
+    finishSending();
+    setCurrentAgentId(nextAgentId);
     setCurrentConversationId('');
+    setMessages([]);
+  };
+
+  const startNewConversation = () => {
+    abortRef.current?.abort();
+    finishSending();
+    setCurrentConversationId('');
+    setMessages([]);
+  };
+
+  const selectConversation = (conversationId: string | number) => {
+    const nextConversationId = String(conversationId);
+    if (currentConversationId === nextConversationId) return;
+    abortRef.current?.abort();
+    finishSending();
+    setCurrentConversationId(nextConversationId);
+    setMessages([]);
   };
 
   const removeConversation = async (conversationId: string) => {
     if (!currentAgent) return;
     await deleteConversation(currentAgent.id, conversationId);
     message.success('删除成功');
-    if (currentConversationId === conversationId) setCurrentConversationId('');
+    if (currentConversationId === conversationId) {
+      abortRef.current?.abort();
+      finishSending();
+      setCurrentConversationId('');
+      setMessages([]);
+    }
     await refreshConversationData(currentAgent.id);
   };
 
@@ -390,7 +408,7 @@ export default function AiChatPage() {
                 block
                 icon={<PlusOutlined />}
                 disabled={!agents.length}
-                onClick={() => setCurrentConversationId('')}
+                onClick={startNewConversation}
               >
                 新对话
               </Button>
@@ -416,7 +434,7 @@ export default function AiChatPage() {
                     className="ai-chat-conversations"
                     items={conversationItems}
                     activeKey={currentConversationId}
-                    onActiveChange={key => setCurrentConversationId(String(key))}
+                    onActiveChange={selectConversation}
                     menu={item => ({
                       items: [{ key: 'delete', label: '删除', icon: <DeleteOutlined />, danger: true }],
                       onClick: ({ domEvent }) => {
