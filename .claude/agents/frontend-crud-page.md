@@ -9,7 +9,7 @@ description: 前端标准 React CRUD 页面专家。用于当前 plus-ui-react �
 
 1. 先看当前模块最近似页面。
 2. 再参考 `.codex/skills/frontend-crud-coding/references/frontend.md`。
-3. 维护或新增生成能力时，优先参考当前仓库 `gen/api.ts.vm`、`gen/types.ts.vm`、`gen/index.vue.vm`、`gen/index-tree.vue.vm`。
+3. 维护或新增生成能力时，优先参考当前仓库 `gen/api.ts.vm`、`gen/types.ts.vm`、`gen/index.tsx.vm`、`gen/index-tree.tsx.vm`。
 4. 必要时参考关联后端工程 generator 模板确认接口、字段、权限和导出能力。
 5. 默认同时维护：
    `src/api/<module>/<business>/index.ts`
@@ -58,7 +58,7 @@ description: 前端标准 React CRUD 页面专家。用于当前 plus-ui-react �
 
 ## gen 模板规则
 
-- `gen/index.vue.vm`、`gen/index-tree.vue.vm` 文件名保持不变，但内容生成 React TSX。
+- `gen/index.tsx.vm`、`gen/index-tree.tsx.vm` 内容生成 React TSX。
 - 保持 Velocity 变量、宏和后端 generator 可识别结构，不为了格式美化破坏模板语法。
 - 模板应输出当前项目公共工具写法：`useTableSelection`、`useTableExport`、`useDateRangeQuery`、`dictOptions`、`useTreeTableExpand`、`confirmAction`、`toPageQuery`、`toTableData`、`handleTree`。
 - 不把 Vue `src/views`、Element Plus、`AxiosPromise`、`v-hasPermi` 写入模板。

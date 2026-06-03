@@ -1,6 +1,6 @@
 ---
 name: frontend-crud-coding
-description: 在当前 plus-ui-react 前端项目中按真实 React + TypeScript + Umi Max + Ant Design ProComponents + oxlint/oxfmt 代码风格生成或修改页面、API、types、hooks 接入、样式和项目内置 gen/*.vm 代码生成模板。用于新增或修改标准 CRUD 列表页、树表页、系统管理页、监控页、workflow 页面、demo 页面，补齐与 RuoYi-Vue-Plus boot4 后端接口对应的 src/api、types 和 src/pages 代码，或维护 gen/api.ts.vm、gen/types.ts.vm、gen/index.vue.vm、gen/index-tree.vue.vm；触发后应先读取适用 references，再阅读目标模块真实代码和项目内置 gen 模板。
+description: 在当前 plus-ui-react 前端项目中按真实 React + TypeScript + Umi Max + Ant Design ProComponents + oxlint/oxfmt 代码风格生成或修改页面、API、types、hooks 接入、样式和项目内置 gen/*.vm 代码生成模板。用于新增或修改标准 CRUD 列表页、树表页、系统管理页、监控页、workflow 页面、demo 页面，补齐与 RuoYi-Vue-Plus boot4 后端接口对应的 src/api、types 和 src/pages 代码，或维护 gen/api.ts.vm、gen/types.ts.vm、gen/index.tsx.vm、gen/index-tree.tsx.vm；触发后应先读取适用 references，再阅读目标模块真实代码和项目内置 gen 模板。
 ---
 
 # 前端编码规范
@@ -16,7 +16,7 @@ description: 在当前 plus-ui-react 前端项目中按真实 React + TypeScript
    - 树表优先看 `src/pages/demo/tree/index.tsx`、`src/pages/workflow/category/index.tsx`。
    - 系统复杂页优先看 `src/pages/system/user/index.tsx`、`system/role`、`system/post`、`system/config`。
    - workflow 业务页优先看 `src/pages/workflow/*` 与 `src/api/workflow/*` 同类页面。
-4. 新增或维护代码生成能力时，优先阅读当前仓库 `gen/api.ts.vm`、`gen/types.ts.vm`、`gen/index.vue.vm`、`gen/index-tree.vue.vm`。这些是 React 版内置生成模板，即使文件名保留 `.vue.vm`，内容也应是当前项目 React/TSX 风格。
+4. 新增或维护代码生成能力时，优先阅读当前仓库 `gen/api.ts.vm`、`gen/types.ts.vm`、`gen/index.tsx.vm`、`gen/index-tree.tsx.vm`。这些是 React 版内置生成模板，页面模板必须输出当前项目 React/TSX 风格。
 5. 需要从 Vue 版本迁移经验时，参考 `D:\git-sources\Plus相关\plus-ui-new\.codex\skills\frontend-crud-coding` 和 `.claude\agents`，只吸收任务分型、增量修改和自检原则。
 6. 新增标准页面前，可以对照后端工程 `D:\git-sources\Plus相关\RuoYi-Vue-Plus-boot4\ruoyi-modules\ruoyi-gen\src\main\resources\vm` 确认字段、权限和导出能力，但输出和 `gen/` 模板必须保持 React 项目风格。
 7. 新增代码时通常同步维护 `src/api/<module>/<business>/index.ts`、`types.ts`、`src/pages/<module>/<business>/index.tsx`；如果是生成模板优化，同步维护 `gen/` 对应 `.vm`。
@@ -112,8 +112,8 @@ workflow 目录优先参考 `src/pages/workflow/*`。流程定义、流程实例
 
 - `gen/api.ts.vm`
 - `gen/types.ts.vm`
-- `gen/index.vue.vm`
-- `gen/index-tree.vue.vm`
+- `gen/index.tsx.vm`
+- `gen/index-tree.tsx.vm`
 
 模板内容必须生成当前 React 项目代码，并优先使用已有公共工具：`useDateRangeQuery`、`dictOptions`、`useTreeTableExpand`、`useTableSelection`、`useTableExport`、`confirmAction`、`toPageQuery`、`toTableData`、`handleTree`、`formatDateTimeFields`、`toDayjsFields`。不要把 Vue 模板、Element Plus 组件或 `src/views` 路径写入这些模板。
 

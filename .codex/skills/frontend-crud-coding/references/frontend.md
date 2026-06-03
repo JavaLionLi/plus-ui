@@ -3,7 +3,7 @@
 ## 优先参考的代码来源
 
 - 当前目标目录下最近似页面、API、types。
-- 当前仓库内置 React 生成模板：`gen/api.ts.vm`、`gen/types.ts.vm`、`gen/index.vue.vm`、`gen/index-tree.vue.vm`。
+- 当前仓库内置 React 生成模板：`gen/api.ts.vm`、`gen/types.ts.vm`、`gen/index.tsx.vm`、`gen/index-tree.tsx.vm`。
 - 标准单表：`src/pages/demo/demo/index.tsx`、`src/api/demo/demo/index.ts`、`src/api/demo/demo/types.ts`。
 - 树表：`src/pages/demo/tree/index.tsx`、`src/pages/workflow/category/index.tsx`。
 - 复杂系统页：`src/pages/system/user/index.tsx`、`src/pages/system/role/index.tsx`、`src/pages/system/post/index.tsx`、`src/pages/system/config/index.tsx`。
@@ -128,7 +128,7 @@
 ## 与 gen 模板、Vue 参考项目和后端生成器的关系
 
 - 当前仓库 `gen/*.vm` 是 React 版内置代码生成模板，是维护生成能力时的第一参考。
-- `gen/index.vue.vm`、`gen/index-tree.vue.vm` 文件名为兼容后端 generator 保持不变，但内容必须生成 React TSX 页面。
+- `gen/index.tsx.vm`、`gen/index-tree.tsx.vm` 内容必须生成 React TSX 页面。
 - 修改公共 hooks/工具后，如果它们能简化标准生成页，要同步评估 `gen/*.vm` 是否需要更新。
 - Vue skill 和 `.claude/agents` 提供的是任务分型、优先级、增量修改、自检方式，不是 React 实现模板。
 - boot4 后端 generator 模板可用于确认字段、权限、导出、状态切换、排序、日期范围等，但不是最终答案。

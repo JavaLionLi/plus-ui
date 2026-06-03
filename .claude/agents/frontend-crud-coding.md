@@ -10,7 +10,7 @@ description: 前端总入口。用于当前 plus-ui-react 项目中的标准 Rea
 1. 如果是新增标准 CRUD 页面、补 `src/api`、`types.ts`、`index.tsx`，优先使用 `frontend-crud-page.md`。
 2. 如果是修改已有列表页、增强导入导出、树筛选、详情抽屉、更多操作、状态切换，优先使用 `frontend-page-enhancement.md`。
 3. 如果只改接口层和类型定义，优先使用 `frontend-api-types.md`。
-4. 如果是维护代码生成模板，优先读取当前仓库 `gen/api.ts.vm`、`gen/types.ts.vm`、`gen/index.vue.vm`、`gen/index-tree.vue.vm`，再按 React 项目真实工具和页面规则修改模板。
+4. 如果是维护代码生成模板，优先读取当前仓库 `gen/api.ts.vm`、`gen/types.ts.vm`、`gen/index.tsx.vm`、`gen/index-tree.tsx.vm`，再按 React 项目真实工具和页面规则修改模板。
 
 通用要求：
 
@@ -30,7 +30,7 @@ description: 前端总入口。用于当前 plus-ui-react 项目中的标准 Rea
 - 多选通过 `useTableSelection`，导出通过 `useTableExport`。
 - 行操作优先使用 `RowActions` 和 `@ant-design/icons`。
 - 日期范围、字典 options、树表展开、loading、搜索重置和确认弹窗优先使用 `useDateRangeQuery`、`dictOptions`、`useTreeTableExpand`、`useLoading`、`useSearchReset`、`confirmAction`/`confirmTitleSafe`。
-- `gen/index.vue.vm`、`gen/index-tree.vue.vm` 文件名保持不变，但内容必须生成 React TSX 页面。
+- `gen/index.tsx.vm`、`gen/index-tree.tsx.vm` 内容必须生成 React TSX 页面。
 
 验证要求：
 
