@@ -55,6 +55,7 @@ export interface DbTableVO extends Omit<TableVO, 'tableId'> {
   uniqueFields?: string[];
   enableSort?: boolean;
   sortField?: string;
+  frontendType?: string;
   treeRootValue?: string;
   treeAncestorsField?: string;
   treeOrderField?: string;
@@ -79,6 +80,7 @@ export interface TableVO extends BaseEntity {
   tableComment?: string;
   className?: string;
   tplCategory?: string;
+  frontendType?: string;
   packageName?: string;
   moduleName?: string;
   businessName?: string;

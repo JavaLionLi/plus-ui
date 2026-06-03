@@ -1,5 +1,6 @@
 import type { FormInstance } from 'antd';
-import { Col, Form, Input, Row, Select, Switch, TreeSelect } from 'antd';
+import { QuestionCircleOutlined } from '@ant-design/icons';
+import { Col, Form, Input, Radio, Row, Select, Switch, Tooltip, TreeSelect } from 'antd';
 import { useMemo } from 'react';
 import type { MenuVO } from '@/api/system/menu/types';
 import type { DbColumnVO, DbTableVO } from '@/api/tool/gen/types';
@@ -28,6 +29,10 @@ export default function GenInfoForm({ form, columns, menuOptions }: GenInfoFormP
     label: `${column.columnName}：${column.columnComment || ''}`,
     value: column.columnName
   }));
+  const frontendTypeOptions = [
+    { label: 'Vue', value: 'vue' },
+    { label: 'React', value: 'react' }
+  ];
 
   return (
     <>
@@ -40,6 +45,25 @@ export default function GenInfoForm({ form, columns, menuOptions }: GenInfoFormP
                 { label: '树表（增删改查）', value: 'tree' }
               ]}
             />
+          </Form.Item>
+        </Col>
+        <Col xs={24} md={12}>
+          <Form.Item
+            name="frontendType"
+            label={
+              <span>
+                前端模板{' '}
+                <Tooltip title="对应后端 resources/vm 下的模板目录，例如 vue、react">
+                  <QuestionCircleOutlined />
+                </Tooltip>
+              </span>
+            }
+            rules={[
+              { required: true, message: '请选择前端模板' },
+              { pattern: /^[A-Za-z0-9_-]+$/, message: '仅支持字母、数字、下划线和中划线' }
+            ]}
+          >
+            <Radio.Group options={frontendTypeOptions} />
           </Form.Item>
         </Col>
         <Col xs={24} md={12}>

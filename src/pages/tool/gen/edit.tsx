@@ -30,6 +30,7 @@ function withDefaults(info: DbTableVO): DbTableVO {
     uniqueFields: normalizeStringArray(info.uniqueFields),
     enableSort: info.enableSort ?? false,
     sortField: info.sortField ?? '',
+    frontendType: info.frontendType || 'react',
     treeRootValue: info.treeRootValue ?? '0',
     treeAncestorsField: info.treeAncestorsField ?? '',
     treeOrderField: info.treeOrderField ?? ''
