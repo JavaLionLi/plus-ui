@@ -19,19 +19,21 @@ import {
 } from '@ant-design/pro-components';
 import { history } from '@umijs/max';
 import { useBoolean } from 'ahooks';
-import { Button, Form, message, Modal, Popconfirm, Switch } from 'antd';
+import { Button, Form, message, Popconfirm, Switch } from 'antd';
 import { useRef, useState } from 'react';
-import type { DictData } from '@/api/system/dict/data/types';
 import type { RoleForm, RoleQuery, RoleVO } from '@/api/system/role/types';
 import { roleMenuTreeselect } from '@/api/system/menu';
 import { addRole, changeRoleStatus, delRole, getRole, listRole, updateRole } from '@/api/system/role';
 import RowActions from '@/components/common/RowActions';
+import { useDateRangeQuery } from '@/hooks/useDateRangeQuery';
 import { useDict } from '@/hooks/useDict';
 import { useTableExport } from '@/hooks/useTableExport';
 import { useTableSelection } from '@/hooks/useTableSelection';
 import { useUserStore } from '@/stores/userStore';
+import { dictOptions } from '@/utils/dict';
+import { confirmAction } from '@/utils/modal';
 import { hasPermi } from '@/utils/permission';
-import { addDateRange, formatDateTimeRange, toPageQuery, toTableData } from '@/utils/ruoyi';
+import { toPageQuery, toTableData } from '@/utils/ruoyi';
 import RolePermissionModal from './components/RolePermissionModal';
 
 const defaultRoleForm: RoleForm = {
@@ -43,24 +45,6 @@ const defaultRoleForm: RoleForm = {
   menuIds: [],
   deptIds: []
 };
-
-function confirmAction(content: string) {
-  return new Promise<void>((resolve, reject) => {
-    Modal.confirm({
-      title: '系统提示',
-      content,
-      onOk: () => resolve(),
-      onCancel: () => reject(new Error('cancelled'))
-    });
-  });
-}
-
-function dictOptions(dicts?: DictData[]) {
-  return (dicts || []).map(item => ({
-    label: item.dictLabel,
-    value: item.dictValue
-  }));
-}
 
 export default function SystemRolePage() {
   const actionRef = useRef<ActionType | undefined>(undefined);
@@ -78,6 +62,7 @@ export default function SystemRolePage() {
   const [permissionOpen, { setTrue: openPermissionModal, setFalse: closePermissionModal }] = useBoolean(false);
   const [permissionRoleId, setPermissionRoleId] = useState<string | number>();
   const { updateExportParams, exportFile } = useTableExport();
+  const { applyDateRange: applyCreateTimeDateRange } = useDateRangeQuery();
 
   const canAdd = hasPermi(userInfo, ['system:role:add']);
   const canEdit = hasPermi(userInfo, ['system:role:edit']);
@@ -257,7 +242,7 @@ export default function SystemRolePage() {
         }}
         request={async params => {
           const { createTimeRange, ...tableParams } = params;
-          const query = addDateRange(toPageQuery(tableParams), formatDateTimeRange(createTimeRange));
+          const query = applyCreateTimeDateRange(toPageQuery(tableParams), createTimeRange);
           updateExportParams(query);
           const res = await listRole(query);
           return toTableData(res);

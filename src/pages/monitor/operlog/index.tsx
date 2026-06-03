@@ -10,16 +10,15 @@ import DictTag from '@/components/common/DictTag';
 import EllipsisText from '@/components/common/EllipsisText';
 import JsonViewer from '@/components/common/JsonViewer';
 import RowActions from '@/components/common/RowActions';
+import { useDateRangeQuery } from '@/hooks/useDateRangeQuery';
 import { useDict } from '@/hooks/useDict';
 import { useTableExport } from '@/hooks/useTableExport';
 import { useTableSelection } from '@/hooks/useTableSelection';
 import { useUserStore } from '@/stores/userStore';
+import { dictOptions } from '@/utils/dict';
 import { hasPermi } from '@/utils/permission';
-import { addDateRange, formatDateTimeRange, toPageQuery, toTableData, withTableSort } from '@/utils/ruoyi';
+import { toPageQuery, toTableData, withTableSort } from '@/utils/ruoyi';
 
-function dictOptions(dicts?: DictData[]) {
-  return (dicts || []).map(item => ({ label: item.dictLabel, value: item.dictValue }));
-}
 
 function dictText(dicts: DictData[] | undefined, value?: string | number) {
   const normalized = value === undefined || value === null ? undefined : String(value);
@@ -34,6 +33,7 @@ export default function MonitorOperlogPage() {
   const [detailOpen, { setTrue: openDetailModal, setFalse: closeDetailModal }] = useBoolean(false);
   const [detail, setDetail] = useState<OperLogVO>();
   const { updateExportParams, exportFile } = useTableExport();
+  const { applyDateRange: applyOperTimeDateRange } = useDateRangeQuery();
 
   const canQuery = hasPermi(userInfo, ['monitor:operlog:query']);
   const canRemove = hasPermi(userInfo, ['monitor:operlog:remove']);
@@ -167,9 +167,9 @@ export default function MonitorOperlogPage() {
         rowSelection={{ selectedRowKeys: ids, onChange: handleSelectionChange }}
         request={async (params, sort) => {
           const { operTimeRange, ...tableParams } = params;
-          const query = addDateRange(
+          const query = applyOperTimeDateRange(
             withTableSort(toPageQuery(tableParams), sort, { orderByColumn: 'operTime', isAsc: 'descending' }),
-            formatDateTimeRange(operTimeRange)
+            operTimeRange
           );
           updateExportParams(query);
           const res = await listOperlog(query);

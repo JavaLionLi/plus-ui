@@ -3,7 +3,6 @@ import { PageContainer, ProTable, type ActionType, type ProColumns } from '@ant-
 import { useBoolean } from 'ahooks';
 import { Badge, Button } from 'antd';
 import { useMemo, useRef, useState } from 'react';
-import type { DictData } from '@/api/system/dict/data/types';
 import type { UserVO } from '@/api/system/user/types';
 import type { PageResult, R } from '@/api/types';
 import type { FlowTaskVO, TaskQuery } from '@/api/workflow/task/types';
@@ -15,6 +14,7 @@ import RowActions from '@/components/common/RowActions';
 import UserSelect from '@/components/common/UserSelect';
 import UserNameDisplay from '@/components/workflow/UserNameDisplay';
 import { useDict } from '@/hooks/useDict';
+import { dictOptions } from '@/utils/dict';
 import { toPageQuery, toTableData } from '@/utils/ruoyi';
 
 type TaskListType = 'wait' | 'finish' | 'copy';
@@ -29,9 +29,6 @@ const pageTitle: Record<TaskListType, string> = {
   copy: '抄送任务'
 };
 
-function dictOptions(dicts?: DictData[]) {
-  return (dicts || []).map(item => ({ label: item.dictLabel, value: item.dictValue }));
-}
 
 function requestTaskList(type: TaskListType, query: TaskQuery): Promise<R<PageResult<FlowTaskVO>>> {
   if (type === 'wait') return pageByTaskWait(query);

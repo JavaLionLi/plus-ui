@@ -10,9 +10,8 @@ import {
   type ProColumns
 } from '@ant-design/pro-components';
 import { useBoolean } from 'ahooks';
-import { Button, Form, message, Modal, Popconfirm, Switch, Tag } from 'antd';
+import { Button, Form, message, Popconfirm, Switch, Tag } from 'antd';
 import { useMemo, useRef, useState } from 'react';
-import type { DictData } from '@/api/system/dict/data/types';
 import type { OssConfigForm, OssConfigQuery, OssConfigVO } from '@/api/system/ossConfig/types';
 import {
   addOssConfig,
@@ -27,6 +26,8 @@ import RowActions from '@/components/common/RowActions';
 import { useDict } from '@/hooks/useDict';
 import { useTableSelection } from '@/hooks/useTableSelection';
 import { useUserStore } from '@/stores/userStore';
+import { dictOptions } from '@/utils/dict';
+import { confirmAction } from '@/utils/modal';
 import { hasPermi } from '@/utils/permission';
 import { toPageQuery, toTableData } from '@/utils/ruoyi';
 
@@ -35,21 +36,6 @@ const defaultOssConfigForm: OssConfigForm = {
   accessPolicy: '1',
   status: 'N'
 };
-
-function confirmAction(content: string) {
-  return new Promise<void>((resolve, reject) => {
-    Modal.confirm({
-      title: '系统提示',
-      content,
-      onOk: () => resolve(),
-      onCancel: () => reject(new Error('cancelled'))
-    });
-  });
-}
-
-function dictOptions(dicts?: DictData[]) {
-  return (dicts || []).map(item => ({ label: item.dictLabel, value: item.dictValue }));
-}
 
 function accessPolicyTag(value?: string) {
   if (value === '0') return <Tag color="orange">private</Tag>;

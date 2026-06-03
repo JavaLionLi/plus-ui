@@ -32,12 +32,15 @@ import {
 } from '@/api/system/user';
 import RowActions from '@/components/common/RowActions';
 import TreePanel from '@/components/common/TreePanel';
+import { useDateRangeQuery } from '@/hooks/useDateRangeQuery';
 import { useDict } from '@/hooks/useDict';
 import { useTableExport } from '@/hooks/useTableExport';
 import { useTableSelection } from '@/hooks/useTableSelection';
 import { useUserStore } from '@/stores/userStore';
+import { dictOptions } from '@/utils/dict';
+import { confirmAction } from '@/utils/modal';
 import { hasPermi } from '@/utils/permission';
-import { addDateRange, formatDateTimeRange, toPageQuery, toTableData } from '@/utils/ruoyi';
+import { filterTree, toPageQuery, toTableData } from '@/utils/ruoyi';
 import UserDetailDrawer from './components/UserDetailDrawer';
 import UserFormModal from './components/UserFormModal';
 import UserImportModal from './components/UserImportModal';
@@ -55,17 +58,6 @@ interface TreeSelectNode {
   children?: TreeSelectNode[];
 }
 
-function filterDisabledDept(depts: DeptTreeVO[]): DeptTreeVO[] {
-  return depts.reduce<DeptTreeVO[]>((result, dept) => {
-    if (dept.disabled) return result;
-    result.push({
-      ...dept,
-      children: dept.children?.length ? filterDisabledDept(dept.children) : []
-    });
-    return result;
-  }, []);
-}
-
 function toTreeSelectData(depts: DeptTreeVO[]): TreeSelectNode[] {
   return depts.map(dept => ({
     title: dept.label,
@@ -75,23 +67,6 @@ function toTreeSelectData(depts: DeptTreeVO[]): TreeSelectNode[] {
   }));
 }
 
-function dictOptions(dicts?: Array<{ dictLabel: string; dictValue: string }>) {
-  return (dicts || []).map(item => ({
-    label: item.dictLabel,
-    value: item.dictValue
-  }));
-}
-
-function confirmAction(content: string) {
-  return new Promise<void>((resolve, reject) => {
-    Modal.confirm({
-      title: '系统提示',
-      content,
-      onOk: () => resolve(),
-      onCancel: () => reject(new Error('cancelled'))
-    });
-  });
-}
 
 export default function SystemUserPage() {
   const actionRef = useRef<ActionType | undefined>(undefined);
@@ -116,6 +91,7 @@ export default function SystemUserPage() {
   const [viewOpen, { setTrue: openViewDrawer, setFalse: closeViewDrawer }] = useBoolean(false);
   const [viewUserId, setViewUserId] = useState<string | number>();
   const { updateExportParams, exportFile } = useTableExport();
+  const { applyDateRange: applyCreateTimeDateRange } = useDateRangeQuery();
 
   const canAdd = hasPermi(userInfo, ['system:user:add']);
   const canEdit = hasPermi(userInfo, ['system:user:edit']);
@@ -127,7 +103,7 @@ export default function SystemUserPage() {
   useEffect(() => {
     Promise.all([deptTreeSelect(), getConfigKey('sys.user.initPassword')]).then(([deptRes, configRes]) => {
       setDeptOptions(deptRes.data || []);
-      setEnabledDeptOptions(filterDisabledDept(deptRes.data || []));
+      setEnabledDeptOptions(filterTree(deptRes.data || [], dept => !dept.disabled));
       setInitPassword(configRes.data || '');
     });
   }, []);
@@ -385,12 +361,12 @@ export default function SystemUserPage() {
             }}
             request={async params => {
               const { createTimeRange, ...tableParams } = params;
-              const query = addDateRange(
+              const query = applyCreateTimeDateRange(
                 {
                   ...toPageQuery(tableParams),
                   deptId
                 },
-                formatDateTimeRange(createTimeRange)
+                createTimeRange
               );
               updateExportParams(query);
               const res = await listUser(query);

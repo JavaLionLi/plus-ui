@@ -6,6 +6,8 @@ import type { UserVO } from '@/api/system/user/types';
 import type { FlowTaskVO } from '@/api/workflow/task/types';
 import { currentTaskAllUser, getTask, taskOperation, terminationTask } from '@/api/workflow/task';
 import UserSelect from '@/components/common/UserSelect';
+import { useLoading } from '@/hooks/useLoading';
+import { confirmTitleSafe } from '@/utils/modal';
 
 type UserSelectMode = 'transfer' | 'addSignature';
 
@@ -24,7 +26,7 @@ interface ProcessMeddleProps {
 }
 
 export default function ProcessMeddle({ open, taskId, width = 760, onOpenChange, onSuccess }: ProcessMeddleProps) {
-  const [loading, setLoading] = useState(false);
+  const { loading, withLoading } = useLoading();
   const [currentTask, setCurrentTask] = useState<FlowTaskVO>();
   const [userModalOpen, { setTrue: openUserModal, setFalse: closeUserModal }] = useBoolean(false);
   const [userSelectMode, setUserSelectMode] = useState<UserSelectMode>('transfer');
@@ -36,19 +38,15 @@ export default function ProcessMeddle({ open, taskId, width = 760, onOpenChange,
       return;
     }
 
-    const loadTask = async () => {
-      setLoading(true);
-      setCurrentTask(undefined);
-      try {
+    const loadTask = () =>
+      withLoading(async () => {
+        setCurrentTask(undefined);
         const res = await getTask(taskId);
         setCurrentTask(res.data);
-      } finally {
-        setLoading(false);
-      }
-    };
+      });
 
     loadTask();
-  }, [open, taskId]);
+  }, [open, taskId, withLoading]);
 
   const closeWithSuccess = () => {
     onOpenChange(false);
@@ -74,18 +72,14 @@ export default function ProcessMeddle({ open, taskId, width = 760, onOpenChange,
         message.warning('请选择用户');
         return;
       }
-      Modal.confirm({
-        title: '是否确认提交？',
-        onOk: async () => {
-          await taskOperation(
-            { taskId: currentTask.id, userId: user.userId, message: '', messageType: ['1'] },
-            'transferTask'
-          );
-          message.success('操作成功');
-          closeUserModal();
-          closeWithSuccess();
-        }
-      });
+      if (!(await confirmTitleSafe('是否确认提交？'))) return;
+      await taskOperation(
+        { taskId: currentTask.id, userId: user.userId, message: '', messageType: ['1'] },
+        'transferTask'
+      );
+      message.success('操作成功');
+      closeUserModal();
+      closeWithSuccess();
       return;
     }
 
@@ -94,55 +88,40 @@ export default function ProcessMeddle({ open, taskId, width = 760, onOpenChange,
       message.warning('请选择用户');
       return;
     }
-    Modal.confirm({
-      title: '是否确认提交？',
-      onOk: async () => {
-        await taskOperation({ taskId: currentTask.id, userIds, message: '', messageType: ['1'] }, 'addSignature');
-        message.success('操作成功');
-        closeUserModal();
-        closeWithSuccess();
-      }
-    });
+    if (!(await confirmTitleSafe('是否确认提交？'))) return;
+    await taskOperation({ taskId: currentTask.id, userIds, message: '', messageType: ['1'] }, 'addSignature');
+    message.success('操作成功');
+    closeUserModal();
+    closeWithSuccess();
   };
 
   const openReductionSignature = async () => {
     if (!currentTask?.id) return;
-    setLoading(true);
-    try {
+    await withLoading(async () => {
       const res = await currentTaskAllUser(currentTask.id);
       setSignatureUsers((res.data || []).map(item => ({ ...item, nodeName: currentTask.nodeName })));
       openSignatureModal();
-    } finally {
-      setLoading(false);
-    }
+    });
   };
 
   const deleteSignatureUser = async (row: SignatureUser) => {
     if (!currentTask?.id) return;
-    Modal.confirm({
-      title: '是否确认提交？',
-      onOk: async () => {
-        await taskOperation(
-          { taskId: currentTask.id, userIds: [row.userId], message: '', messageType: ['1'] },
-          'reductionSignature'
-        );
-        message.success('操作成功');
-        closeSignatureModal();
-        closeWithSuccess();
-      }
-    });
+    if (!(await confirmTitleSafe('是否确认提交？'))) return;
+    await taskOperation(
+      { taskId: currentTask.id, userIds: [row.userId], message: '', messageType: ['1'] },
+      'reductionSignature'
+    );
+    message.success('操作成功');
+    closeSignatureModal();
+    closeWithSuccess();
   };
 
   const submitTermination = async () => {
     if (!currentTask?.id) return;
-    Modal.confirm({
-      title: '是否确认终止？',
-      onOk: async () => {
-        await terminationTask({ taskId: currentTask.id, comment: '' });
-        message.success('操作成功');
-        closeWithSuccess();
-      }
-    });
+    if (!(await confirmTitleSafe('是否确认终止？'))) return;
+    await terminationTask({ taskId: currentTask.id, comment: '' });
+    message.success('操作成功');
+    closeWithSuccess();
   };
 
   return (

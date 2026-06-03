@@ -12,7 +12,6 @@ import {
 import { useBoolean } from 'ahooks';
 import { Button, Form, message, Popconfirm } from 'antd';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { DictData } from '@/api/system/dict/data/types';
 import type { SpelForm, SpelQuery, SpelVO } from '@/api/workflow/spel/types';
 import { addSpel, delSpel, getSpel, listSpel, updateSpel } from '@/api/workflow/spel';
 import DictTag from '@/components/common/DictTag';
@@ -21,15 +20,13 @@ import RowActions from '@/components/common/RowActions';
 import { useDict } from '@/hooks/useDict';
 import { useTableSelection } from '@/hooks/useTableSelection';
 import { useUserStore } from '@/stores/userStore';
+import { dictOptions } from '@/utils/dict';
 import { hasPermi } from '@/utils/permission';
 import { toPageQuery, toTableData } from '@/utils/ruoyi';
 
 const defaultSpelForm: SpelForm = { status: '0' };
 const spelPlaceholder = '例如：#{@组件名.方法名(#方法参数)} 或 ${方法参数}';
 
-function dictOptions(dicts?: DictData[]) {
-  return (dicts || []).map(item => ({ label: item.dictLabel, value: item.dictValue }));
-}
 
 function buildViewSpel(values: Pick<SpelForm, 'componentName' | 'methodName' | 'methodParams'>) {
   const comp = (values.componentName || '').trim();

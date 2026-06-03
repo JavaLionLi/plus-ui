@@ -9,8 +9,7 @@ import {
 } from '@ant-design/pro-components';
 import { useBoolean } from 'ahooks';
 import { Badge, Button, Card, Form, Input, message, Modal, Popconfirm, Tabs, Tag } from 'antd';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import type { DictData } from '@/api/system/dict/data/types';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { UserVO } from '@/api/system/user/types';
 import type { PageResult, R } from '@/api/types';
 import type { CategoryTreeVO } from '@/api/workflow/category/types';
@@ -33,15 +32,16 @@ import RowActions from '@/components/common/RowActions';
 import TreePanel from '@/components/common/TreePanel';
 import UserSelect from '@/components/common/UserSelect';
 import { useDict } from '@/hooks/useDict';
+import { useLoading } from '@/hooks/useLoading';
+import { useSearchReset } from '@/hooks/useSearchReset';
 import { useUserStore } from '@/stores/userStore';
+import { dictOptions } from '@/utils/dict';
+import { confirmAction } from '@/utils/modal';
 import { hasPermi } from '@/utils/permission';
 import { toPageQuery, toTableData } from '@/utils/ruoyi';
 
 type InstanceTab = 'running' | 'finish';
 
-function dictOptions(dicts?: DictData[]) {
-  return (dicts || []).map(item => ({ label: item.dictLabel, value: item.dictValue }));
-}
 
 function requestInstanceList(tab: InstanceTab, query: FlowInstanceQuery): Promise<R<PageResult<FlowInstanceVO>>> {
   if (tab === 'running') return pageByRunning(query);
@@ -55,17 +55,6 @@ function openBusinessForm(row: FlowInstanceVO) {
     type: 'view',
     formCustom: row.formCustom || 'N',
     formPath: row.formPath || '/workflow/leaveEdit/index'
-  });
-}
-
-function confirmAction(content: string) {
-  return new Promise<void>((resolve, reject) => {
-    Modal.confirm({
-      title: '系统提示',
-      content,
-      onOk: () => resolve(),
-      onCancel: () => reject(new Error('cancelled'))
-    });
   });
 }
 
@@ -84,7 +73,7 @@ export default function WorkflowProcessInstancePage() {
   const [invalidOpen, { setTrue: openInvalidModal, setFalse: closeInvalidModal }] = useBoolean(false);
   const [invalidRow, setInvalidRow] = useState<FlowInstanceVO>();
   const [variableOpen, { setTrue: openVariableModal, setFalse: closeVariableModal }] = useBoolean(false);
-  const [variableLoading, setVariableLoading] = useState(false);
+  const { loading: variableLoading, withLoading: withVariableLoading } = useLoading();
   const [variableRow, setVariableRow] = useState<FlowInstanceVO>();
   const [variableText, setVariableText] = useState('');
 
@@ -97,6 +86,13 @@ export default function WorkflowProcessInstancePage() {
   const businessStatusOptions = useMemo(() => dictOptions(dicts.wf_business_status), [dicts.wf_business_status]);
   const selectedIds = selectedRows.map(item => item.id).filter(Boolean);
   const selectedApplicantIds = selectedApplicants.map(item => item.userId).filter(Boolean) as Array<string | number>;
+  const resetSearch = useSearchReset(
+    actionRef,
+    useCallback(() => {
+      setCategory(undefined);
+      setSelectedApplicants([]);
+    }, [])
+  );
 
   useEffect(() => {
     categoryTree().then(res => setCategoryOptions(res.data || []));
@@ -121,12 +117,6 @@ export default function WorkflowProcessInstancePage() {
   const clearApplicantFilter = () => {
     setSelectedApplicants([]);
     actionRef.current?.reloadAndRest?.();
-  };
-
-  const resetSearch = () => {
-    setCategory(undefined);
-    setSelectedApplicants([]);
-    setTimeout(() => actionRef.current?.reloadAndRest?.(), 0);
   };
 
   const handleDelete = async (row?: FlowInstanceVO) => {
@@ -160,14 +150,11 @@ export default function WorkflowProcessInstancePage() {
   const openVariable = async (row: FlowInstanceVO) => {
     setVariableRow(row);
     openVariableModal();
-    setVariableLoading(true);
     variableForm.resetFields();
-    try {
+    await withVariableLoading(async () => {
       const res = await instanceVariable(row.id);
       setVariableText(res.data.variable || '');
-    } finally {
-      setVariableLoading(false);
-    }
+    });
   };
 
   const submitVariable = async () => {

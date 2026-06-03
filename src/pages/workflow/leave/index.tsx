@@ -10,7 +10,6 @@ import { PageContainer, ProTable, type ActionType, type ProColumns } from '@ant-
 import { history } from '@umijs/max';
 import { Button, message, Tag } from 'antd';
 import { useMemo, useRef } from 'react';
-import type { DictData } from '@/api/system/dict/data/types';
 import type { LeaveQuery, LeaveVO } from '@/api/workflow/leave/types';
 import { cancelProcessApply } from '@/api/workflow/instance';
 import { delLeave, listLeave } from '@/api/workflow/leave';
@@ -21,6 +20,7 @@ import { useDict } from '@/hooks/useDict';
 import { useTableExport } from '@/hooks/useTableExport';
 import { useTableSelection } from '@/hooks/useTableSelection';
 import { useUserStore } from '@/stores/userStore';
+import { dictOptions } from '@/utils/dict';
 import { hasPermi } from '@/utils/permission';
 import { toPageQuery, toTableData } from '@/utils/ruoyi';
 
@@ -31,9 +31,6 @@ const leaveTypeOptions = [
   { value: '4', label: '婚假' }
 ];
 
-function dictOptions(dicts?: DictData[]) {
-  return (dicts || []).map(item => ({ label: item.dictLabel, value: item.dictValue }));
-}
 
 function leaveTypeLabel(value?: string) {
   return leaveTypeOptions.find(item => item.value === value)?.label || value || '-';

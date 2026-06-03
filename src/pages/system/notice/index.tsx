@@ -14,7 +14,6 @@ import { history, useLocation } from '@umijs/max';
 import { useBoolean } from 'ahooks';
 import { Button, Descriptions, Form, message, Modal, Popconfirm } from 'antd';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { DictData } from '@/api/system/dict/data/types';
 import type { NoticeForm, NoticeQuery, NoticeVO } from '@/api/system/notice/types';
 import { addNotice, delNotice, getNotice, listNotice, updateNotice } from '@/api/system/notice';
 import DictTag from '@/components/common/DictTag';
@@ -25,6 +24,7 @@ import { useDict } from '@/hooks/useDict';
 import { useTableSelection } from '@/hooks/useTableSelection';
 import { useUserStore } from '@/stores/userStore';
 import { resolveOssContent } from '@/utils/ossContent';
+import { dictOptions } from '@/utils/dict';
 import { hasPermi } from '@/utils/permission';
 import { toPageQuery, toTableData } from '@/utils/ruoyi';
 import { sanitizeHtml } from '@/utils/sanitize';
@@ -32,9 +32,6 @@ import { sanitizeHtml } from '@/utils/sanitize';
 const defaultNoticeForm: NoticeForm = { status: '0' };
 const emptyNoticeContent = '<p>暂无公告内容</p>';
 
-function dictOptions(dicts?: DictData[]) {
-  return (dicts || []).map(item => ({ label: item.dictLabel, value: item.dictValue }));
-}
 
 function SafeHtmlContent({ html }: { html: string }) {
   const ref = useRef<HTMLDivElement>(null);

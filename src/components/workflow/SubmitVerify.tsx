@@ -25,6 +25,8 @@ import {
 import FileUpload from '@/components/common/FileUpload';
 import UserSelect from '@/components/common/UserSelect';
 import MessageType from '@/components/workflow/MessageType';
+import { useLoading } from '@/hooks/useLoading';
+import { confirmTitleSafe } from '@/utils/modal';
 
 type UserSelectMode = 'copy' | 'assigneeMap' | 'transfer' | 'delegate' | 'addSignature';
 
@@ -46,16 +48,6 @@ function buttonVisible(task?: FlowTaskVO, code?: string) {
   return !!task?.buttonList?.find(item => item.code === code && item.show);
 }
 
-function confirmAction(title: string) {
-  return new Promise<boolean>(resolve => {
-    Modal.confirm({
-      title,
-      onOk: () => resolve(true),
-      onCancel: () => resolve(false)
-    });
-  });
-}
-
 export default function SubmitVerify({ open, taskId, variables = {}, onOpenChange, onSubmitted }: SubmitVerifyProps) {
   const [approveForm] = Form.useForm<{
     message?: string;
@@ -64,7 +56,7 @@ export default function SubmitVerify({ open, taskId, variables = {}, onOpenChang
     fileId?: string;
   }>();
   const [backForm] = Form.useForm<{ nodeCode?: string; message?: string; messageType?: string[]; fileId?: string }>();
-  const [approvalLoading, setApprovalLoading] = useState(false);
+  const { loading: approvalLoading, setLoading: setApprovalLoading, withLoading: withApprovalLoading } = useLoading();
   const [currentTask, setCurrentTask] = useState<FlowTaskVO>();
   const [nextNodes, setNextNodes] = useState<FlowNextNodeVO[]>([]);
   const [backOpen, { setTrue: openBackModal, setFalse: closeBackModal }] = useBoolean(false);
@@ -121,7 +113,7 @@ export default function SubmitVerify({ open, taskId, variables = {}, onOpenChang
     openUserModal();
   };
 
-  const submitUserSelect = (users: UserVO[]) => {
+  const submitUserSelect = async (users: UserVO[]) => {
     if (userSelectMode === 'copy') {
       setCopyUsers(users);
       closeUserModal();
@@ -155,25 +147,21 @@ export default function SubmitVerify({ open, taskId, variables = {}, onOpenChang
         message.warning('请选择用户');
         return;
       }
-      Modal.confirm({
-        title: '是否确认提交？',
-        onOk: async () => {
-          const values = approveForm.getFieldsValue();
-          await taskOperation(
-            {
-              taskId: currentTask.id,
-              userId: user.userId,
-              message: values.message,
-              messageType: values.messageType || ['1'],
-              variables
-            },
-            userSelectMode === 'transfer' ? 'transferTask' : 'delegateTask'
-          );
-          message.success('操作成功');
-          closeUserModal();
-          finishWorkflowAction();
-        }
-      });
+      if (!(await confirmTitleSafe('是否确认提交？'))) return;
+      const values = approveForm.getFieldsValue();
+      await taskOperation(
+        {
+          taskId: currentTask.id,
+          userId: user.userId,
+          message: values.message,
+          messageType: values.messageType || ['1'],
+          variables
+        },
+        userSelectMode === 'transfer' ? 'transferTask' : 'delegateTask'
+      );
+      message.success('操作成功');
+      closeUserModal();
+      finishWorkflowAction();
       return;
     }
 
@@ -182,25 +170,21 @@ export default function SubmitVerify({ open, taskId, variables = {}, onOpenChang
       message.warning('请选择用户');
       return;
     }
-    Modal.confirm({
-      title: '是否确认提交？',
-      onOk: async () => {
-        const values = approveForm.getFieldsValue();
-        await taskOperation(
-          {
-            taskId: currentTask.id,
-            userIds,
-            message: values.message,
-            messageType: values.messageType || ['1'],
-            variables
-          },
-          'addSignature'
-        );
-        message.success('操作成功');
-        closeUserModal();
-        finishWorkflowAction();
-      }
-    });
+    if (!(await confirmTitleSafe('是否确认提交？'))) return;
+    const values = approveForm.getFieldsValue();
+    await taskOperation(
+      {
+        taskId: currentTask.id,
+        userIds,
+        message: values.message,
+        messageType: values.messageType || ['1'],
+        variables
+      },
+      'addSignature'
+    );
+    message.success('操作成功');
+    closeUserModal();
+    finishWorkflowAction();
   };
 
   const removeCopyUser = (userId?: string | number) => {
@@ -210,9 +194,8 @@ export default function SubmitVerify({ open, taskId, variables = {}, onOpenChang
   const completeApproval = async () => {
     if (!currentTask?.id) return;
     const values = await approveForm.validateFields();
-    if (!(await confirmAction('是否确认提交？'))) return;
-    setApprovalLoading(true);
-    try {
+    if (!(await confirmTitleSafe('是否确认提交？'))) return;
+    await withApprovalLoading(async () => {
       await completeTask({
         taskId: currentTask.id,
         message: values.message,
@@ -224,16 +207,13 @@ export default function SubmitVerify({ open, taskId, variables = {}, onOpenChang
       });
       message.success('操作成功');
       finishWorkflowAction();
-    } finally {
-      setApprovalLoading(false);
-    }
+    });
   };
 
   const openBack = async () => {
     if (!currentTask?.id) return;
     openBackModal();
-    setApprovalLoading(true);
-    try {
+    await withApprovalLoading(async () => {
       const res = await getBackTaskNode(currentTask.id, currentTask.nodeCode);
       setBackNodes(res.data || []);
       backForm.setFieldsValue({
@@ -242,17 +222,14 @@ export default function SubmitVerify({ open, taskId, variables = {}, onOpenChang
         messageType: ['1'],
         fileId: undefined
       });
-    } finally {
-      setApprovalLoading(false);
-    }
+    });
   };
 
   const submitBack = async () => {
     if (!currentTask?.id) return;
     const values = await backForm.validateFields();
-    if (!(await confirmAction('是否确认驳回？'))) return;
-    setApprovalLoading(true);
-    try {
+    if (!(await confirmTitleSafe('是否确认驳回？'))) return;
+    await withApprovalLoading(async () => {
       await backProcess({
         ...values,
         taskId: currentTask.id,
@@ -261,58 +238,46 @@ export default function SubmitVerify({ open, taskId, variables = {}, onOpenChang
       message.success('操作成功');
       closeBackModal();
       finishWorkflowAction();
-    } finally {
-      setApprovalLoading(false);
-    }
+    });
   };
 
   const submitTermination = async () => {
     if (!currentTask?.id) return;
     const values = approveForm.getFieldsValue();
-    if (!(await confirmAction('是否确认终止？'))) return;
-    setApprovalLoading(true);
-    try {
+    if (!(await confirmTitleSafe('是否确认终止？'))) return;
+    await withApprovalLoading(async () => {
       await terminationTask({ taskId: currentTask.id, comment: values.message });
       message.success('操作成功');
       finishWorkflowAction();
-    } finally {
-      setApprovalLoading(false);
-    }
+    });
   };
 
   const openReductionSignature = async () => {
     if (!currentTask?.id) return;
-    setApprovalLoading(true);
-    try {
+    await withApprovalLoading(async () => {
       const res = await currentTaskAllUser(currentTask.id);
       setSignatureUsers((res.data || []).map(item => ({ ...item, nodeName: currentTask.nodeName })));
       openSignatureModal();
-    } finally {
-      setApprovalLoading(false);
-    }
+    });
   };
 
   const deleteSignatureUser = async (row: SignatureUser) => {
     if (!currentTask?.id) return;
     const values = approveForm.getFieldsValue();
-    Modal.confirm({
-      title: '是否确认提交？',
-      onOk: async () => {
-        await taskOperation(
-          {
-            taskId: currentTask.id,
-            userIds: [row.userId],
-            message: values.message,
-            messageType: values.messageType || ['1'],
-            variables
-          },
-          'reductionSignature'
-        );
-        message.success('操作成功');
-        closeSignatureModal();
-        finishWorkflowAction();
-      }
-    });
+    if (!(await confirmTitleSafe('是否确认提交？'))) return;
+    await taskOperation(
+      {
+        taskId: currentTask.id,
+        userIds: [row.userId],
+        message: values.message,
+        messageType: values.messageType || ['1'],
+        variables
+      },
+      'reductionSignature'
+    );
+    message.success('操作成功');
+    closeSignatureModal();
+    finishWorkflowAction();
   };
 
   return (

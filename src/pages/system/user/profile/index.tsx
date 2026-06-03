@@ -21,7 +21,6 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Cropper, { type ReactCropperElement } from 'react-cropper';
 import type { OnlineVO } from '@/api/monitor/online/types';
-import type { DictData } from '@/api/system/dict/data/types';
 import type { SocialAuthVO } from '@/api/system/social/types';
 import type { UserForm, UserInfoVO } from '@/api/system/user/types';
 import { delOnline, getOnline } from '@/api/monitor/online';
@@ -35,6 +34,8 @@ import wechatIcon from '@/assets/icons/svg/wechat.svg';
 import defaultAvatar from '@/assets/images/profile.jpg';
 import DictTag from '@/components/common/DictTag';
 import { useDict } from '@/hooks/useDict';
+import { useLoading } from '@/hooks/useLoading';
+import { dictOptions } from '@/utils/dict';
 import { usePermissionStore } from '@/stores/permissionStore';
 import { getUploadErrorMessage, validateUploadFile } from '@/utils/upload';
 
@@ -70,9 +71,6 @@ function socialProviderNode(source?: string) {
   );
 }
 
-function dictOptions(dicts?: DictData[]) {
-  return (dicts || []).map(item => ({ label: item.dictLabel, value: item.dictValue }));
-}
 
 function normalizeOnlineDevices(payload: OnlineVO[] | { rows?: OnlineVO[] } | undefined) {
   if (Array.isArray(payload)) return payload;
@@ -87,8 +85,8 @@ export default function Profile() {
   const [profile, setProfile] = useState<UserInfoVO>();
   const [devices, setDevices] = useState<OnlineVO[]>([]);
   const [auths, setAuths] = useState<SocialAuthVO[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [avatarUploading, setAvatarUploading] = useState(false);
+  const { loading, withLoading } = useLoading();
+  const { loading: avatarUploading, withLoading: withAvatarUploading } = useLoading();
   const [avatarCropOpen, setAvatarCropOpen] = useState(false);
   const [avatarCropUrl, setAvatarCropUrl] = useState('');
   const [avatarFileName, setAvatarFileName] = useState('avatar.png');
@@ -97,17 +95,14 @@ export default function Profile() {
   const genderOptions = useMemo(() => dictOptions(dicts.sys_user_gender), [dicts.sys_user_gender]);
 
   const loadProfile = useCallback(async () => {
-    setLoading(true);
-    try {
+    await withLoading(async () => {
       const [profileRes, authRes, onlineRes] = await Promise.all([getUserProfile(), getAuthList(), getOnline()]);
       setProfile(profileRes.data);
       setAuths(authRes.data || []);
       setDevices(normalizeOnlineDevices(onlineRes.data));
       userForm.setFieldsValue(profileRes.data.user || {});
-    } finally {
-      setLoading(false);
-    }
-  }, [userForm]);
+    });
+  }, [userForm, withLoading]);
 
   useEffect(() => {
     loadProfile();
@@ -169,18 +164,17 @@ export default function Profile() {
     }
     const formData = new FormData();
     formData.append('avatarfile', blob, avatarFileName);
-    setAvatarUploading(true);
-    try {
-      await uploadAvatar(formData);
-      message.success('修改成功');
-      closeAvatarCrop();
-      await reloadMenus();
-      await loadProfile();
-    } catch (error) {
-      message.error(getUploadErrorMessage(error, '头像上传失败'));
-    } finally {
-      setAvatarUploading(false);
-    }
+    await withAvatarUploading(async () => {
+      try {
+        await uploadAvatar(formData);
+        message.success('修改成功');
+        closeAvatarCrop();
+        await reloadMenus();
+        await loadProfile();
+      } catch (error) {
+        message.error(getUploadErrorMessage(error, '头像上传失败'));
+      }
+    });
   };
 
   const deleteDevice = async (row: OnlineVO) => {

@@ -1,9 +1,8 @@
 import { BellOutlined, EyeOutlined, SettingOutlined, SwapOutlined, UserAddOutlined } from '@ant-design/icons';
 import { ModalForm, PageContainer, ProTable, type ActionType, type ProColumns } from '@ant-design/pro-components';
 import { useBoolean } from 'ahooks';
-import { Badge, Button, Form, message, Modal, Tabs } from 'antd';
-import { useMemo, useRef, useState } from 'react';
-import type { DictData } from '@/api/system/dict/data/types';
+import { Badge, Button, Form, message, Tabs } from 'antd';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import type { UserVO } from '@/api/system/user/types';
 import type { PageResult, R } from '@/api/types';
 import type { FlowTaskVO, TaskQuery } from '@/api/workflow/task/types';
@@ -17,13 +16,13 @@ import MessageType from '@/components/workflow/MessageType';
 import ProcessMeddle from '@/components/workflow/ProcessMeddle';
 import UserNameDisplay from '@/components/workflow/UserNameDisplay';
 import { useDict } from '@/hooks/useDict';
+import { useSearchReset } from '@/hooks/useSearchReset';
+import { dictOptions } from '@/utils/dict';
+import { confirmTitleSafe } from '@/utils/modal';
 import { toPageQuery, toTableData } from '@/utils/ruoyi';
 type AllTaskTab = 'waiting' | 'finish';
 type UserSelectMode = 'applicant' | 'assignee';
 
-function dictOptions(dicts?: DictData[]) {
-  return (dicts || []).map(item => ({ label: item.dictLabel, value: item.dictValue }));
-}
 
 function requestAllTaskList(tab: AllTaskTab, query: TaskQuery): Promise<R<PageResult<FlowTaskVO>>> {
   if (tab === 'waiting') return pageByAllTaskWait(query);
@@ -37,16 +36,6 @@ function openBusinessForm(row: FlowTaskVO) {
     type: 'view',
     formCustom: row.formCustom || 'N',
     formPath: row.formPath || '/workflow/leaveEdit/index'
-  });
-}
-
-function confirmAction(title: string) {
-  return new Promise<void>((resolve, reject) => {
-    Modal.confirm({
-      title,
-      onOk: () => resolve(),
-      onCancel: () => reject(new Error('cancelled'))
-    });
   });
 }
 
@@ -67,6 +56,10 @@ export default function WorkflowAllTaskWaitingPage() {
   const taskStatusOptions = useMemo(() => dictOptions(dicts.wf_task_status), [dicts.wf_task_status]);
   const selectedTaskIds = selectedRows.map(item => item.id).filter(Boolean);
   const selectedApplicantIds = selectedApplicants.map(item => item.userId).filter(Boolean) as Array<string | number>;
+  const resetSearch = useSearchReset(
+    actionRef,
+    useCallback(() => setSelectedApplicants([]), [])
+  );
 
   const changeTab = (key: string) => {
     setActiveTab(key as AllTaskTab);
@@ -103,16 +96,12 @@ export default function WorkflowAllTaskWaitingPage() {
         return;
       }
       const userId = user.userId;
-      Modal.confirm({
-        title: '是否确认提交？',
-        onOk: async () => {
-          await updateAssignee(selectedTaskIds, userId);
-          message.success('操作成功');
-          closeUserModal();
-          setSelectedRows([]);
-          actionRef.current?.reload();
-        }
-      });
+      if (!(await confirmTitleSafe('是否确认提交？'))) return;
+      await updateAssignee(selectedTaskIds, userId);
+      message.success('操作成功');
+      closeUserModal();
+      setSelectedRows([]);
+      actionRef.current?.reload();
       return;
     }
   };
@@ -122,13 +111,8 @@ export default function WorkflowAllTaskWaitingPage() {
     actionRef.current?.reloadAndRest?.();
   };
 
-  const resetSearch = () => {
-    setSelectedApplicants([]);
-    setTimeout(() => actionRef.current?.reloadAndRest?.(), 0);
-  };
-
   const submitUrge = async (values: { message: string; messageType: string[] }) => {
-    await confirmAction('是否确认提交？');
+    if (!(await confirmTitleSafe('是否确认提交？'))) return false;
     await urgeTask({ ...values, taskIdList: selectedTaskIds });
     message.success('操作成功');
     urgeForm.resetFields();

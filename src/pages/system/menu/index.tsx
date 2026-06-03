@@ -14,7 +14,6 @@ import {
 import { useBoolean } from 'ahooks';
 import { Button, Form, message, Modal, Space, Tag, Tree } from 'antd';
 import { useMemo, useRef, useState } from 'react';
-import type { DictData } from '@/api/system/dict/data/types';
 import type { MenuForm, MenuQuery, MenuTreeOption, MenuVO } from '@/api/system/menu/types';
 import { addMenu, cascadeDelMenu, delMenu, getMenu, listMenu, treeselect, updateMenu } from '@/api/system/menu';
 import DictTag from '@/components/common/DictTag';
@@ -22,8 +21,10 @@ import EllipsisText from '@/components/common/EllipsisText';
 import IconSelect from '@/components/common/IconSelect';
 import RowActions from '@/components/common/RowActions';
 import { useDict } from '@/hooks/useDict';
+import { useLoading } from '@/hooks/useLoading';
 import { useUserStore } from '@/stores/userStore';
 import { routeIcon } from '@/utils/menu';
+import { dictOptions } from '@/utils/dict';
 import { hasPermi } from '@/utils/permission';
 import { handleTree } from '@/utils/ruoyi';
 
@@ -37,9 +38,6 @@ const defaultMenuForm: MenuForm = {
   status: '0'
 };
 
-function dictOptions(dicts?: DictData[]) {
-  return (dicts || []).map(item => ({ label: item.dictLabel, value: item.dictValue }));
-}
 
 function menuTypeMeta(row: MenuVO) {
   if (row.menuType === 'F') return { label: '按钮', color: 'orange' };
@@ -66,7 +64,7 @@ export default function SystemMenuPage() {
   const [modalTitle, setModalTitle] = useState('');
   const [cascadeOpen, { setTrue: openCascadeModal, setFalse: closeCascadeModal }] = useBoolean(false);
   const [cascadeKeys, setCascadeKeys] = useState<Array<string | number>>([]);
-  const [cascadeLoading, setCascadeLoading] = useState(false);
+  const { loading: cascadeLoading, withLoading: withCascadeLoading } = useLoading();
 
   const canAdd = hasPermi(userInfo, ['system:menu:add']);
   const canEdit = hasPermi(userInfo, ['system:menu:edit']);
@@ -122,15 +120,12 @@ export default function SystemMenuPage() {
       message.warning('请选择要删除的菜单');
       return;
     }
-    setCascadeLoading(true);
-    try {
+    await withCascadeLoading(async () => {
       await cascadeDelMenu(cascadeKeys);
       message.success('删除成功');
       closeCascadeModal();
       actionRef.current?.reload();
-    } finally {
-      setCascadeLoading(false);
-    }
+    });
   };
 
   const columns: ProColumns<MenuVO>[] = [

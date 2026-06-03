@@ -8,6 +8,7 @@ import { useCallback, useEffect, useState } from 'react';
 import type { RegisterParams, VerifyCodeResult } from '@/api/types';
 import { getCodeImg, register } from '@/api/login';
 import LocaleSelect from '@/components/layout/LocaleSelect';
+import { useLoading } from '@/hooks/useLoading';
 import { useAppStore } from '@/stores/appStore';
 import { appEnv } from '@/utils/env';
 
@@ -70,7 +71,7 @@ export default function Register() {
   const appLocale = useAppStore(state => state.appLocale);
   const setAppLocale = useAppStore(state => state.setAppLocale);
   const [captcha, setCaptcha] = useState<VerifyCodeResult>({ captchaEnabled: true });
-  const [loading, setLoading] = useState(false);
+  const { loading, withLoading } = useLoading();
   const text = registerText[appLocale];
 
   const loadCaptcha = useCallback(async () => {
@@ -90,26 +91,25 @@ export default function Register() {
   }, []);
 
   const submitRegister = async (values: RegisterParams) => {
-    setLoading(true);
-    try {
-      await register({
-        ...values,
-        uuid: captcha.uuid,
-        userType: 'sys_user'
-      });
-      await Modal.success({
-        title: text.successTitle,
-        content: text.success(values.username)
-      });
-      history.push('/login');
-    } catch (error) {
-      if (captcha.captchaEnabled) {
-        loadCaptcha();
+    await withLoading(async () => {
+      try {
+        await register({
+          ...values,
+          uuid: captcha.uuid,
+          userType: 'sys_user'
+        });
+        await Modal.success({
+          title: text.successTitle,
+          content: text.success(values.username)
+        });
+        history.push('/login');
+      } catch (error) {
+        if (captcha.captchaEnabled) {
+          loadCaptcha();
+        }
+        message.error((error as Error).message || text.fail);
       }
-      message.error((error as Error).message || text.fail);
-    } finally {
-      setLoading(false);
-    }
+    });
   };
 
   return (

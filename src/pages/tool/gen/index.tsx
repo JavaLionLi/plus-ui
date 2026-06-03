@@ -17,10 +17,11 @@ import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import type { TableQuery, TableVO } from '@/api/tool/gen/types';
 import { batchGenCode, delTable, getDataNames, listTable, previewTable, synchDb } from '@/api/tool/gen';
 import EllipsisText from '@/components/common/EllipsisText';
+import { useDateRangeQuery } from '@/hooks/useDateRangeQuery';
 import { useUserStore } from '@/stores/userStore';
 import { saveValidatedBlob } from '@/utils/download';
 import { hasPermi } from '@/utils/permission';
-import { addDateRange, toPageQuery, toTableData } from '@/utils/ruoyi';
+import { toPageQuery, toTableData } from '@/utils/ruoyi';
 import ImportTableModal from './components/ImportTableModal';
 
 function previewName(path: string) {
@@ -63,6 +64,7 @@ export default function ToolGenPage() {
   const [currentPage, setCurrentPage] = useState(
     () => Number(new URLSearchParams(location.search).get('pageNum')) || 1
   );
+  const { applyDateRange } = useDateRangeQuery();
 
   const canCode = hasPermi(userInfo, ['tool:gen:code']);
   const canImport = hasPermi(userInfo, ['tool:gen:import']);
@@ -238,7 +240,7 @@ export default function ToolGenPage() {
           const { dateRange, ...tableParams } = params;
           setCurrentPage(tableParams.current || 1);
           setCurrentDataName(tableParams.dataName || undefined);
-          const query = addDateRange(toPageQuery(tableParams), dateRange);
+          const query = applyDateRange(toPageQuery(tableParams), dateRange);
           const res = await listTable(query);
           return toTableData(res);
         }}

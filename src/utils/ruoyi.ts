@@ -1,4 +1,5 @@
 import dayjs, { type ConfigType } from 'dayjs';
+import type { Key } from 'react';
 
 export function tansParams(params: Record<string, unknown>) {
   let result = '';
@@ -35,14 +36,20 @@ export function parseStrEmpty(value?: string | number) {
   return value;
 }
 
-export function addDateRange<T extends Record<string, unknown>>(params: T, dateRange?: [string, string] | null) {
+export function addDateRange<T extends Record<string, unknown>>(
+  params: T,
+  dateRange?: [string, string] | null,
+  propName?: string
+) {
   if (!dateRange?.length) return params;
+  const beginKey = propName ? `begin${propName}` : 'beginTime';
+  const endKey = propName ? `end${propName}` : 'endTime';
   return {
     ...params,
     params: {
       ...((params.params as Record<string, unknown>) || {}),
-      beginTime: dateRange[0],
-      endTime: dateRange[1]
+      [beginKey]: dateRange[0],
+      [endKey]: dateRange[1]
     }
   };
 }
@@ -59,6 +66,35 @@ export function formatDateTimeRange(dateRange?: [ConfigType, ConfigType] | null)
     string,
     string
   ];
+}
+
+export function toDayjsValue(value?: ConfigType | null) {
+  return value ? dayjs(value) : undefined;
+}
+
+export function formatDateTimeValue(value: unknown) {
+  if (!value) return value;
+  return dayjs(value as ConfigType).format('YYYY-MM-DD HH:mm:ss');
+}
+
+export function toDayjsFields<T extends Record<string, unknown>>(data: T, fields: string[]) {
+  const next: Record<string, unknown> = { ...data };
+  for (const field of fields) {
+    if (next[field]) {
+      next[field] = toDayjsValue(next[field] as ConfigType);
+    }
+  }
+  return next as T;
+}
+
+export function formatDateTimeFields<T extends Record<string, unknown>>(data: T, fields: string[]) {
+  const next: Record<string, unknown> = { ...data };
+  for (const field of fields) {
+    if (next[field]) {
+      next[field] = formatDateTimeValue(next[field]);
+    }
+  }
+  return next as T;
 }
 
 export function toPageQuery<T extends object>(params: T & { current?: number; pageSize?: number }) {
@@ -137,4 +173,31 @@ export function handleTree<T>(data: T[], id = 'id', parentId = 'parentId', child
     }
   }
   return tree;
+}
+
+export function collectTreeKeys<T extends object>(
+  nodes: T[],
+  getKey: (node: T) => Key,
+  getChildren: (node: T) => T[] | undefined = node => (node as Record<string, unknown>).children as T[] | undefined
+): Key[] {
+  return nodes.flatMap(node => {
+    const children = getChildren(node);
+    return [getKey(node), ...(children?.length ? collectTreeKeys(children, getKey, getChildren) : [])];
+  });
+}
+
+export function filterTree<T extends object>(
+  nodes: T[],
+  predicate: (node: T) => boolean,
+  children = 'children'
+): T[] {
+  return nodes
+    .filter(predicate)
+    .map(node => {
+      const record = node as Record<string, unknown>;
+      return {
+        ...node,
+        [children]: filterTree((record[children] as T[] | undefined) || [], predicate, children)
+      } as T;
+    });
 }

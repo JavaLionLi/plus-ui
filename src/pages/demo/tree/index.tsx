@@ -1,4 +1,3 @@
-import type { Key } from 'react';
 import { DeleteOutlined, EditOutlined, PlusOutlined, SortAscendingOutlined } from '@ant-design/icons';
 import {
   ModalForm,
@@ -15,6 +14,7 @@ import { useMemo, useRef, useState } from 'react';
 import type { TreeForm, TreeQuery, TreeVO } from '@/api/demo/tree/types';
 import { addTree, delTree, getTree, listTree, updateTree } from '@/api/demo/tree';
 import RowActions from '@/components/common/RowActions';
+import { useTreeTableExpand } from '@/hooks/useTreeTableExpand';
 import { useUserStore } from '@/stores/userStore';
 import { hasPermi } from '@/utils/permission';
 import { handleTree } from '@/utils/ruoyi';
@@ -35,18 +35,14 @@ function toTreeSelectData(nodes: TreeVO[]): TreeSelectNode[] {
   }));
 }
 
-function collectTreeKeys(nodes: TreeVO[]): Key[] {
-  return nodes.flatMap(node => [node.id, ...(node.children ? collectTreeKeys(node.children) : [])]);
-}
-
 export default function DemoTreePage() {
   const actionRef = useRef<ActionType | undefined>(undefined);
   const [form] = Form.useForm<TreeForm>();
   const userInfo = useUserStore(state => state.userInfo);
   const [treeOptions, setTreeOptions] = useState<TreeVO[]>([]);
   const [tableRows, setTableRows] = useState<TreeVO[]>([]);
-  const [expandAll, setExpandAll] = useState(false);
-  const [expandedRowKeys, setExpandedRowKeys] = useState<Key[]>([]);
+  const { expandAll, expandedRowKeys, onExpandedRowsChange, syncExpandedRows, toggleExpandAll } =
+    useTreeTableExpand<TreeVO>(row => row.id);
   const [modalOpen, { setTrue: openModal, setFalse: closeModal }] = useBoolean(false);
   const [modalTitle, setModalTitle] = useState('');
 
@@ -134,13 +130,13 @@ export default function DemoTreePage() {
         search={{ labelWidth: 90 }}
         expandable={{
           expandedRowKeys,
-          onExpandedRowsChange: keys => setExpandedRowKeys([...keys])
+          onExpandedRowsChange
         }}
         request={async params => {
           const res = await listTree({ treeName: params.treeName });
           const rows = handleTree<TreeVO>(res.data || [], 'id', 'parentId');
           setTableRows(rows);
-          setExpandedRowKeys(expandAll ? collectTreeKeys(rows) : []);
+          syncExpandedRows(rows, expandAll);
           return { data: rows, total: rows.length, success: true };
         }}
         toolbar={{ title: '测试树列表' }}
@@ -153,13 +149,7 @@ export default function DemoTreePage() {
           <Button
             key="expand"
             icon={<SortAscendingOutlined />}
-            onClick={() => {
-              setExpandAll(value => {
-                const next = !value;
-                setExpandedRowKeys(next ? collectTreeKeys(tableRows) : []);
-                return next;
-              });
-            }}
+            onClick={() => toggleExpandAll(tableRows)}
           >
             展开/折叠
           </Button>

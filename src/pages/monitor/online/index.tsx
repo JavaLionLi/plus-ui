@@ -3,19 +3,16 @@ import { PageContainer, ProTable, type ActionType, type ProColumns } from '@ant-
 import { message } from 'antd';
 import { useMemo, useRef } from 'react';
 import type { OnlineQuery, OnlineVO } from '@/api/monitor/online/types';
-import type { DictData } from '@/api/system/dict/data/types';
 import { forceLogout, listOnline } from '@/api/monitor/online';
 import DictTag from '@/components/common/DictTag';
 import EllipsisText from '@/components/common/EllipsisText';
 import RowActions from '@/components/common/RowActions';
 import { useDict } from '@/hooks/useDict';
 import { useUserStore } from '@/stores/userStore';
+import { dictOptions } from '@/utils/dict';
 import { hasPermi } from '@/utils/permission';
 import { toPageQuery, toTableData } from '@/utils/ruoyi';
 
-function dictOptions(dicts?: DictData[]) {
-  return (dicts || []).map(item => ({ label: item.dictLabel, value: item.dictValue }));
-}
 
 export default function MonitorOnlinePage() {
   const actionRef = useRef<ActionType | undefined>(undefined);

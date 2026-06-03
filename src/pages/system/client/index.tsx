@@ -12,10 +12,9 @@ import {
   type ProColumns
 } from '@ant-design/pro-components';
 import { useBoolean } from 'ahooks';
-import { Button, Form, message, Modal, Popconfirm, Space, Switch } from 'antd';
+import { Button, Form, message, Popconfirm, Space, Switch } from 'antd';
 import { useMemo, useRef, useState } from 'react';
 import type { ClientForm, ClientQuery, ClientVO } from '@/api/system/client/types';
-import type { DictData } from '@/api/system/dict/data/types';
 import { addClient, changeStatus, delClient, getClient, listClient, updateClient } from '@/api/system/client';
 import DictTag from '@/components/common/DictTag';
 import EllipsisText from '@/components/common/EllipsisText';
@@ -24,14 +23,13 @@ import { useDict } from '@/hooks/useDict';
 import { useTableExport } from '@/hooks/useTableExport';
 import { useTableSelection } from '@/hooks/useTableSelection';
 import { useUserStore } from '@/stores/userStore';
+import { dictOptions } from '@/utils/dict';
+import { confirmAction } from '@/utils/modal';
 import { hasPermi } from '@/utils/permission';
 import { toPageQuery, toTableData } from '@/utils/ruoyi';
 
 const defaultClientForm: ClientForm = { status: '0' };
 
-function dictOptions(dicts?: DictData[]) {
-  return (dicts || []).map(item => ({ label: item.dictLabel, value: item.dictValue }));
-}
 
 function getRuleList(ruleList?: string[], ruleValue?: string) {
   if (Array.isArray(ruleList) && ruleList.length) return ruleList;
@@ -40,17 +38,6 @@ function getRuleList(ruleList?: string[], ruleValue?: string) {
     .split(/[\n,;]+/)
     .map(item => item.trim())
     .filter(Boolean);
-}
-
-function confirmAction(content: string) {
-  return new Promise<void>((resolve, reject) => {
-    Modal.confirm({
-      title: '系统提示',
-      content,
-      onOk: () => resolve(),
-      onCancel: () => reject(new Error('cancelled'))
-    });
-  });
 }
 
 export default function SystemClientPage() {

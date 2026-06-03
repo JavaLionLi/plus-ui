@@ -11,7 +11,7 @@ import {
 import { PageContainer, ProTable, type ActionType, type ProColumns } from '@ant-design/pro-components';
 import { history, useLocation } from '@umijs/max';
 import { useBoolean } from 'ahooks';
-import { Button, Form, message, Modal, Popconfirm, Space, Switch, Tabs, Tag } from 'antd';
+import { Button, Form, message, Popconfirm, Space, Switch, Tabs, Tag } from 'antd';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { PageResult, R } from '@/api/types';
 import type { CategoryTreeVO } from '@/api/workflow/category/types';
@@ -31,8 +31,10 @@ import {
 } from '@/api/workflow/definition';
 import EllipsisText from '@/components/common/EllipsisText';
 import TreePanel from '@/components/common/TreePanel';
+import { useSearchReset } from '@/hooks/useSearchReset';
 import { useUserStore } from '@/stores/userStore';
 import { saveValidatedBlob } from '@/utils/download';
+import { confirmAction } from '@/utils/modal';
 import { hasPermi } from '@/utils/permission';
 import { toPageQuery, toTableData } from '@/utils/ruoyi';
 import DefinitionFormModal from './components/DefinitionFormModal';
@@ -58,17 +60,6 @@ const defaultForm: FlowDefinitionForm = {
   formCustom: 'N',
   modelValue: 'CLASSICS'
 };
-
-function confirmAction(content: string) {
-  return new Promise<void>((resolve, reject) => {
-    Modal.confirm({
-      title: '系统提示',
-      content,
-      onOk: () => resolve(),
-      onCancel: () => reject(new Error('cancelled'))
-    });
-  });
-}
 
 function requestDefinitionList(
   tab: DefinitionTab,
@@ -104,6 +95,10 @@ export default function WorkflowProcessDefinitionPage() {
 
   const selectedIds = selectedRows.map(item => item.id).filter(Boolean);
   const selectedOne = selectedRows.length === 1 ? selectedRows[0] : undefined;
+  const resetSearch = useSearchReset(
+    actionRef,
+    useCallback(() => setCategory(undefined), [])
+  );
 
   const switchTab = useCallback((nextTab: DefinitionTab) => {
     setSelectedRows([]);
@@ -222,11 +217,6 @@ export default function WorkflowProcessDefinitionPage() {
     if (!selectedOne?.id) return;
     const blob = await exportDefinition(selectedOne.id);
     await saveValidatedBlob(blob, `${selectedOne.flowCode}.json`);
-  };
-
-  const resetSearch = () => {
-    setCategory(undefined);
-    setTimeout(() => actionRef.current?.reloadAndRest?.(), 0);
   };
 
   const columns: ProColumns<FlowDefinitionVO>[] = [

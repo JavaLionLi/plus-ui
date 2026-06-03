@@ -2,7 +2,6 @@ import { DeleteOutlined, EditOutlined, EyeOutlined, RollbackOutlined } from '@an
 import { PageContainer, ProTable, type ActionType, type ProColumns } from '@ant-design/pro-components';
 import { message, Tag } from 'antd';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { DictData } from '@/api/system/dict/data/types';
 import type { CategoryTreeVO } from '@/api/workflow/category/types';
 import type { FlowInstanceQuery, FlowInstanceVO } from '@/api/workflow/instance/types';
 import { categoryTree } from '@/api/workflow/category';
@@ -14,12 +13,10 @@ import RowActions from '@/components/common/RowActions';
 import TreePanel from '@/components/common/TreePanel';
 import { useDict } from '@/hooks/useDict';
 import { useUserStore } from '@/stores/userStore';
+import { dictOptions } from '@/utils/dict';
 import { hasPermi } from '@/utils/permission';
 import { toPageQuery, toTableData } from '@/utils/ruoyi';
 
-function dictOptions(dicts?: DictData[]) {
-  return (dicts || []).map(item => ({ label: item.dictLabel, value: item.dictValue }));
-}
 
 function editableStatus(status?: string) {
   return status === 'draft' || status === 'cancel' || status === 'back';

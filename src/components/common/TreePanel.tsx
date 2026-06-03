@@ -2,6 +2,7 @@ import type { DataNode, EventDataNode } from 'antd/es/tree';
 import { LeftOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Card, Input, Tree } from 'antd';
 import { useEffect, useMemo, useState, type Key } from 'react';
+import { collectTreeKeys } from '@/utils/ruoyi';
 
 export interface TreePanelProps<T extends object = Record<string, unknown>> {
   title: string;
@@ -60,10 +61,6 @@ function toDataNodes<T extends object>(
   });
 }
 
-function collectKeys(nodes: DataNode[]): Key[] {
-  return nodes.flatMap(node => [node.key, ...(node.children?.length ? collectKeys(node.children) : [])]);
-}
-
 export default function TreePanel<T extends object = Record<string, unknown>>({
   title,
   placeholder = '请输入名称',
@@ -95,7 +92,7 @@ export default function TreePanel<T extends object = Record<string, unknown>>({
     () => toDataNodes(filteredData, mergedFieldNames, disabledField),
     [disabledField, filteredData, mergedFieldNames]
   );
-  const allTreeKeys = useMemo(() => collectKeys(treeData), [treeData]);
+  const allTreeKeys = useMemo(() => collectTreeKeys(treeData, node => node.key), [treeData]);
   const mergedCollapsed = collapsed ?? innerCollapsed;
 
   useEffect(() => {

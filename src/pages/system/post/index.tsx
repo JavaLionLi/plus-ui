@@ -15,7 +15,6 @@ import { useBoolean } from 'ahooks';
 import { Button, Form, message, Popconfirm, Tag } from 'antd';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { DeptTreeVO } from '@/api/system/dept/types';
-import type { DictData } from '@/api/system/dict/data/types';
 import type { PostForm, PostQuery, PostVO } from '@/api/system/post/types';
 import { addPost, delPost, getPost, listPost, postDeptTreeSelect, updatePost } from '@/api/system/post';
 import EllipsisText from '@/components/common/EllipsisText';
@@ -25,14 +24,12 @@ import { useDict } from '@/hooks/useDict';
 import { useTableExport } from '@/hooks/useTableExport';
 import { useTableSelection } from '@/hooks/useTableSelection';
 import { useUserStore } from '@/stores/userStore';
+import { dictOptions } from '@/utils/dict';
 import { hasPermi } from '@/utils/permission';
 import { toPageQuery, toTableData } from '@/utils/ruoyi';
 
 const defaultPostForm: PostForm = { postSort: 0, status: '0' };
 
-function dictOptions(dicts?: DictData[]) {
-  return (dicts || []).map(item => ({ label: item.dictLabel, value: item.dictValue }));
-}
 
 interface TreeSelectNode {
   title: string;

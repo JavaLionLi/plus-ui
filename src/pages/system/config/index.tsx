@@ -13,21 +13,19 @@ import { useBoolean } from 'ahooks';
 import { Button, Form, message, Popconfirm } from 'antd';
 import { useRef, useState } from 'react';
 import type { ConfigForm, ConfigQuery, ConfigVO } from '@/api/system/config/types';
-import type { DictData } from '@/api/system/dict/data/types';
 import { addConfig, delConfig, getConfig, listConfig, refreshConfigCache, updateConfig } from '@/api/system/config';
 import DictTag from '@/components/common/DictTag';
 import EllipsisText from '@/components/common/EllipsisText';
 import RowActions from '@/components/common/RowActions';
+import { useDateRangeQuery } from '@/hooks/useDateRangeQuery';
 import { useDict } from '@/hooks/useDict';
 import { useTableExport } from '@/hooks/useTableExport';
 import { useTableSelection } from '@/hooks/useTableSelection';
 import { useUserStore } from '@/stores/userStore';
+import { dictOptions } from '@/utils/dict';
 import { hasPermi } from '@/utils/permission';
-import { addDateRange, formatDateTimeRange, toPageQuery, toTableData } from '@/utils/ruoyi';
+import { toPageQuery, toTableData } from '@/utils/ruoyi';
 
-function dictOptions(dicts?: DictData[]) {
-  return (dicts || []).map(item => ({ label: item.dictLabel, value: item.dictValue }));
-}
 
 export default function SystemConfigPage() {
   const actionRef = useRef<ActionType | undefined>(undefined);
@@ -38,6 +36,7 @@ export default function SystemConfigPage() {
   const [modalOpen, { setTrue: openModal, setFalse: closeModal }] = useBoolean(false);
   const [modalTitle, setModalTitle] = useState('');
   const { updateExportParams, exportFile } = useTableExport();
+  const { applyDateRange: applyCreateTimeDateRange } = useDateRangeQuery();
   const canAdd = hasPermi(userInfo, ['system:config:add']);
   const canEdit = hasPermi(userInfo, ['system:config:edit']);
   const canRemove = hasPermi(userInfo, ['system:config:remove']);
@@ -132,7 +131,7 @@ export default function SystemConfigPage() {
         rowSelection={{ selectedRowKeys: ids, onChange: handleSelectionChange }}
         request={async params => {
           const { createTimeRange, ...tableParams } = params;
-          const query = addDateRange(toPageQuery(tableParams), formatDateTimeRange(createTimeRange));
+          const query = applyCreateTimeDateRange(toPageQuery(tableParams), createTimeRange);
           updateExportParams(query);
           const res = await listConfig(query);
           return toTableData(res);

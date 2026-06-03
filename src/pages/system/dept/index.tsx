@@ -13,16 +13,17 @@ import {
 } from '@ant-design/pro-components';
 import { useBoolean } from 'ahooks';
 import { Button, Form, message, Tag } from 'antd';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import type { DeptForm, DeptQuery, DeptVO } from '@/api/system/dept/types';
-import type { DictData } from '@/api/system/dict/data/types';
 import type { UserVO } from '@/api/system/user/types';
 import { addDept, delDept, getDept, listDept, listDeptExcludeChild, updateDept } from '@/api/system/dept';
 import { listUserByDeptId } from '@/api/system/user';
 import EllipsisText from '@/components/common/EllipsisText';
 import RowActions from '@/components/common/RowActions';
 import { useDict } from '@/hooks/useDict';
+import { useTreeTableExpand } from '@/hooks/useTreeTableExpand';
 import { useUserStore } from '@/stores/userStore';
+import { dictOptions } from '@/utils/dict';
 import { hasPermi } from '@/utils/permission';
 import { handleTree } from '@/utils/ruoyi';
 
@@ -37,12 +38,6 @@ interface TreeSelectNode {
   children?: TreeSelectNode[];
 }
 
-function dictOptions(dicts?: DictData[]) {
-  return (dicts || []).map(item => ({
-    label: item.dictLabel,
-    value: item.dictValue
-  }));
-}
 
 function toTreeSelectData(depts: DeptVO[]): TreeSelectNode[] {
   return depts.map(dept => ({
@@ -50,16 +45,6 @@ function toTreeSelectData(depts: DeptVO[]): TreeSelectNode[] {
     value: dept.deptId,
     children: dept.children ? toTreeSelectData(dept.children) : undefined
   }));
-}
-
-function collectDeptKeys(depts: DeptVO[]): Array<string | number> {
-  return depts.reduce<Array<string | number>>((keys, dept) => {
-    keys.push(dept.deptId);
-    if (dept.children?.length) {
-      keys.push(...collectDeptKeys(dept.children));
-    }
-    return keys;
-  }, []);
 }
 
 export default function SystemDeptPage() {
@@ -71,18 +56,17 @@ export default function SystemDeptPage() {
   const [modalTitle, setModalTitle] = useState('');
   const [deptOptions, setDeptOptions] = useState<DeptVO[]>([]);
   const [deptUserList, setDeptUserList] = useState<UserVO[]>([]);
-  const [expandedRowKeys, setExpandedRowKeys] = useState<readonly React.Key[]>([]);
   const [lastDeptList, setLastDeptList] = useState<DeptVO[]>([]);
+  const { expandedRowKeys, onExpandedRowsChange, syncExpandedRows, toggleExpandAll } = useTreeTableExpand<DeptVO>(
+    dept => dept.deptId,
+    { initialExpandAll: true }
+  );
 
   const canAdd = hasPermi(userInfo, ['system:dept:add']);
   const canEdit = hasPermi(userInfo, ['system:dept:edit']);
   const canRemove = hasPermi(userInfo, ['system:dept:remove']);
   const parentId = Form.useWatch('parentId', form);
   const deptTreeSelectData = useMemo(() => toTreeSelectData(deptOptions), [deptOptions]);
-
-  useEffect(() => {
-    setExpandedRowKeys(collectDeptKeys(lastDeptList));
-  }, [lastDeptList]);
 
   const loadDeptOptions = async (excludeDeptId?: string | number) => {
     const res = excludeDeptId ? await listDeptExcludeChild(excludeDeptId) : await listDept();
@@ -212,12 +196,13 @@ export default function SystemDeptPage() {
         pagination={false}
         expandable={{
           expandedRowKeys,
-          onExpandedRowsChange: setExpandedRowKeys
+          onExpandedRowsChange
         }}
         request={async params => {
           const res = await listDept(params);
           const data = handleTree<DeptVO>(res.data || [], 'deptId');
           setLastDeptList(data);
+          syncExpandedRows(data);
           return { data, success: true };
         }}
         toolbar={{ title: '部门列表' }}
@@ -229,7 +214,7 @@ export default function SystemDeptPage() {
           ),
           <Button
             key="expand"
-            onClick={() => setExpandedRowKeys(expandedRowKeys.length ? [] : collectDeptKeys(lastDeptList))}
+            onClick={() => toggleExpandAll(lastDeptList)}
           >
             展开/折叠
           </Button>

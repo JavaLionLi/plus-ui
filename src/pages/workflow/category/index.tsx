@@ -1,4 +1,3 @@
-import type { Key } from 'react';
 import { DeleteOutlined, EditOutlined, PlusOutlined, SortAscendingOutlined } from '@ant-design/icons';
 import {
   ModalForm,
@@ -16,6 +15,7 @@ import { useMemo, useRef, useState } from 'react';
 import type { CategoryForm, CategoryQuery, CategoryVO } from '@/api/workflow/category/types';
 import { addCategory, delCategory, getCategory, listCategory, updateCategory } from '@/api/workflow/category';
 import RowActions from '@/components/common/RowActions';
+import { useTreeTableExpand } from '@/hooks/useTreeTableExpand';
 import { useUserStore } from '@/stores/userStore';
 import { hasPermi } from '@/utils/permission';
 import { handleTree } from '@/utils/ruoyi';
@@ -36,18 +36,14 @@ function toTreeSelectData(nodes: CategoryVO[]): CategorySelectNode[] {
   }));
 }
 
-function collectCategoryKeys(nodes: CategoryVO[]): Key[] {
-  return nodes.flatMap(node => [node.categoryId, ...(node.children ? collectCategoryKeys(node.children) : [])]);
-}
-
 export default function WorkflowCategoryPage() {
   const actionRef = useRef<ActionType | undefined>(undefined);
   const [form] = Form.useForm<CategoryForm>();
   const userInfo = useUserStore(state => state.userInfo);
   const [categoryOptions, setCategoryOptions] = useState<CategoryVO[]>([]);
   const [tableRows, setTableRows] = useState<CategoryVO[]>([]);
-  const [expandAll, setExpandAll] = useState(false);
-  const [expandedRowKeys, setExpandedRowKeys] = useState<Key[]>([]);
+  const { expandAll, expandedRowKeys, onExpandedRowsChange, syncExpandedRows, toggleExpandAll } =
+    useTreeTableExpand<CategoryVO>(row => row.categoryId);
   const [modalOpen, { setTrue: openModal, setFalse: closeModal }] = useBoolean(false);
   const [modalTitle, setModalTitle] = useState('');
 
@@ -131,13 +127,13 @@ export default function WorkflowCategoryPage() {
         search={{ labelWidth: 90 }}
         expandable={{
           expandedRowKeys,
-          onExpandedRowsChange: keys => setExpandedRowKeys([...keys])
+          onExpandedRowsChange
         }}
         request={async params => {
           const res = await listCategory({ categoryName: params.categoryName });
           const rows = handleTree<CategoryVO>(res.data || [], 'categoryId', 'parentId');
           setTableRows(rows);
-          setExpandedRowKeys(expandAll ? collectCategoryKeys(rows) : []);
+          syncExpandedRows(rows, expandAll);
           return { data: rows, total: rows.length, success: true };
         }}
         toolbar={{ title: '流程分类列表' }}
@@ -150,13 +146,7 @@ export default function WorkflowCategoryPage() {
           <Button
             key="expand"
             icon={<SortAscendingOutlined />}
-            onClick={() => {
-              setExpandAll(value => {
-                const next = !value;
-                setExpandedRowKeys(next ? collectCategoryKeys(tableRows) : []);
-                return next;
-              });
-            }}
+            onClick={() => toggleExpandAll(tableRows)}
           >
             展开/折叠
           </Button>

@@ -6,6 +6,7 @@ import ReactECharts from 'echarts-for-react';
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import type { CacheVO } from '@/api/monitor/cache/types';
 import { getCache } from '@/api/monitor/cache';
+import { useLoading } from '@/hooks/useLoading';
 
 function infoValue(cache: Partial<CacheVO>, key: string) {
   return cache.info?.[key] || '-';
@@ -44,17 +45,14 @@ function overviewRows(cache: Partial<CacheVO>) {
 
 export default function MonitorCachePage() {
   const [cache, setCache] = useState<Partial<CacheVO>>({});
-  const [loading, setLoading] = useState(false);
+  const { loading, withLoading } = useLoading();
 
   const loadOverview = useCallback(async () => {
-    setLoading(true);
-    try {
+    await withLoading(async () => {
       const cacheRes = await getCache();
       setCache(cacheRes.data || {});
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    });
+  }, [withLoading]);
 
   useEffect(() => {
     loadOverview();

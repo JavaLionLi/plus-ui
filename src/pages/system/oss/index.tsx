@@ -19,10 +19,11 @@ import FileUpload from '@/components/common/FileUpload';
 import ImagePreview from '@/components/common/ImagePreview';
 import ImageUpload from '@/components/common/ImageUpload';
 import RowActions from '@/components/common/RowActions';
+import { useDateRangeQuery } from '@/hooks/useDateRangeQuery';
 import { useUserStore } from '@/stores/userStore';
 import { saveValidatedBlob } from '@/utils/download';
 import { hasPermi } from '@/utils/permission';
-import { addDateRange, formatDateTimeRange, toPageQuery, toTableData, withTableSort } from '@/utils/ruoyi';
+import { toPageQuery, toTableData, withTableSort } from '@/utils/ruoyi';
 
 function isImage(fileSuffix?: string) {
   return ['.png', '.jpg', '.jpeg'].includes((fileSuffix || '').toLowerCase());
@@ -37,6 +38,7 @@ export default function SystemOssPage() {
   const [uploadTitle, setUploadTitle] = useState('上传文件');
   const [uploadType, setUploadType] = useState<'file' | 'image'>('file');
   const [uploadValue, setUploadValue] = useState('');
+  const { applyDateRange: applyCreateTimeDateRange } = useDateRangeQuery();
 
   const canUpload = hasPermi(userInfo, ['system:oss:upload']);
   const canRemove = hasPermi(userInfo, ['system:oss:remove']);
@@ -149,9 +151,9 @@ export default function SystemOssPage() {
         rowSelection={{ selectedRowKeys: ids, onChange: (_, rows) => setSelectedRows(rows) }}
         request={async (params, sort) => {
           const { createTimeRange, ...tableParams } = params;
-          const query = addDateRange(
+          const query = applyCreateTimeDateRange(
             withTableSort(toPageQuery(tableParams), sort, { orderByColumn: 'createTime', isAsc: 'ascending' }),
-            formatDateTimeRange(createTimeRange)
+            createTimeRange
           );
           const preview = await getConfigKey('sys.oss.previewListResource');
           setPreviewListResource(preview.data === undefined ? true : preview.data === 'true');

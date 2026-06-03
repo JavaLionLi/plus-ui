@@ -3,20 +3,18 @@ import { PageContainer, ProTable, type ActionType, type ProColumns } from '@ant-
 import { Button, message, Popconfirm } from 'antd';
 import { useMemo, useRef } from 'react';
 import type { LoginInfoQuery, LoginInfoVO } from '@/api/monitor/logininfo/types';
-import type { DictData } from '@/api/system/dict/data/types';
 import { cleanLoginInfo, delLoginInfo, listLoginInfo, unlockLoginInfo } from '@/api/monitor/logininfo';
 import DictTag from '@/components/common/DictTag';
 import EllipsisText from '@/components/common/EllipsisText';
+import { useDateRangeQuery } from '@/hooks/useDateRangeQuery';
 import { useDict } from '@/hooks/useDict';
 import { useTableExport } from '@/hooks/useTableExport';
 import { useTableSelection } from '@/hooks/useTableSelection';
 import { useUserStore } from '@/stores/userStore';
+import { dictOptions } from '@/utils/dict';
 import { hasPermi } from '@/utils/permission';
-import { addDateRange, formatDateTimeRange, toPageQuery, toTableData, withTableSort } from '@/utils/ruoyi';
+import { toPageQuery, toTableData, withTableSort } from '@/utils/ruoyi';
 
-function dictOptions(dicts?: DictData[]) {
-  return (dicts || []).map(item => ({ label: item.dictLabel, value: item.dictValue }));
-}
 
 export default function MonitorLoginInfoPage() {
   const actionRef = useRef<ActionType | undefined>(undefined);
@@ -26,6 +24,7 @@ export default function MonitorLoginInfoPage() {
     row => row.infoId
   );
   const { updateExportParams, exportFile } = useTableExport();
+  const { applyDateRange: applyLoginTimeDateRange } = useDateRangeQuery();
 
   const canRemove = hasPermi(userInfo, ['monitor:logininfo:remove']);
   const canUnlock = hasPermi(userInfo, ['monitor:logininfo:unlock']);
@@ -136,9 +135,9 @@ export default function MonitorLoginInfoPage() {
         rowSelection={{ selectedRowKeys: ids, onChange: handleSelectionChange }}
         request={async (params, sort) => {
           const { loginTimeRange, ...tableParams } = params;
-          const query = addDateRange(
+          const query = applyLoginTimeDateRange(
             withTableSort(toPageQuery(tableParams), sort, { orderByColumn: 'loginTime', isAsc: 'descending' }),
-            formatDateTimeRange(loginTimeRange)
+            loginTimeRange
           );
           updateExportParams(query);
           const res = await listLoginInfo(query);
