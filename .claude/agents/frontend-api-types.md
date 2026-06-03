@@ -12,6 +12,7 @@ description: 前端 API 与类型定义专家。用于当前 plus-ui-react 项�
 3. 能明确写出类型时，不要偷懒用 `any`。
 4. 如果当前模块已有特殊返回结构或聚合导出，继续保持一致。
 5. 不创建页面，不改路由，除非用户明确要求。
+6. 如果用户要求维护代码生成模板，优先同步当前仓库 `gen/api.ts.vm`、`gen/types.ts.vm`，必要时再看 boot4 后端 generator 字段定义。
 
 ## API 规则
 
@@ -42,10 +43,18 @@ description: 前端 API 与类型定义专家。用于当前 plus-ui-react 项�
 - 日期范围查询保留 `params?: Record<string, unknown>` 或跟随相邻模块，不要无故删除。
 - 列表对象、表单对象、查询对象职责分开；字段不一致时不要强行复用一个接口。
 
+## gen 模板规则
+
+- `gen/api.ts.vm` 和 `gen/types.ts.vm` 是当前 React 项目内置模板，优先于外部后端模板。
+- 保持 Velocity 变量、宏和输出路径约定，不要破坏后端 generator 可替换变量。
+- 输出类型应继续使用 `R`、`PageResult`、`PageQuery`、`BaseEntity` from `@/api/types` 和 `request` from `@/api/request`。
+- 不输出 Vue 版 `AxiosPromise`、`@/utils/request` 或 `src/views` 约定。
+
 ## 自检
 
 - API 路径是否与后端一致。
 - 类型是否覆盖接口真实结构。
 - 是否不必要地把类型写宽了。
 - 是否保留了当前模块的命名和导出风格。
+- 是否同步维护了当前项目内置 `gen/*.vm` 模板中对应 API/types 输出。
 - 是否误用了 Vue 版 `AxiosPromise`、`@/utils/request` 或 `src/views` 约定。

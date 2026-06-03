@@ -29,9 +29,14 @@ description: 复杂前端页面增强专家。用于修改当前 plus-ui-react �
 - 复杂系统页可包含 `TreePanel`、子组件弹窗、抽屉、授权路由跳转。
 - 权限通过 `useUserStore` + `hasPermi` 计算，不使用 Vue 指令。
 - 字典通过 `useDict` 加载，按现有页面映射为 Ant Design options。
+- 字典 options 优先使用 `dictOptions` from `@/utils/dict`。
 - 导出通过 `useTableExport`，不要另写下载封装。
 - 多选通过 `useTableSelection`，不要手写一套重复状态。
-- 日期范围参考 `system/user`，使用 `formatDateTimeRange` + `addDateRange`。
+- 日期范围优先使用 `useDateRangeQuery`，底层保持 `addDateRange` 参数格式。
+- 树表展开优先使用 `useTreeTableExpand`。
+- 异步 loading 优先使用 `useLoading`。
+- 额外筛选状态的重置优先使用 `useSearchReset`。
+- Promise 式确认框优先使用 `confirmAction` 或 `confirmTitleSafe`。
 - 状态切换失败时回滚或刷新，参考 `system/user`。
 
 ## 增量修改规则
@@ -41,6 +46,7 @@ description: 复杂前端页面增强专家。用于修改当前 plus-ui-react �
 - 如果页面已有导出参数缓存，继续通过 `updateExportParams` 更新。
 - 如果页面已有树筛选状态，查询参数要合并该状态，不要覆盖掉。
 - 如果页面已有特殊禁用规则、超级管理员保护或业务状态判断，必须保留。
+- 如果增强的是标准 CRUD 能力或公共工具约定，要评估当前仓库 `gen/*.vm` 是否也应同步更新。
 
 ## 自检
 
@@ -48,4 +54,5 @@ description: 复杂前端页面增强专家。用于修改当前 plus-ui-react �
 - 是否误删了已有权限控制或交互能力。
 - 是否保留了树筛选、导入导出、抽屉、路由跳转等复杂能力。
 - 是否应该拆成子组件而不是继续堆主页面。
+- 是否使用了当前项目已有工具，避免重复手写日期范围、字典 options、树展开、loading、确认框。
 - 是否误用了 Vue/Element Plus/generator 的简化逻辑。

@@ -14,9 +14,10 @@
 
 - 先看 `src/api/system/client/*` 和 `src/pages/system/client/index.tsx` 是否已存在。
 - 再看 `src/pages/demo/demo/index.tsx` 的标准 React CRUD 骨架。
-- 必要时对照 boot4 generator 模板确认字段、权限和接口。
+- 新增标准生成能力时优先对照当前仓库 `gen/index.vue.vm`、`gen/api.ts.vm`、`gen/types.ts.vm`；boot4 generator 只用于核对字段、权限和接口。
 - 生成或修改 `api/index.ts`、`types.ts`、`pages/.../index.tsx`。
 - 使用 `request<R<PageResult<T>>>`、`ProTable`、`ModalForm`、`RowActions`、`useTableSelection`、`useTableExport`。
+- 日期范围、字典 options、确认框、loading 等优先使用 `useDateRangeQuery`、`dictOptions`、`confirmAction`、`useLoading` 等项目工具。
 
 ## 案例 2：新增树表页面
 
@@ -32,8 +33,24 @@
 - 判断这是树表，不生成分页 `PageResult` 页面。
 - API 列表返回 `R<Tree2VO[]>`。
 - `Query` 不继承 `PageQuery`。
-- 页面使用 `handleTree`、`pagination={false}`、`expandedRowKeys`、`ProFormTreeSelect`。
+- 页面使用 `handleTree`、`pagination={false}`、`useTreeTableExpand`、`ProFormTreeSelect`。
 - 新增子节点时从当前行带入 `parentId`。
+
+## 案例 2.1：优化 React 代码生成模板
+
+### 用户提问示例
+
+```text
+使用 $frontend-crud-coding 优化当前项目 gen 目录下的 React 代码生成模板，让生成页面继续使用新加的工具。
+```
+
+### 期望执行方式
+
+- 读取 `gen/api.ts.vm`、`gen/types.ts.vm`、`gen/index.vue.vm`、`gen/index-tree.vue.vm`。
+- 保持 Velocity 变量、宏和文件名不变。
+- 普通表模板继续使用 `useTableSelection`、`useTableExport`、`useDateRangeQuery`、`dictOptions`、`confirmAction`。
+- 树表模板继续使用 `handleTree`、`filterTree`、`useTreeTableExpand`、`dictOptions`。
+- 输出仍是 React TSX 项目代码，不写 Vue `src/views`、Element Plus 或 `AxiosPromise`。
 
 ## 案例 3：修改已有复杂列表页
 
@@ -66,7 +83,7 @@
 - 优先看 `src/pages/workflow/category/index.tsx` 和 `src/api/workflow/category/*`。
 - 判断是否需要后端新增导出接口；前端导出路径保持 `/workflow/category/export`。
 - 不迁移 system/user 的用户专属逻辑。
-- 保留树表、`expandedRowKeys`、`handleTree` 和分类弹窗逻辑。
+- 保留树表、`useTreeTableExpand`、`handleTree` 和分类弹窗逻辑。
 
 ## 案例 5：只补 API 和 types
 
@@ -107,7 +124,7 @@
 2. 新增状态筛选和导出
 3. API 路径沿用后端接口
 4. 参考 system/config 的工具栏与导出交互
-5. 参考 boot4 generator 模板补齐缺失 types
+5. 参考当前项目 gen 模板和 boot4 generator 字段补齐缺失 types
 ```
 
 ## 不推荐的任务描述

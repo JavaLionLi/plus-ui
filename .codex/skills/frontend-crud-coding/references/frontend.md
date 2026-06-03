@@ -3,14 +3,15 @@
 ## 优先参考的代码来源
 
 - 当前目标目录下最近似页面、API、types。
+- 当前仓库内置 React 生成模板：`gen/api.ts.vm`、`gen/types.ts.vm`、`gen/index.vue.vm`、`gen/index-tree.vue.vm`。
 - 标准单表：`src/pages/demo/demo/index.tsx`、`src/api/demo/demo/index.ts`、`src/api/demo/demo/types.ts`。
 - 树表：`src/pages/demo/tree/index.tsx`、`src/pages/workflow/category/index.tsx`。
 - 复杂系统页：`src/pages/system/user/index.tsx`、`src/pages/system/role/index.tsx`、`src/pages/system/post/index.tsx`、`src/pages/system/config/index.tsx`。
 - workflow 页：`src/pages/workflow/*`、`src/api/workflow/*`。
 - 监控页：`src/pages/monitor/*`、`src/api/monitor/*`。
-- 公共 hooks：`src/hooks/useTableSelection.ts`、`src/hooks/useTableExport.ts`、`src/hooks/useDict.ts`。
+- 公共 hooks：`src/hooks/useTableSelection.ts`、`src/hooks/useTableExport.ts`、`src/hooks/useDict.ts`、`src/hooks/useDateRangeQuery.ts`、`src/hooks/useTreeTableExpand.ts`、`src/hooks/useLoading.ts`、`src/hooks/useSearchReset.ts`。
 - 公共组件：`src/components/common/RowActions.tsx`、`TreePanel.tsx`、`RightToolbar.tsx`、`DictTag.tsx`、上传/预览组件。
-- 工具函数：`src/utils/ruoyi.ts`、`src/utils/permission.ts`、`src/utils/download.ts`。
+- 工具函数：`src/utils/ruoyi.ts`、`src/utils/permission.ts`、`src/utils/download.ts`、`src/utils/dict.ts`、`src/utils/modal.ts`。
 
 ## 基础栈与格式
 
@@ -82,13 +83,14 @@
 - `remove` 或 `handleDelete` 支持行删除和批量删除，成功后 `message.success('删除成功')`、`clearSelection()`、`reloadAndRest` 或 `reload`。
 - 批量按钮通常用 `Popconfirm`，行操作确认优先放在 `RowActions` 的 `confirm`。
 - 状态切换失败时要回滚或刷新，参考 `src/pages/system/user/index.tsx`。
-- 日期范围查询使用 `formatDateTimeRange` 和 `addDateRange`，参考 `system/user`。
+- 日期范围查询优先使用 `useDateRangeQuery`，底层通过 `addDateRange` 写入 `params.beginXxx/endXxx`。
+- 字典 options 优先使用 `dictOptions(dicts.xxx)`。
 - 导入上传参考 `system/user/components/UserImportModal.tsx` 或流程定义导入弹窗，保留 `globalHeaders()` 和 `appEnv.baseApi` 相关方式。
 
 ## 字典、权限与公共工具
 
 - 字典使用 `const dicts = useDict('sys_normal_disable', 'sys_user_gender')`。
-- 字典 options 可按 `system/user` 中的 `dictOptions` 函数映射为 `{ label, value }`。
+- 字典 options 使用 `dictOptions` from `@/utils/dict` 映射为 `{ label, value }`。
 - 权限使用：
   `const userInfo = useUserStore(state => state.userInfo);`
   `const canAdd = hasPermi(userInfo, ['system:user:add']);`
@@ -96,6 +98,8 @@
 - 常用工具：
   `hasPermi` from `@/utils/permission`
   `handleTree`、`parseStrEmpty`、`toPageQuery`、`toTableData`、`addDateRange`、`formatDateTimeRange` from `@/utils/ruoyi`
+  `dictOptions` from `@/utils/dict`
+  `confirmAction`、`confirmTitleSafe` from `@/utils/modal`
   `download` via `useTableExport`
 
 ## 组件与样式规则
@@ -104,6 +108,9 @@
 - 树筛选优先复用 `TreePanel`，参考 `system/user`。
 - 导出优先复用 `useTableExport`。
 - 多选优先复用 `useTableSelection`。
+- 异步 loading 优先复用 `useLoading`，不要重复手写 `setLoading(true)` + `finally setLoading(false)`。
+- ProTable 重置后还要清空额外筛选状态时，优先复用 `useSearchReset`。
+- Promise 式确认框优先复用 `confirmAction` 或 `confirmTitleSafe`。
 - 标准页面尽量使用 `PageContainer`、`ProTable`、ProComponents 页面壳，不堆大量内联样式。
 - 需要自定义布局时先查 `src/assets/styles` 是否已有 `.tree-table-page`、`.table-panel`、`.page-surface` 等类。
 - 不要为了单页需求修改全局组件样式。
@@ -112,22 +119,25 @@
 
 - 树表列表接口通常返回数组，页面通过 `handleTree<T>(res.data || [], 'id', 'parentId')` 组树。
 - `ProTable` 使用 `pagination={false}`。
-- 使用 `expandedRowKeys` 和 `onExpandedRowsChange` 控制展开。
+- 使用 `useTreeTableExpand` 控制 `expandedRowKeys`、`onExpandedRowsChange`、`syncExpandedRows`、`toggleExpandAll`。
 - 展开/折叠按钮参考 `demo/tree` 和 `workflow/category`，用 `SortAscendingOutlined`。
 - 表单中上级节点使用 `ProFormTreeSelect`。
 - 新增子节点时从当前行回填 `parentId`。
 - 删除确认文案优先使用业务名称，而不是批量 ID 文案。
 
-## 与 Vue 参考项目和生成器模板的关系
+## 与 gen 模板、Vue 参考项目和后端生成器的关系
 
+- 当前仓库 `gen/*.vm` 是 React 版内置代码生成模板，是维护生成能力时的第一参考。
+- `gen/index.vue.vm`、`gen/index-tree.vue.vm` 文件名为兼容后端 generator 保持不变，但内容必须生成 React TSX 页面。
+- 修改公共 hooks/工具后，如果它们能简化标准生成页，要同步评估 `gen/*.vm` 是否需要更新。
 - Vue skill 和 `.claude/agents` 提供的是任务分型、优先级、增量修改、自检方式，不是 React 实现模板。
-- generator 模板可用于确认字段、权限、导出、状态切换、排序、日期范围等，但不是最终答案。
+- boot4 后端 generator 模板可用于确认字段、权限、导出、状态切换、排序、日期范围等，但不是最终答案。
 - 当前 React 项目的核心骨架是 `ProTable`、`ModalForm`、`RowActions`、`useTableSelection`、`useTableExport`。
 - 修改已有页面时，不要把现有强业务逻辑替换回 generator 的简化逻辑。
 
 ## 验证规则
 
-- 只改文档或 skill：运行 skill 基础校验。
+- 只改文档、skill 或 `gen/*.vm` 模板：至少运行 skill 基础校验或 `git diff --check`；如果模板改动依赖项目工具，优先再跑 `pnpm lint`。
 - 改前端 TS/TSX/API/types：优先运行 `pnpm exec tsc --noEmit` 或 `pnpm lint`。
 - 改页面、import、权限或较多文件：运行 `pnpm lint`。
 - 改公共 hooks、组件、构建相关或大范围页面：再运行 `pnpm build`。
