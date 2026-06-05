@@ -22,10 +22,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Cropper, { type ReactCropperElement } from 'react-cropper';
 import type { OnlineVO } from '@/api/monitor/online/types';
 import type { SocialAuthVO } from '@/api/system/social/types';
-import type { UserForm, UserInfoVO } from '@/api/system/user/types';
+import type { UserInfoVO, UserProfileForm } from '@/api/system/user/types';
 import { delOnline, getOnline } from '@/api/monitor/online';
+import { uploadOss } from '@/api/system/oss';
 import { authRouterUrl, authUnlock, getAuthList } from '@/api/system/social/auth';
-import { getUserProfile, updateUserProfile, updateUserPwd, uploadAvatar } from '@/api/system/user';
+import { getUserProfile, updateUserProfile, updateUserPwd } from '@/api/system/user';
 import giteeIcon from '@/assets/icons/svg/gitee.svg';
 import githubIcon from '@/assets/icons/svg/github.svg';
 import maxkeyIcon from '@/assets/icons/svg/maxkey.svg';
@@ -78,7 +79,7 @@ function normalizeOnlineDevices(payload: OnlineVO[] | { rows?: OnlineVO[] } | un
 }
 
 export default function Profile() {
-  const [userForm] = Form.useForm<UserForm>();
+  const [userForm] = Form.useForm<UserProfileForm>();
   const [pwdForm] = Form.useForm<{ oldPassword: string; newPassword: string; confirmPassword: string }>();
   const reloadMenus = usePermissionStore(state => state.reloadMenus);
   const dicts = useDict('sys_user_gender', 'sys_device_type');
@@ -110,7 +111,13 @@ export default function Profile() {
 
   const submitUserInfo = async () => {
     const values = await userForm.validateFields();
-    await updateUserProfile(values);
+    const profileForm: UserProfileForm = {
+      nickName: values.nickName,
+      phoneNumber: values.phoneNumber,
+      email: values.email,
+      gender: values.gender
+    };
+    await updateUserProfile(profileForm);
     message.success('修改成功');
     await reloadMenus();
     await loadProfile();
@@ -163,10 +170,14 @@ export default function Profile() {
       return;
     }
     const formData = new FormData();
-    formData.append('avatarfile', blob, avatarFileName);
+    formData.append('file', blob, avatarFileName || 'avatar.png');
     await withAvatarUploading(async () => {
       try {
-        await uploadAvatar(formData);
+        const res = await uploadOss(formData);
+        if (!res.data.ossId) {
+          throw new Error('头像上传失败');
+        }
+        await updateUserProfile({ avatar: res.data.ossId });
         message.success('修改成功');
         closeAvatarCrop();
         await reloadMenus();

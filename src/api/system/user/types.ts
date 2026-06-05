@@ -30,6 +30,14 @@ export interface UserForm {
   roleIds?: Array<string | number>;
 }
 
+export interface UserProfileForm {
+  nickName?: string;
+  phoneNumber?: string;
+  email?: string;
+  gender?: string;
+  avatar?: string | number;
+}
+
 export interface UserInfoVO {
   user?: UserVO;
   roles: RoleVO[];

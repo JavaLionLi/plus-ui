@@ -3,7 +3,7 @@ import type { RoleVO } from '@/api/system/role/types';
 import type { PageResult, R } from '@/api/types';
 import request from '@/api/request';
 import { parseStrEmpty } from '@/utils/ruoyi';
-import type { UserForm, UserInfoVO, UserQuery, UserVO } from './types';
+import type { UserForm, UserInfoVO, UserProfileForm, UserQuery, UserVO } from './types';
 
 export function listUser(query: UserQuery) {
   return request<R<PageResult<UserVO>>>({
@@ -90,7 +90,7 @@ export function getUserProfile() {
   });
 }
 
-export function updateUserProfile(data: UserForm) {
+export function updateUserProfile(data: UserProfileForm) {
   return request<R>({
     url: '/system/user/profile',
     method: 'put',
@@ -110,14 +110,6 @@ export function updateUserPwd(oldPassword: string, newPassword: string) {
       oldPassword,
       newPassword
     }
-  });
-}
-
-export function uploadAvatar(data: FormData) {
-  return request<R<{ imgUrl: string }>>({
-    url: '/system/user/profile/avatar',
-    method: 'post',
-    data
   });
 }
 
