@@ -6,7 +6,7 @@ export interface TagViewItem {
   path: string;
   fullPath: string;
   title: string;
-  icon?: string;
+  icon?: string | null;
   affix?: boolean;
 }
 

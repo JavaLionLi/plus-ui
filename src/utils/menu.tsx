@@ -121,9 +121,10 @@ const iconMap: Record<string, React.ReactNode> = {
   fileDone: <FileDoneOutlined />
 };
 
-export function routeIcon(icon?: string) {
-  if (!icon) return <AppstoreOutlined />;
-  const normalizedIcon = icon.replace(/^i-/, '');
+export function routeIcon(icon?: string | null) {
+  const iconValue = typeof icon === 'string' ? icon.trim() : '';
+  if (!iconValue) return <AppstoreOutlined />;
+  const normalizedIcon = iconValue.replace(/^i-/, '');
   if (normalizedIcon.includes(':')) return <Icon icon={normalizedIcon} />;
   const svgIcon = svgIconMap[normalizedIcon] || svgIconMap[normalizedIcon.toLowerCase()];
   if (svgIcon) {
@@ -134,7 +135,7 @@ export function routeIcon(icon?: string) {
       />
     );
   }
-  return iconMap[icon] || iconMap[normalizedIcon] || iconMap[normalizedIcon.toLowerCase()] || <AppstoreOutlined />;
+  return iconMap[iconValue] || iconMap[normalizedIcon] || iconMap[normalizedIcon.toLowerCase()] || <AppstoreOutlined />;
 }
 
 function joinPath(parentPath: string, childPath: string) {

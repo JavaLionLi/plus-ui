@@ -63,7 +63,7 @@ export interface VerifyCodeResult {
 
 export interface RouteMeta {
   title?: string;
-  icon?: string;
+  icon?: string | null;
   noCache?: boolean;
   link?: string;
   hidden?: boolean;

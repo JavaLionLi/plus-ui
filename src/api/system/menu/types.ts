@@ -15,7 +15,7 @@ export interface MenuForm {
   menuType?: 'M' | 'C' | 'F' | string;
   visible?: string;
   status?: string;
-  icon?: string;
+  icon?: string | null;
   activeMenu?: string;
   ext?: string;
   remark?: string;
@@ -56,7 +56,7 @@ export interface MenuVO extends BaseEntity {
   menuType: 'M' | 'C' | 'F' | string;
   visible?: string;
   status?: string;
-  icon?: string;
+  icon?: string | null;
   activeMenu?: string;
   ext?: string;
   perms?: string;

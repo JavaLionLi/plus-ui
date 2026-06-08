@@ -17,7 +17,7 @@ import { flattenBackendRoutes, routeIcon } from '@/utils/menu';
 
 interface RouteMetaLite {
   title?: string;
-  icon?: string;
+  icon?: string | null;
   affix?: boolean;
 }
 
