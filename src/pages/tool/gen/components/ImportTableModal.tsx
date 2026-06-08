@@ -68,7 +68,7 @@ export default function ImportTableModal({
 
   return (
     <Modal title="导入表" open={open} width={900} onOk={submit} onCancel={closeModal} destroyOnHidden>
-      <Space direction="vertical" size={12} style={{ width: '100%' }}>
+      <Space orientation="vertical" size={12} style={{ width: '100%' }}>
         <Select
           showSearch
           value={currentDataName}

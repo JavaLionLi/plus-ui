@@ -88,7 +88,7 @@ export default function UserImportModal({ open, onClose, onSuccess }: UserImport
         <p className="ant-upload-text">将文件拖到此处，或点击上传</p>
         <p className="ant-upload-hint">仅允许导入 xls、xlsx 格式文件。</p>
       </Upload.Dragger>
-      <Space direction="vertical" style={{ marginTop: 12 }}>
+      <Space orientation="vertical" style={{ marginTop: 12 }}>
         <Checkbox checked={updateSupport} onChange={event => setUpdateSupport(event.target.checked)}>
           是否更新已经存在的用户数据
         </Checkbox>

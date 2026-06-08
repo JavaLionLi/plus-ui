@@ -13,13 +13,14 @@ import {
   Popconfirm,
   Radio,
   Row,
+  Slider,
   Space,
   Tabs,
   Upload,
   type UploadProps
 } from 'antd';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import Cropper, { type ReactCropperElement } from 'react-cropper';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import Cropper, { type Area, type Point } from 'react-easy-crop';
 import type { OnlineVO } from '@/api/monitor/online/types';
 import type { SocialAuthVO } from '@/api/system/social/types';
 import type { UserInfoVO, UserProfileForm } from '@/api/system/user/types';
@@ -48,6 +49,8 @@ const socialProviders = [
   { source: 'github', label: 'GitHub', icon: githubIcon }
 ];
 const avatarFileTypes = ['png', 'jpg', 'jpeg'];
+const avatarOutputSize = 200;
+const initialAvatarCrop: Point = { x: 0, y: 0 };
 
 function socialProvider(source?: string) {
   return socialProviders.find(item => item.source === source);
@@ -72,6 +75,57 @@ function socialProviderNode(source?: string) {
   );
 }
 
+function createImage(url: string) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new window.Image();
+    image.addEventListener('load', () => resolve(image));
+    image.addEventListener('error', error => reject(error));
+    image.src = url;
+  });
+}
+
+function getRadianAngle(degreeValue: number) {
+  return (degreeValue * Math.PI) / 180;
+}
+
+function rotateSize(width: number, height: number, rotation: number) {
+  const rotRad = getRadianAngle(rotation);
+  return {
+    width: Math.abs(Math.cos(rotRad) * width) + Math.abs(Math.sin(rotRad) * height),
+    height: Math.abs(Math.sin(rotRad) * width) + Math.abs(Math.cos(rotRad) * height)
+  };
+}
+
+async function getCroppedAvatarBlob(imageSrc: string, crop: Area, rotation: number) {
+  const image = await createImage(imageSrc);
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+
+  const rotRad = getRadianAngle(rotation);
+  const { width: bBoxWidth, height: bBoxHeight } = rotateSize(image.naturalWidth, image.naturalHeight, rotation);
+
+  canvas.width = bBoxWidth;
+  canvas.height = bBoxHeight;
+  ctx.translate(bBoxWidth / 2, bBoxHeight / 2);
+  ctx.rotate(rotRad);
+  ctx.translate(-image.naturalWidth / 2, -image.naturalHeight / 2);
+  ctx.drawImage(image, 0, 0);
+
+  const croppedCanvas = document.createElement('canvas');
+  const croppedCtx = croppedCanvas.getContext('2d');
+  if (!croppedCtx) return null;
+
+  croppedCanvas.width = avatarOutputSize;
+  croppedCanvas.height = avatarOutputSize;
+  croppedCtx.drawImage(canvas, crop.x, crop.y, crop.width, crop.height, 0, 0, avatarOutputSize, avatarOutputSize);
+
+  return new Promise<Blob | null>(resolve => croppedCanvas.toBlob(resolve, 'image/png'));
+}
+
+function avatarUploadFileName(fileName: string) {
+  return fileName.replace(/\.[^.]+$/, '') || 'avatar';
+}
 
 function normalizeOnlineDevices(payload: OnlineVO[] | { rows?: OnlineVO[] } | undefined) {
   if (Array.isArray(payload)) return payload;
@@ -91,9 +145,16 @@ export default function Profile() {
   const [avatarCropOpen, setAvatarCropOpen] = useState(false);
   const [avatarCropUrl, setAvatarCropUrl] = useState('');
   const [avatarFileName, setAvatarFileName] = useState('avatar.png');
-  const cropperRef = useRef<ReactCropperElement>(null);
+  const [avatarCrop, setAvatarCrop] = useState<Point>(initialAvatarCrop);
+  const [avatarZoom, setAvatarZoom] = useState(1);
+  const [avatarRotation, setAvatarRotation] = useState(0);
+  const [avatarCroppedAreaPixels, setAvatarCroppedAreaPixels] = useState<Area>();
   const user = profile?.user || {};
   const genderOptions = useMemo(() => dictOptions(dicts.sys_user_gender), [dicts.sys_user_gender]);
+
+  const onAvatarCropComplete = useCallback((_croppedArea: Area, croppedAreaPixels: Area) => {
+    setAvatarCroppedAreaPixels(croppedAreaPixels);
+  }, []);
 
   const loadProfile = useCallback(async () => {
     await withLoading(async () => {
@@ -143,6 +204,10 @@ export default function Profile() {
         window.URL.revokeObjectURL(avatarCropUrl);
       }
       setAvatarFileName(file.name || 'avatar.png');
+      setAvatarCrop(initialAvatarCrop);
+      setAvatarZoom(1);
+      setAvatarRotation(0);
+      setAvatarCroppedAreaPixels(undefined);
       setAvatarCropUrl(window.URL.createObjectURL(file));
       setAvatarCropOpen(true);
       return Upload.LIST_IGNORE;
@@ -155,22 +220,24 @@ export default function Profile() {
     }
     setAvatarCropOpen(false);
     setAvatarCropUrl('');
+    setAvatarCrop(initialAvatarCrop);
+    setAvatarZoom(1);
+    setAvatarRotation(0);
+    setAvatarCroppedAreaPixels(undefined);
   };
 
   const submitAvatarCrop = async () => {
-    const cropper = cropperRef.current?.cropper;
-    const canvas = cropper?.getCroppedCanvas({ width: 200, height: 200, imageSmoothingQuality: 'high' });
-    if (!canvas) {
+    if (!avatarCropUrl || !avatarCroppedAreaPixels) {
       message.warning('请先选择头像图片');
       return;
     }
-    const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png'));
+    const blob = await getCroppedAvatarBlob(avatarCropUrl, avatarCroppedAreaPixels, avatarRotation);
     if (!blob) {
       message.error('头像裁剪失败');
       return;
     }
     const formData = new FormData();
-    formData.append('file', blob, avatarFileName || 'avatar.png');
+    formData.append('file', blob, `${avatarUploadFileName(avatarFileName)}.png`);
     await withAvatarUploading(async () => {
       try {
         const res = await uploadOss(formData);
@@ -260,7 +327,7 @@ export default function Profile() {
       <Row gutter={16}>
         <Col xs={24} lg={7}>
           <Card title="个人信息">
-            <Space direction="vertical" size={18} style={{ width: '100%' }}>
+            <Space orientation="vertical" size={18} style={{ width: '100%' }}>
               <div style={{ textAlign: 'center' }}>
                 <Avatar size={112} src={user.avatar || defaultAvatar} />
                 <div style={{ marginTop: 12 }}>
@@ -385,7 +452,7 @@ export default function Profile() {
                   key: 'thirdParty',
                   label: '第三方应用',
                   children: (
-                    <Space direction="vertical" size={16} style={{ width: '100%' }}>
+                    <Space orientation="vertical" size={16} style={{ width: '100%' }}>
                       <ProTable<SocialAuthVO>
                         rowKey="id"
                         columns={authColumns}
@@ -440,24 +507,31 @@ export default function Profile() {
       >
         {avatarCropUrl && (
           <div className="avatar-cropper-react">
-            <Cropper
-              ref={cropperRef}
-              src={avatarCropUrl}
-              viewMode={1}
-              aspectRatio={1}
-              guides
-              background={false}
-              autoCropArea={0.8}
-              dragMode="move"
-              style={{ height: 360, width: '100%' }}
-            />
-            <Space style={{ marginTop: 12 }}>
-              <Button icon={<RotateLeftOutlined />} onClick={() => cropperRef.current?.cropper.rotate(-90)}>
-                左旋转
-              </Button>
-              <Button icon={<RotateRightOutlined />} onClick={() => cropperRef.current?.cropper.rotate(90)}>
-                右旋转
-              </Button>
+            <div style={{ position: 'relative', height: 360, width: '100%', background: '#111', borderRadius: 6 }}>
+              <Cropper
+                image={avatarCropUrl}
+                crop={avatarCrop}
+                zoom={avatarZoom}
+                rotation={avatarRotation}
+                aspect={1}
+                cropShape="round"
+                showGrid={false}
+                onCropChange={setAvatarCrop}
+                onZoomChange={setAvatarZoom}
+                onRotationChange={setAvatarRotation}
+                onCropComplete={onAvatarCropComplete}
+              />
+            </div>
+            <Space orientation="vertical" size={12} style={{ marginTop: 12, width: '100%' }}>
+              <Space>
+                <Button icon={<RotateLeftOutlined />} onClick={() => setAvatarRotation(value => value - 90)}>
+                  左旋转
+                </Button>
+                <Button icon={<RotateRightOutlined />} onClick={() => setAvatarRotation(value => value + 90)}>
+                  右旋转
+                </Button>
+              </Space>
+              <Slider min={1} max={3} step={0.1} value={avatarZoom} onChange={setAvatarZoom} />
             </Space>
           </div>
         )}
