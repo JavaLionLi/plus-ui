@@ -6,3 +6,5 @@ src/.umi
 src/.umi-production
 .env.local
 *.log
+.idea/
+*.iml

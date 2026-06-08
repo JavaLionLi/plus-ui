@@ -32,8 +32,11 @@ export function saveBlob(blob: Blob, fileName: string) {
   const link = document.createElement('a');
   link.href = objectUrl;
   link.download = fileName;
+  link.style.display = 'none';
+  document.body.appendChild(link);
   link.click();
-  window.URL.revokeObjectURL(objectUrl);
+  document.body.removeChild(link);
+  window.setTimeout(() => window.URL.revokeObjectURL(objectUrl), 0);
 }
 
 export async function saveValidatedBlob(blob: Blob, fileName: string) {

@@ -13,6 +13,7 @@ let eventSource: EventSource | undefined;
 let webSocket: WebSocket | undefined;
 let reconnectTimer: number | undefined;
 let reconnectAttempts = 0;
+let pushClosed = true;
 
 function messageEnabled() {
   return appEnv.messageEnabled;
@@ -91,6 +92,7 @@ function clearReconnectTimer() {
 }
 
 function scheduleReconnect(connect: () => void, maxRetries: number, delay: number) {
+  if (pushClosed) return;
   if (reconnectAttempts >= maxRetries) return;
   reconnectAttempts += 1;
   clearReconnectTimer();
@@ -99,6 +101,7 @@ function scheduleReconnect(connect: () => void, maxRetries: number, delay: numbe
 
 function initSsePush(path: string) {
   const connect = () => {
+    if (pushClosed) return;
     eventSource?.close();
     eventSource = new EventSource(buildHttpUrl(path));
     eventSource.onopen = () => {
@@ -117,6 +120,7 @@ function initSsePush(path: string) {
 
 function initWsPush(path: string) {
   const connect = () => {
+    if (pushClosed) return;
     webSocket?.close();
     webSocket = new WebSocket(buildWsUrl(path));
     webSocket.onopen = () => {
@@ -149,6 +153,7 @@ export async function initMessageBox() {
 export function initPush() {
   closePush();
   if (!messageEnabled()) return;
+  pushClosed = false;
   if (appEnv.messageTransport === 'websocket') {
     initWsPush(appEnv.messagePath);
     return;
@@ -157,7 +162,19 @@ export function initPush() {
 }
 
 export function closePush() {
+  pushClosed = true;
   clearReconnectTimer();
+  if (webSocket) {
+    webSocket.onopen = null;
+    webSocket.onmessage = null;
+    webSocket.onclose = null;
+    webSocket.onerror = null;
+  }
+  if (eventSource) {
+    eventSource.onopen = null;
+    eventSource.onmessage = null;
+    eventSource.onerror = null;
+  }
   eventSource?.close();
   webSocket?.close();
   eventSource = undefined;

@@ -40,10 +40,9 @@ function getRememberedLogin() {
   if (typeof window === 'undefined') return { rememberMe: false };
   const rememberMe = localStorage.getItem('rememberMe') === 'true';
   const username = localStorage.getItem('username') || undefined;
-  const password = localStorage.getItem('password') || undefined;
   return {
     username: rememberMe ? username : 'admin',
-    password: rememberMe ? password : 'admin123',
+    password: rememberMe ? undefined : 'admin123',
     rememberMe
   };
 }
@@ -172,13 +171,12 @@ export default function Login() {
                 try {
                   if (values.rememberMe) {
                     localStorage.setItem('username', String(values.username || ''));
-                    localStorage.setItem('password', String(values.password || ''));
                     localStorage.setItem('rememberMe', 'true');
                   } else {
                     localStorage.removeItem('username');
-                    localStorage.removeItem('password');
                     localStorage.removeItem('rememberMe');
                   }
+                  localStorage.removeItem('password');
                   const res = await login({
                     username: values.username,
                     password: values.password,
