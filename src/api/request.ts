@@ -26,6 +26,18 @@ export interface RequestConfig<D = unknown> extends AxiosRequestConfig<D> {
 
 export const isRelogin = { show: false };
 
+type HandledRequestError = Error & { isHandled?: boolean };
+
+function createHandledError(message: string) {
+  const error = new Error(message) as HandledRequestError;
+  error.isHandled = true;
+  return error;
+}
+
+export function isHandledRequestError(error: unknown) {
+  return Boolean((error as { isHandled?: boolean } | undefined)?.isHandled);
+}
+
 export function globalHeaders() {
   return {
     Authorization: `Bearer ${getToken() || ''}`,
@@ -196,7 +208,7 @@ service.interceptors.response.use(
           }
         });
       }
-      return Promise.reject(new Error('无效的会话，或者会话已过期，请重新登录。'));
+      return Promise.reject(createHandledError('无效的会话，或者会话已过期，请重新登录。'));
     }
 
     if (code === SERVER_ERROR || code === WARN || code !== SUCCESS) {

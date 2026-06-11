@@ -10,6 +10,7 @@ import dayjs from 'dayjs';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { RuntimeMenuItem } from '@/api/types';
 import { logout } from '@/api/login';
+import { isHandledRequestError } from '@/api/request';
 import defaultAvatar from '@/assets/images/profile.jpg';
 import appLogo from '@/assets/logo/logo.png';
 import ExternalLinkButton from '@/components/layout/ExternalLinkButton';
@@ -81,7 +82,9 @@ export default function BasicLayout() {
         }
       })
       .catch(error => {
-        message.error(error.message || '加载用户信息失败');
+        if (!isHandledRequestError(error)) {
+          message.error(error.message || '加载用户信息失败');
+        }
         closePush();
         pushStartedRef.current = false;
         removeToken();
