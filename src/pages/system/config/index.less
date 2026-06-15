@@ -1,0 +1,48 @@
+.system-config-page {
+  display: flex;
+  align-items: flex-start;
+  border-top: 1px solid rgba(5, 5, 5, 0.06);
+
+  &__tabs {
+    flex-shrink: 0;
+    padding-top: 16px;
+
+    .ant-tabs-content-holder {
+      display: none;
+    }
+
+    .ant-tabs-nav {
+      margin-bottom: 0;
+    }
+
+    .ant-tabs-tab {
+      height: 36px;
+      padding: 0 16px;
+      font-size: 14px;
+    }
+  }
+
+  &__content {
+    flex: 1;
+    min-width: 0;
+    padding-left: 16px;
+    border-left: 1px solid rgba(5, 5, 5, 0.06);
+  }
+}
+
+@media (max-width: 768px) {
+  .system-config-page {
+    display: block;
+    border-top: 0;
+
+    &__tabs {
+      margin-bottom: 12px;
+      padding-top: 0;
+    }
+
+    &__content {
+      padding-left: 0;
+      border-left: 0;
+    }
+  }
+}

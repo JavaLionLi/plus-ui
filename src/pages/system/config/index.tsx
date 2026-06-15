@@ -10,52 +10,63 @@ import {
   type ProColumns
 } from '@ant-design/pro-components';
 import { useBoolean } from 'ahooks';
-import { Button, Form, message, Popconfirm } from 'antd';
+import { Button, Form, Input, message, Tabs } from 'antd';
 import { useRef, useState } from 'react';
 import type { ConfigForm, ConfigQuery, ConfigVO } from '@/api/system/config/types';
-import { addConfig, delConfig, getConfig, listConfig, refreshConfigCache, updateConfig } from '@/api/system/config';
-import DictTag from '@/components/common/DictTag';
-import EllipsisText from '@/components/common/EllipsisText';
+import {
+  addConfig,
+  delConfig,
+  getConfig,
+  listConfig,
+  refreshConfigCache,
+  updateConfig,
+  updateConfigByKey
+} from '@/api/system/config';
 import RowActions from '@/components/common/RowActions';
-import { useDateRangeQuery } from '@/hooks/useDateRangeQuery';
 import { useDict } from '@/hooks/useDict';
 import { useTableExport } from '@/hooks/useTableExport';
-import { useTableSelection } from '@/hooks/useTableSelection';
 import { useUserStore } from '@/stores/userStore';
 import { dictOptions } from '@/utils/dict';
+import { confirmTitleSafe } from '@/utils/modal';
 import { hasPermi } from '@/utils/permission';
 import { toPageQuery, toTableData } from '@/utils/ruoyi';
+import './index.less';
 
+const configTypeTabs = [
+  { key: '', label: '全部' },
+  { key: 'Y', label: '系统内置' },
+  { key: 'N', label: '自定义配置' }
+];
 
 export default function SystemConfigPage() {
   const actionRef = useRef<ActionType | undefined>(undefined);
   const [form] = Form.useForm<ConfigForm>();
   const userInfo = useUserStore(state => state.userInfo);
   const dicts = useDict('sys_yes_no');
-  const { ids, selectedOne, handleSelectionChange, clearSelection } = useTableSelection<ConfigVO>(row => row.configId);
   const [modalOpen, { setTrue: openModal, setFalse: closeModal }] = useBoolean(false);
   const [modalTitle, setModalTitle] = useState('');
+  const [activeConfigType, setActiveConfigType] = useState('');
   const { updateExportParams, exportFile } = useTableExport();
-  const { applyDateRange: applyCreateTimeDateRange } = useDateRangeQuery();
   const canAdd = hasPermi(userInfo, ['system:config:add']);
   const canEdit = hasPermi(userInfo, ['system:config:edit']);
   const canRemove = hasPermi(userInfo, ['system:config:remove']);
   const canExport = hasPermi(userInfo, ['system:config:export']);
+
   const openAdd = () => {
     form.resetFields();
     form.setFieldsValue({ configType: 'Y' });
     setModalTitle('添加参数');
     openModal();
   };
-  const openEdit = async (row?: ConfigVO) => {
-    const target = row || selectedOne;
-    if (!target) return;
-    const res = await getConfig(target.configId);
+
+  const openEdit = async (row: ConfigVO) => {
+    const res = await getConfig(row.configId);
     form.resetFields();
     form.setFieldsValue(res.data);
     setModalTitle('修改参数');
     openModal();
   };
+
   const submit = async (values: ConfigForm) => {
     values.configId ? await updateConfig(values) : await addConfig(values);
     message.success('操作成功');
@@ -63,44 +74,55 @@ export default function SystemConfigPage() {
     actionRef.current?.reload();
     return true;
   };
-  const remove = async (row?: ConfigVO) => {
-    await delConfig(row?.configId || ids);
+
+  const remove = async (row: ConfigVO) => {
+    await delConfig(row.configId);
     message.success('删除成功');
-    clearSelection();
-    actionRef.current?.reloadAndRest?.();
+    actionRef.current?.reload();
+  };
+
+  const changeConfigType = (key: string) => {
+    setActiveConfigType(key);
+    setTimeout(() => actionRef.current?.reloadAndRest?.(), 0);
+  };
+
+  const saveInlineValue = async (row: ConfigVO, value: string) => {
+    if (value === row.configValue) return;
+    if (!(await confirmTitleSafe(`确认要保存对参数"${row.configKey}"的修改吗？`))) return;
+    await updateConfigByKey(row.configKey, value);
+    message.success('修改成功');
+    actionRef.current?.reload();
   };
 
   const columns: ProColumns<ConfigVO>[] = [
-    { title: '参数名称', dataIndex: 'configName', width: 160 },
-    { title: '参数键名', dataIndex: 'configKey', width: 180 },
+    { title: '参数名称', dataIndex: 'configName', width: 180 },
+    { title: '参数键名', dataIndex: 'configKey', width: 200 },
     {
       title: '参数键值',
       dataIndex: 'configValue',
       search: false,
-      width: 220,
-      render: (_, row) => <EllipsisText value={row.configValue} maxWidth={200} />
-    },
-    {
-      title: '系统内置',
-      dataIndex: 'configType',
-      valueType: 'select',
-      width: 120,
-      fieldProps: { options: dictOptions(dicts.sys_yes_no) },
-      render: (_, row) => <DictTag options={dicts.sys_yes_no} value={row.configType} />
+      width: 240,
+      render: (_, row) => (
+        <Input
+          defaultValue={row.configValue}
+          placeholder="请输入参数键值"
+          onBlur={event => saveInlineValue(row, event.target.value)}
+          onPressEnter={event => event.currentTarget.blur()}
+        />
+      )
     },
     {
       title: '备注',
       dataIndex: 'remark',
       search: false,
-      width: 180,
-      render: (_, row) => <EllipsisText value={row.remark} maxWidth={160} />
+      width: 220,
+      ellipsis: true,
+      renderText: value => value || '-'
     },
-    { title: '创建时间', dataIndex: 'createTimeRange', valueType: 'dateTimeRange', hideInTable: true },
-    { title: '创建时间', dataIndex: 'createTime', valueType: 'dateTime', search: false, width: 170 },
     {
       title: '操作',
       valueType: 'option',
-      width: 120,
+      width: 96,
       fixed: 'right',
       render: (_, row) => (
         <RowActions
@@ -122,38 +144,39 @@ export default function SystemConfigPage() {
 
   return (
     <PageContainer title="参数管理">
-      <ProTable<ConfigVO, ConfigQuery & { createTimeRange?: [string, string] }>
+      <ProTable<ConfigVO, ConfigQuery>
         actionRef={actionRef}
         rowKey="configId"
         columns={columns}
-        scroll={{ x: 1180 }}
+        scroll={{ x: 900 }}
         search={{ labelWidth: 90 }}
-        rowSelection={{ selectedRowKeys: ids, onChange: handleSelectionChange }}
         request={async params => {
-          const { createTimeRange, ...tableParams } = params;
-          const query = applyCreateTimeDateRange(toPageQuery(tableParams), createTimeRange);
+          const query = {
+            ...toPageQuery(params),
+            configType: activeConfigType
+          };
           updateExportParams(query);
           const res = await listConfig(query);
           return toTableData(res);
         }}
         toolbar={{ title: '参数列表' }}
+        tableRender={(_, dom) => (
+          <div className="system-config-page">
+            <Tabs
+              activeKey={activeConfigType}
+              tabPosition="left"
+              className="system-config-page__tabs"
+              items={configTypeTabs}
+              onChange={changeConfigType}
+            />
+            <div className="system-config-page__content">{dom}</div>
+          </div>
+        )}
         toolBarRender={() => [
           canAdd && (
             <Button key="add" type="primary" icon={<PlusOutlined />} onClick={openAdd}>
               新增
             </Button>
-          ),
-          canEdit && (
-            <Button key="edit" disabled={!selectedOne} icon={<EditOutlined />} onClick={() => openEdit()}>
-              修改
-            </Button>
-          ),
-          canRemove && (
-            <Popconfirm key="delete" title={`是否确认删除参数编号为"${ids}"的数据项？`} onConfirm={() => remove()}>
-              <Button danger disabled={!ids.length} icon={<DeleteOutlined />}>
-                删除
-              </Button>
-            </Popconfirm>
           ),
           canExport && (
             <Button
