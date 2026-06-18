@@ -14,7 +14,7 @@
 
 - 先看 `src/api/system/client/*` 和 `src/pages/system/client/index.tsx` 是否已存在。
 - 再看 `src/pages/demo/demo/index.tsx` 的标准 React CRUD 骨架。
-- 新增标准生成能力时优先对照当前仓库 `gen/index.tsx.vm`、`gen/api.ts.vm`、`gen/types.ts.vm`；boot4 generator 只用于核对字段、权限和接口。
+- 新增标准生成能力时优先对照当前仓库 `gen/index.tsx.ftl`、`gen/api.ts.ftl`、`gen/types.ts.ftl`；boot4 generator 只用于核对字段、权限和接口。
 - 生成或修改 `api/index.ts`、`types.ts`、`pages/.../index.tsx`。
 - 使用 `request<R<PageResult<T>>>`、`ProTable`、`ModalForm`、`RowActions`、`useTableSelection`、`useTableExport`。
 - 日期范围、字典 options、确认框、loading 等优先使用 `useDateRangeQuery`、`dictOptions`、`confirmAction`、`useLoading` 等项目工具。
@@ -46,8 +46,8 @@
 
 ### 期望执行方式
 
-- 读取 `gen/api.ts.vm`、`gen/types.ts.vm`、`gen/index.tsx.vm`、`gen/index-tree.tsx.vm`。
-- 保持 Velocity 变量、宏和文件名不变。
+- 读取 `gen/api.ts.ftl`、`gen/types.ts.ftl`、`gen/index.tsx.ftl`、`gen/index-tree.tsx.ftl`。
+- 保持 FreeMarker 变量、宏和文件名不变。
 - 普通表模板继续使用 `useTableSelection`、`useTableExport`、`useDateRangeQuery`、`dictOptions`、`confirmAction`。
 - 树表模板继续使用 `handleTree`、`filterTree`、`useTreeTableExpand`、`dictOptions`。
 - 输出仍是 React TSX 项目代码，不写 Vue `src/views`、Element Plus 或 `AxiosPromise`。

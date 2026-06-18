@@ -1,6 +1,6 @@
 ---
 name: frontend-crud-coding
-description: 在当前 plus-ui-react 前端项目中按真实 React + TypeScript + Umi Max + Ant Design ProComponents + oxlint/oxfmt 代码风格生成或修改页面、API、types、hooks 接入、样式和项目内置 gen/*.vm 代码生成模板。用于新增或修改标准 CRUD 列表页、树表页、系统管理页、监控页、workflow 页面、demo 页面，补齐与 RuoYi-Vue-Plus boot4 后端接口对应的 src/api、types 和 src/pages 代码，或维护 gen/api.ts.vm、gen/types.ts.vm、gen/index.tsx.vm、gen/index-tree.tsx.vm；触发后应先读取适用 references，再阅读目标模块真实代码和项目内置 gen 模板。
+description: 在当前 plus-ui-react 前端项目中按真实 React + TypeScript + Umi Max + Ant Design ProComponents + oxlint/oxfmt 代码风格生成或修改页面、API、types、hooks 接入、样式和项目内置 gen/*.ftl 代码生成模板。用于新增或修改标准 CRUD 列表页、树表页、系统管理页、监控页、workflow 页面、demo 页面，补齐与 RuoYi-Vue-Plus boot4 后端接口对应的 src/api、types 和 src/pages 代码，或维护 gen/api.ts.ftl、gen/types.ts.ftl、gen/index.tsx.ftl、gen/index-tree.tsx.ftl；触发后应先读取适用 references，再阅读目标模块真实代码和项目内置 gen 模板。
 ---
 
 # 前端编码规范
@@ -16,10 +16,10 @@ description: 在当前 plus-ui-react 前端项目中按真实 React + TypeScript
    - 树表优先看 `src/pages/demo/tree/index.tsx`、`src/pages/workflow/category/index.tsx`。
    - 系统复杂页优先看 `src/pages/system/user/index.tsx`、`system/role`、`system/post`、`system/config`。
    - workflow 业务页优先看 `src/pages/workflow/*` 与 `src/api/workflow/*` 同类页面。
-4. 新增或维护代码生成能力时，优先阅读当前仓库 `gen/api.ts.vm`、`gen/types.ts.vm`、`gen/index.tsx.vm`、`gen/index-tree.tsx.vm`。这些是 React 版内置生成模板，页面模板必须输出当前项目 React/TSX 风格。
+4. 新增或维护代码生成能力时，优先阅读当前仓库 `gen/api.ts.ftl`、`gen/types.ts.ftl`、`gen/index.tsx.ftl`、`gen/index-tree.tsx.ftl`。这些是 React 版内置 FreeMarker 生成模板，页面模板必须输出当前项目 React/TSX 风格。
 5. 需要从 Vue 版本迁移经验时，参考 `D:\git-sources\Plus相关\plus-ui-new\.codex\skills\frontend-crud-coding` 和 `.claude\agents`，只吸收任务分型、增量修改和自检原则。
-6. 新增标准页面前，可以对照后端工程 `D:\git-sources\Plus相关\RuoYi-Vue-Plus-boot4\ruoyi-modules\ruoyi-gen\src\main\resources\vm` 确认字段、权限和导出能力，但输出和 `gen/` 模板必须保持 React 项目风格。
-7. 新增代码时通常同步维护 `src/api/<module>/<business>/index.ts`、`types.ts`、`src/pages/<module>/<business>/index.tsx`；如果是生成模板优化，同步维护 `gen/` 对应 `.vm`。
+6. 新增标准页面前，可以对照后端工程 `D:\git-sources\Plus相关\RuoYi-Vue-Plus-boot4\ruoyi-modules\ruoyi-gen\src\main\resources\fm` 确认字段、权限和导出能力，但输出和 `gen/` 模板必须保持 React 项目风格。
+7. 新增代码时通常同步维护 `src/api/<module>/<business>/index.ts`、`types.ts`、`src/pages/<module>/<business>/index.tsx`；如果是生成模板优化，同步维护 `gen/` 对应 `.ftl`。
 8. 增强已有页面时只做增量修改，保留原页面的树筛选、导入导出、列显隐、权限、字典、弹窗、抽屉和路由跳转能力。
 9. 修改完成后按影响范围运行验证：优先 `pnpm exec tsc --noEmit` 或 `pnpm lint`；大范围页面、公共组件、构建配置变更再跑 `pnpm build`。
 
@@ -35,7 +35,7 @@ description: 在当前 plus-ui-react 前端项目中按真实 React + TypeScript
 
 1. 目标目录下最近似页面、API、types 的真实实现。
 2. 当前项目公共 hooks、组件、工具、样式和请求封装约定。
-3. 当前项目内置 `gen/*.vm` React 代码生成模板。
+3. 当前项目内置 `gen/*.ftl` React 代码生成模板。
 4. Vue 参考项目 `.codex` / `.claude` 中的任务分型和工作流。
 5. 关联后端工程 generator 模板。
 6. 通用 React / Ant Design ProComponents 习惯。
@@ -108,12 +108,12 @@ workflow 目录优先参考 `src/pages/workflow/*`。流程定义、流程实例
 
 ### 6. 维护 React 生成模板
 
-模板只放在当前仓库 `gen/` 下，除非用户明确要求写入 boot4 后端工程。维护时保持 Velocity 变量和文件名不变：
+模板只放在当前仓库 `gen/` 下，除非用户明确要求写入 boot4 后端工程。维护时保持 FreeMarker 变量和文件名不变：
 
-- `gen/api.ts.vm`
-- `gen/types.ts.vm`
-- `gen/index.tsx.vm`
-- `gen/index-tree.tsx.vm`
+- `gen/api.ts.ftl`
+- `gen/types.ts.ftl`
+- `gen/index.tsx.ftl`
+- `gen/index-tree.tsx.ftl`
 
 模板内容必须生成当前 React 项目代码，并优先使用已有公共工具：`useDateRangeQuery`、`dictOptions`、`useTreeTableExpand`、`useTableSelection`、`useTableExport`、`confirmAction`、`toPageQuery`、`toTableData`、`handleTree`、`formatDateTimeFields`、`toDayjsFields`。不要把 Vue 模板、Element Plus 组件或 `src/views` 路径写入这些模板。
 

@@ -3,7 +3,7 @@
 ## 优先参考的代码来源
 
 - 当前目标目录下最近似页面、API、types。
-- 当前仓库内置 React 生成模板：`gen/api.ts.vm`、`gen/types.ts.vm`、`gen/index.tsx.vm`、`gen/index-tree.tsx.vm`。
+- 当前仓库内置 React 生成模板：`gen/api.ts.ftl`、`gen/types.ts.ftl`、`gen/index.tsx.ftl`、`gen/index-tree.tsx.ftl`。
 - 标准单表：`src/pages/demo/demo/index.tsx`、`src/api/demo/demo/index.ts`、`src/api/demo/demo/types.ts`。
 - 树表：`src/pages/demo/tree/index.tsx`、`src/pages/workflow/category/index.tsx`。
 - 复杂系统页：`src/pages/system/user/index.tsx`、`src/pages/system/role/index.tsx`、`src/pages/system/post/index.tsx`、`src/pages/system/config/index.tsx`。
@@ -127,9 +127,9 @@
 
 ## 与 gen 模板、Vue 参考项目和后端生成器的关系
 
-- 当前仓库 `gen/*.vm` 是 React 版内置代码生成模板，是维护生成能力时的第一参考。
-- `gen/index.tsx.vm`、`gen/index-tree.tsx.vm` 内容必须生成 React TSX 页面。
-- 修改公共 hooks/工具后，如果它们能简化标准生成页，要同步评估 `gen/*.vm` 是否需要更新。
+- 当前仓库 `gen/*.ftl` 是 React 版内置代码生成模板，是维护生成能力时的第一参考。
+- `gen/index.tsx.ftl`、`gen/index-tree.tsx.ftl` 内容必须生成 React TSX 页面。
+- 修改公共 hooks/工具后，如果它们能简化标准生成页，要同步评估 `gen/*.ftl` 是否需要更新。
 - Vue skill 和 `.claude/agents` 提供的是任务分型、优先级、增量修改、自检方式，不是 React 实现模板。
 - boot4 后端 generator 模板可用于确认字段、权限、导出、状态切换、排序、日期范围等，但不是最终答案。
 - 当前 React 项目的核心骨架是 `ProTable`、`ModalForm`、`RowActions`、`useTableSelection`、`useTableExport`。
@@ -137,7 +137,7 @@
 
 ## 验证规则
 
-- 只改文档、skill 或 `gen/*.vm` 模板：至少运行 skill 基础校验或 `git diff --check`；如果模板改动依赖项目工具，优先再跑 `pnpm lint`。
+- 只改文档、skill 或 `gen/*.ftl` 模板：至少运行 skill 基础校验或 `git diff --check`；如果模板改动依赖项目工具，优先再跑 `pnpm lint`。
 - 改前端 TS/TSX/API/types：优先运行 `pnpm exec tsc --noEmit` 或 `pnpm lint`。
 - 改页面、import、权限或较多文件：运行 `pnpm lint`。
 - 改公共 hooks、组件、构建相关或大范围页面：再运行 `pnpm build`。
