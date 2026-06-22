@@ -3,6 +3,7 @@
   min-height: 100vh;
   display: grid;
   grid-template-columns: minmax(420px, 1fr) 480px;
+  overflow-x: hidden;
   background: #f4f7fb;
 }
 
@@ -117,6 +118,22 @@
 
 .login-panel-inner {
   width: 100%;
+  min-width: 0;
+}
+
+.login-panel .ant-pro-form-login-container,
+.register-panel .ant-pro-form-login-container {
+  width: 100%;
+  min-width: 0;
+  padding-inline: 0;
+  overflow-x: hidden;
+}
+
+.login-panel .ant-pro-form-login-main,
+.register-panel .ant-pro-form-login-main {
+  width: 100% !important;
+  min-width: 0;
+  max-width: 328px;
 }
 
 .login-form-meta {
@@ -179,6 +196,7 @@
   grid-template-columns: minmax(420px, 1fr) 480px;
   min-height: 100vh;
   padding: 40px;
+  overflow-x: hidden;
   background:
     radial-gradient(circle at 12% 12%, rgba(22, 119, 255, 0.24), transparent 24%),
     radial-gradient(circle at 88% 18%, rgba(20, 184, 166, 0.18), transparent 24%),
