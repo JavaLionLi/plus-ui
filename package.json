@@ -1,6 +1,6 @@
 {
   "name": "plus-ui-react",
-  "version": "0.1.0",
+  "version": "6.0.0-BETA",
   "private": true,
   "description": "React + Ant Design version of RuoYi-Vue-Plus UI",
   "type": "module",
