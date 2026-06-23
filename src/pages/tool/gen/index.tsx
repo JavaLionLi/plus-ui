@@ -26,7 +26,7 @@ import ImportTableModal from './components/ImportTableModal';
 
 function previewName(path: string) {
   const fileName = path.substring(path.lastIndexOf('/') + 1);
-  return fileName.includes('.vm') ? fileName.substring(0, fileName.indexOf('.vm')) : fileName;
+  return fileName.includes('.ftl') ? fileName.substring(0, fileName.indexOf('.ftl')) : fileName;
 }
 
 function previewLanguage(name: string) {
