@@ -14,6 +14,9 @@ let webSocket: WebSocket | undefined;
 let reconnectTimer: number | undefined;
 let reconnectAttempts = 0;
 let pushClosed = true;
+const KICKED_MESSAGE = 'kicked';
+let pushKicked = false;
+let resumePushTimer: number | undefined;
 
 function messageEnabled() {
   return appEnv.messageEnabled;
@@ -67,6 +70,15 @@ function appendNotice(raw: string) {
   notification.success({ message: title, description: notice.message, duration: 3 });
 }
 
+function handlePushMessage(raw: string) {
+  if (raw === KICKED_MESSAGE) {
+    pushKicked = true;
+    closePush();
+    return;
+  }
+  appendNotice(raw);
+}
+
 function buildHttpUrl(path: string) {
   const base = appEnv.baseApi;
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
@@ -108,7 +120,7 @@ function initSsePush(path: string) {
       reconnectAttempts = 0;
     };
     eventSource.onmessage = event => {
-      if (event.data) appendNotice(event.data);
+      if (event.data) handlePushMessage(event.data);
     };
     eventSource.onerror = () => {
       eventSource?.close();
@@ -128,7 +140,7 @@ function initWsPush(path: string) {
     };
     webSocket.onmessage = event => {
       if (String(event.data) === 'pong') return;
-      appendNotice(String(event.data));
+      handlePushMessage(String(event.data));
     };
     webSocket.onclose = () => scheduleReconnect(connect, 3, 1000);
   };
@@ -153,6 +165,7 @@ export async function initMessageBox() {
 export function initPush() {
   closePush();
   if (!messageEnabled()) return;
+  pushKicked = false;
   pushClosed = false;
   if (appEnv.messageTransport === 'websocket') {
     initWsPush(appEnv.messagePath);
@@ -180,6 +193,32 @@ export function closePush() {
   eventSource = undefined;
   webSocket = undefined;
   reconnectAttempts = 0;
+}
+
+function resumePushIfNeeded() {
+  if (!pushKicked || !getToken() || document.visibilityState !== 'visible') {
+    return;
+  }
+  if (resumePushTimer) {
+    window.clearTimeout(resumePushTimer);
+  }
+  resumePushTimer = window.setTimeout(async () => {
+    resumePushTimer = undefined;
+    if (!pushKicked || !getToken() || document.visibilityState !== 'visible') {
+      return;
+    }
+    try {
+      await initMessageBox();
+    } finally {
+      initPush();
+    }
+  }, 300);
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('focus', resumePushIfNeeded);
+  document.addEventListener('visibilitychange', resumePushIfNeeded);
+  window.addEventListener('online', resumePushIfNeeded);
 }
 
 export function pushHeaders() {
