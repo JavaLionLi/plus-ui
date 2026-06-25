@@ -196,6 +196,8 @@ export default function BasicLayout() {
     '--layout-nav-menu-hover-bg-react': navColors.menuHoverBg,
     '--layout-nav-menu-selected-bg-react': navColors.menuSelectedBg,
     '--layout-nav-badge-shadow-react': navColors.badgeShadow,
+    '--layout-collapsed-button-bg-react': effectiveNavDark ? navColors.bg : appColors.surface,
+    '--layout-collapsed-button-hover-bg-react': effectiveNavDark ? '#1f2937' : navColors.actionHoverBg,
     backgroundColor: appColors.bg
   } as CSSProperties;
   const proLayoutContentStyle = {
