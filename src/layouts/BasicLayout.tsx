@@ -27,7 +27,7 @@ import { useTagsViewStore } from '@/stores/tagsViewStore';
 import { useUserStore } from '@/stores/userStore';
 import { getToken, removeToken } from '@/utils/auth';
 import { appEnv } from '@/utils/env';
-import { appendRouteQuery, flattenBackendRoutes } from '@/utils/menu';
+import { appendRouteQuery, flattenBackendRoutes, routeIcon } from '@/utils/menu';
 import { closePush, initMessageBox, initPush } from '@/utils/push';
 import { isHttp } from '@/utils/ruoyi';
 
@@ -433,7 +433,7 @@ export default function BasicLayout() {
         menuHeaderRender={menuHeaderRender}
         headerTitleRender={headerTitleRender}
         location={{ pathname: location.pathname }}
-        route={{ path: '/', routes: [{ path: '/index', name: '首页' }, ...menuData] }}
+        route={{ path: '/', routes: [{ path: '/index', name: '首页', icon: routeIcon('dashboard') }, ...menuData] }}
         menuItemRender={(item, _dom) => (
           <button
             type="button"
