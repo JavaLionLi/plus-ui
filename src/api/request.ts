@@ -1,5 +1,5 @@
 ﻿import { history } from '@umijs/max';
-import { Modal } from 'antd';
+import { message, Modal } from 'antd';
 import axios, { type AxiosError, type AxiosRequestConfig } from 'axios';
 import { useAppStore } from '@/stores/appStore';
 import { useTagsViewStore } from '@/stores/tagsViewStore';
@@ -43,6 +43,32 @@ export function globalHeaders() {
     Authorization: `Bearer ${getToken() || ''}`,
     clientid: appEnv.clientId
   };
+}
+
+function showRequestError(content: string) {
+  message.error({ content, key: `request-error:${content}` });
+}
+
+function showReloginConfirm() {
+  if (isRelogin.show) return;
+  isRelogin.show = true;
+  Modal.confirm({
+    title: '系统提示',
+    content: '登录状态已过期，您可以继续留在该页面，或者重新登录',
+    okText: '重新登录',
+    cancelText: '取消',
+    onOk: () => {
+      isRelogin.show = false;
+      removeToken();
+      useTagsViewStore.getState().resetTags();
+      history.replace(
+        `/login?redirect=${encodeURIComponent(`${window.location.pathname || '/'}${window.location.search || ''}`)}`
+      );
+    },
+    onCancel: () => {
+      isRelogin.show = false;
+    }
+  });
 }
 
 function stableDataString(data: unknown) {
@@ -188,37 +214,28 @@ service.interceptors.response.use(
     const msg = response.data?.msg || '系统未知错误';
 
     if (code === 401) {
-      if (!isRelogin.show) {
-        isRelogin.show = true;
-        Modal.confirm({
-          title: '系统提示',
-          content: '登录状态已过期，您可以继续留在该页面，或者重新登录',
-          okText: '重新登录',
-          cancelText: '取消',
-          onOk: () => {
-            isRelogin.show = false;
-            removeToken();
-            useTagsViewStore.getState().resetTags();
-            history.replace(
-              `/login?redirect=${encodeURIComponent(`${window.location.pathname || '/'}${window.location.search || ''}`)}`
-            );
-          },
-          onCancel: () => {
-            isRelogin.show = false;
-          }
-        });
-      }
+      showReloginConfirm();
       return Promise.reject(createHandledError('无效的会话，或者会话已过期，请重新登录。'));
     }
 
     if (code === SERVER_ERROR || code === WARN || code !== SUCCESS) {
-      return Promise.reject(new Error(msg));
+      showRequestError(msg);
+      return Promise.reject(createHandledError(msg));
     }
 
     return response.data;
   },
   async error => {
-    return Promise.reject(new Error(await getErrorMessage(error)));
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      showReloginConfirm();
+      return Promise.reject(createHandledError('无效的会话，或者会话已过期，请重新登录。'));
+    }
+
+    const msg = axios.isAxiosError(error)
+      ? await getErrorMessage(error)
+      : normalizeErrorMessage((error as Error | undefined)?.message) || '系统未知错误';
+    showRequestError(msg);
+    return Promise.reject(createHandledError(msg));
   }
 );
 
