@@ -245,16 +245,24 @@ export default function SystemNoticePage() {
       <Modal title="公告详情" open={detailOpen} width={820} footer={null} onCancel={closeDetail}>
         <div className="notice-detail">
           <h2>{detail?.noticeTitle || '-'}</h2>
-          <Descriptions column={2} size="small">
-            <Descriptions.Item label="类型">
-              <DictTag options={dicts.sys_notice_type} value={detail?.noticeType} />
-            </Descriptions.Item>
-            <Descriptions.Item label="状态">
-              <DictTag options={dicts.sys_notice_status} value={detail?.status} />
-            </Descriptions.Item>
-            <Descriptions.Item label="创建者">{detail?.createByName || '-'}</Descriptions.Item>
-            <Descriptions.Item label="创建时间">{detail?.createTime || '-'}</Descriptions.Item>
-          </Descriptions>
+          <Descriptions
+            column={2}
+            size="small"
+            items={[
+              {
+                key: 'noticeType',
+                label: '类型',
+                children: <DictTag options={dicts.sys_notice_type} value={detail?.noticeType} />
+              },
+              {
+                key: 'status',
+                label: '状态',
+                children: <DictTag options={dicts.sys_notice_status} value={detail?.status} />
+              },
+              { key: 'createByName', label: '创建者', children: detail?.createByName || '-' },
+              { key: 'createTime', label: '创建时间', children: detail?.createTime || '-' }
+            ]}
+          />
           <SafeHtmlContent html={safeNoticeContent} />
         </div>
       </Modal>

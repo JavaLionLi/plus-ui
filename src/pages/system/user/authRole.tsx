@@ -71,10 +71,15 @@ export default function UserAuthRolePage() {
 
   return (
     <PageContainer title="分配角色">
-      <Descriptions bordered column={2} style={{ marginBottom: 16 }}>
-        <Descriptions.Item label="用户昵称">{user?.nickName}</Descriptions.Item>
-        <Descriptions.Item label="登录账号">{user?.userName}</Descriptions.Item>
-      </Descriptions>
+      <Descriptions
+        bordered
+        column={2}
+        style={{ marginBottom: 16 }}
+        items={[
+          { key: 'nickName', label: '用户昵称', children: user?.nickName },
+          { key: 'userName', label: '登录账号', children: user?.userName }
+        ]}
+      />
       <ProTable<RoleVO>
         loading={loading}
         rowKey="roleId"

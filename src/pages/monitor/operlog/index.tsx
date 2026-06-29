@@ -214,7 +214,7 @@ export default function MonitorOperlogPage() {
         <Descriptions
           column={1}
           bordered
-          labelStyle={{ width: 110 }}
+          styles={{ label: { width: 110 } }}
           items={[
             {
               key: 'status',
