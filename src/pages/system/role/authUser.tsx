@@ -6,6 +6,7 @@ import { Button, message, Popconfirm, Tag } from 'antd';
 import { useRef, useState } from 'react';
 import type { UserQuery, UserVO } from '@/api/system/user/types';
 import { allocatedUserList, authUserCancel, authUserCancelAll } from '@/api/system/role';
+import { useTableScroll } from '@/hooks/useTableScroll';
 import { useUserStore } from '@/stores/userStore';
 import { hasPermi } from '@/utils/permission';
 import { toPageQuery, toTableData } from '@/utils/ruoyi';
@@ -19,6 +20,7 @@ export default function RoleAuthUserPage() {
   const location = useLocation();
   const roleId = getRoleId(location.pathname);
   const actionRef = useRef<ActionType | undefined>(undefined);
+  const { tableScroll } = useTableScroll(1210);
   const userInfo = useUserStore(state => state.userInfo);
   const [selectedRows, setSelectedRows] = useState<UserVO[]>([]);
   const [selectOpen, { setTrue: openSelectModal, setFalse: closeSelectModal }] = useBoolean(false);
@@ -76,7 +78,7 @@ export default function RoleAuthUserPage() {
         actionRef={actionRef}
         rowKey="userId"
         columns={columns}
-        scroll={{ x: 1210 }}
+        scroll={tableScroll}
         search={{ labelWidth: 90 }}
         pagination={{ defaultPageSize: 10, showSizeChanger: true }}
         rowSelection={{

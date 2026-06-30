@@ -133,6 +133,9 @@ export default function LayoutSettings({ open, value, onChange, onOpenChange }: 
       <SettingRow label="动态标题">
         <Switch checked={value.dynamicTitle} onChange={dynamicTitle => patchValue({ dynamicTitle })} />
       </SettingRow>
+      <SettingRow label="全高表格">
+        <Switch checked={value.fullHeightTable} onChange={fullHeightTable => patchValue({ fullHeightTable })} />
+      </SettingRow>
 
       <Space style={{ marginTop: 18 }}>
         <Button type="primary" icon={<SaveOutlined />} onClick={() => message.success('配置已保存')}>

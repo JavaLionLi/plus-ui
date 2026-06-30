@@ -22,6 +22,7 @@ import RichTextEditor from '@/components/common/RichTextEditor';
 import RowActions from '@/components/common/RowActions';
 import { useDict } from '@/hooks/useDict';
 import { useTableSelection } from '@/hooks/useTableSelection';
+import { useTableScroll } from '@/hooks/useTableScroll';
 import { useUserStore } from '@/stores/userStore';
 import { resolveOssContent } from '@/utils/ossContent';
 import { dictOptions } from '@/utils/dict';
@@ -47,6 +48,7 @@ function SafeHtmlContent({ html }: { html: string }) {
 
 export default function SystemNoticePage() {
   const actionRef = useRef<ActionType | undefined>(undefined);
+  const { tableScroll } = useTableScroll(1120);
   const [form] = Form.useForm<NoticeForm>();
   const location = useLocation();
   const userInfo = useUserStore(state => state.userInfo);
@@ -184,7 +186,7 @@ export default function SystemNoticePage() {
         actionRef={actionRef}
         rowKey="noticeId"
         columns={columns}
-        scroll={{ x: 1120 }}
+        scroll={tableScroll}
         search={{ labelWidth: 90 }}
         rowSelection={{ selectedRowKeys: ids, onChange: handleSelectionChange }}
         request={async params => {

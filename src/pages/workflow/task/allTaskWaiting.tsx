@@ -17,6 +17,7 @@ import ProcessMeddle from '@/components/workflow/ProcessMeddle';
 import UserNameDisplay from '@/components/workflow/UserNameDisplay';
 import { useDict } from '@/hooks/useDict';
 import { useSearchReset } from '@/hooks/useSearchReset';
+import { useTableScroll } from '@/hooks/useTableScroll';
 import { dictOptions } from '@/utils/dict';
 import { confirmTitleSafe } from '@/utils/modal';
 import { toPageQuery, toTableData } from '@/utils/ruoyi';
@@ -41,6 +42,7 @@ function openBusinessForm(row: FlowTaskVO) {
 
 export default function WorkflowAllTaskWaitingPage() {
   const actionRef = useRef<ActionType | undefined>(undefined);
+  const { tableScroll } = useTableScroll(1464);
   const [urgeForm] = Form.useForm<{ message: string; messageType: string[] }>();
   const dicts = useDict('wf_business_status', 'wf_task_status', 'sys_normal_disable');
   const [activeTab, setActiveTab] = useState<AllTaskTab>('waiting');
@@ -248,7 +250,7 @@ export default function WorkflowAllTaskWaitingPage() {
         actionRef={actionRef}
         rowKey="id"
         columns={columns}
-        scroll={{ x: 1464 }}
+        scroll={tableScroll}
         search={{ labelWidth: 100 }}
         form={{ onReset: resetSearch }}
         pagination={{ defaultPageSize: 10, showSizeChanger: true }}

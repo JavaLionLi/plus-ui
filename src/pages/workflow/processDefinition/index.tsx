@@ -32,6 +32,7 @@ import {
 import EllipsisText from '@/components/common/EllipsisText';
 import TreePanel from '@/components/common/TreePanel';
 import { useSearchReset } from '@/hooks/useSearchReset';
+import { useTableScroll } from '@/hooks/useTableScroll';
 import { useUserStore } from '@/stores/userStore';
 import { saveValidatedBlob } from '@/utils/download';
 import { confirmAction } from '@/utils/modal';
@@ -72,6 +73,7 @@ function requestDefinitionList(
 export default function WorkflowProcessDefinitionPage() {
   const location = useLocation();
   const actionRef = useRef<ActionType | undefined>(undefined);
+  const { tableScroll } = useTableScroll(1240);
   const [form] = Form.useForm<FlowDefinitionForm>();
   const userInfo = useUserStore(state => state.userInfo);
   const [categoryOptions, setCategoryOptions] = useState<CategoryTreeVO[]>([]);
@@ -354,7 +356,7 @@ export default function WorkflowProcessDefinitionPage() {
             actionRef={actionRef}
             rowKey="id"
             columns={columns}
-            scroll={{ x: 1240 }}
+            scroll={tableScroll}
             search={{ labelWidth: 120 }}
             form={{ onReset: resetSearch }}
             pagination={{ defaultPageSize: 10, showSizeChanger: true }}

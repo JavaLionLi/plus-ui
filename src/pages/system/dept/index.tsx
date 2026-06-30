@@ -22,6 +22,7 @@ import EllipsisText from '@/components/common/EllipsisText';
 import RowActions from '@/components/common/RowActions';
 import { useDict } from '@/hooks/useDict';
 import { useTreeTableExpand } from '@/hooks/useTreeTableExpand';
+import { useTableScroll } from '@/hooks/useTableScroll';
 import { useUserStore } from '@/stores/userStore';
 import { dictOptions } from '@/utils/dict';
 import { hasPermi } from '@/utils/permission';
@@ -49,6 +50,7 @@ function toTreeSelectData(depts: DeptVO[]): TreeSelectNode[] {
 
 export default function SystemDeptPage() {
   const actionRef = useRef<ActionType | undefined>(undefined);
+  const { tableScroll } = useTableScroll(850);
   const [form] = Form.useForm<DeptForm>();
   const userInfo = useUserStore(state => state.userInfo);
   const dicts = useDict('sys_normal_disable');
@@ -191,7 +193,7 @@ export default function SystemDeptPage() {
         actionRef={actionRef}
         rowKey="deptId"
         columns={columns}
-        scroll={{ x: 850 }}
+        scroll={tableScroll}
         search={{ labelWidth: 90 }}
         pagination={false}
         expandable={{

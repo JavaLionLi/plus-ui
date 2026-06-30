@@ -25,6 +25,7 @@ import {
 import RowActions from '@/components/common/RowActions';
 import { useDict } from '@/hooks/useDict';
 import { useTableExport } from '@/hooks/useTableExport';
+import { useTableScroll } from '@/hooks/useTableScroll';
 import { useUserStore } from '@/stores/userStore';
 import { dictOptions } from '@/utils/dict';
 import { confirmTitleSafe } from '@/utils/modal';
@@ -40,6 +41,7 @@ const configTypeTabs = [
 
 export default function SystemConfigPage() {
   const actionRef = useRef<ActionType | undefined>(undefined);
+  const { tableScroll } = useTableScroll(900);
   const [form] = Form.useForm<ConfigForm>();
   const userInfo = useUserStore(state => state.userInfo);
   const dicts = useDict('sys_yes_no');
@@ -148,7 +150,7 @@ export default function SystemConfigPage() {
         actionRef={actionRef}
         rowKey="configId"
         columns={columns}
-        scroll={{ x: 900 }}
+        scroll={tableScroll}
         search={{ labelWidth: 90 }}
         request={async params => {
           const query = {

@@ -15,6 +15,7 @@ import type { TreeForm, TreeQuery, TreeVO } from '@/api/demo/tree/types';
 import { addTree, delTree, getTree, listTree, updateTree } from '@/api/demo/tree';
 import RowActions from '@/components/common/RowActions';
 import { useTreeTableExpand } from '@/hooks/useTreeTableExpand';
+import { useTableScroll } from '@/hooks/useTableScroll';
 import { useUserStore } from '@/stores/userStore';
 import { hasPermi } from '@/utils/permission';
 import { handleTree } from '@/utils/ruoyi';
@@ -37,6 +38,7 @@ function toTreeSelectData(nodes: TreeVO[]): TreeSelectNode[] {
 
 export default function DemoTreePage() {
   const actionRef = useRef<ActionType | undefined>(undefined);
+  const { tableScroll } = useTableScroll(760);
   const [form] = Form.useForm<TreeForm>();
   const userInfo = useUserStore(state => state.userInfo);
   const [treeOptions, setTreeOptions] = useState<TreeVO[]>([]);
@@ -125,7 +127,7 @@ export default function DemoTreePage() {
         actionRef={actionRef}
         rowKey="id"
         columns={columns}
-        scroll={{ x: 760 }}
+        scroll={tableScroll}
         pagination={false}
         search={{ labelWidth: 90 }}
         expandable={{

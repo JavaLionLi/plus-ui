@@ -18,6 +18,7 @@ import type { TableQuery, TableVO } from '@/api/tool/gen/types';
 import { batchGenCode, delTable, getDataNames, listTable, previewTable, synchDb } from '@/api/tool/gen';
 import EllipsisText from '@/components/common/EllipsisText';
 import { useDateRangeQuery } from '@/hooks/useDateRangeQuery';
+import { useTableScroll } from '@/hooks/useTableScroll';
 import { useUserStore } from '@/stores/userStore';
 import { saveValidatedBlob } from '@/utils/download';
 import { hasPermi } from '@/utils/permission';
@@ -53,6 +54,7 @@ function previewLanguage(name: string) {
 export default function ToolGenPage() {
   const location = useLocation();
   const actionRef = useRef<ActionType | undefined>(undefined);
+  const { tableScroll } = useTableScroll(1300);
   const userInfo = useUserStore(state => state.userInfo);
   const [selectedRows, setSelectedRows] = useState<TableVO[]>([]);
   const [dataNames, setDataNames] = useState<string[]>([]);
@@ -229,7 +231,7 @@ export default function ToolGenPage() {
         actionRef={actionRef}
         rowKey="tableId"
         columns={columns}
-        scroll={{ x: 1300 }}
+        scroll={tableScroll}
         search={{ labelWidth: 90 }}
         pagination={{ defaultCurrent: currentPage, defaultPageSize: 10, showSizeChanger: true }}
         rowSelection={{

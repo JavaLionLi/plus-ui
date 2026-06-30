@@ -20,6 +20,7 @@ import ImagePreview from '@/components/common/ImagePreview';
 import ImageUpload from '@/components/common/ImageUpload';
 import RowActions from '@/components/common/RowActions';
 import { useDateRangeQuery } from '@/hooks/useDateRangeQuery';
+import { useTableScroll } from '@/hooks/useTableScroll';
 import { useUserStore } from '@/stores/userStore';
 import { saveValidatedBlob } from '@/utils/download';
 import { hasPermi } from '@/utils/permission';
@@ -31,6 +32,7 @@ function isImage(fileSuffix?: string) {
 
 export default function SystemOssPage() {
   const actionRef = useRef<ActionType | undefined>(undefined);
+  const { tableScroll } = useTableScroll(1300);
   const userInfo = useUserStore(state => state.userInfo);
   const [selectedRows, setSelectedRows] = useState<OssVO[]>([]);
   const [previewListResource, setPreviewListResource] = useState(true);
@@ -146,7 +148,7 @@ export default function SystemOssPage() {
         actionRef={actionRef}
         rowKey="ossId"
         columns={columns}
-        scroll={{ x: 1300 }}
+        scroll={tableScroll}
         search={{ labelWidth: 90 }}
         rowSelection={{ selectedRowKeys: ids, onChange: (_, rows) => setSelectedRows(rows) }}
         request={async (params, sort) => {

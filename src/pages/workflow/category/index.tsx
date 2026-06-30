@@ -16,6 +16,7 @@ import type { CategoryForm, CategoryQuery, CategoryVO } from '@/api/workflow/cat
 import { addCategory, delCategory, getCategory, listCategory, updateCategory } from '@/api/workflow/category';
 import RowActions from '@/components/common/RowActions';
 import { useTreeTableExpand } from '@/hooks/useTreeTableExpand';
+import { useTableScroll } from '@/hooks/useTableScroll';
 import { useUserStore } from '@/stores/userStore';
 import { hasPermi } from '@/utils/permission';
 import { handleTree } from '@/utils/ruoyi';
@@ -38,6 +39,7 @@ function toTreeSelectData(nodes: CategoryVO[]): CategorySelectNode[] {
 
 export default function WorkflowCategoryPage() {
   const actionRef = useRef<ActionType | undefined>(undefined);
+  const { tableScroll } = useTableScroll(900);
   const [form] = Form.useForm<CategoryForm>();
   const userInfo = useUserStore(state => state.userInfo);
   const [categoryOptions, setCategoryOptions] = useState<CategoryVO[]>([]);
@@ -122,7 +124,7 @@ export default function WorkflowCategoryPage() {
         actionRef={actionRef}
         rowKey="categoryId"
         columns={columns}
-        scroll={{ x: 900 }}
+        scroll={tableScroll}
         pagination={false}
         search={{ labelWidth: 90 }}
         expandable={{

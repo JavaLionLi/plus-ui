@@ -12,6 +12,7 @@ import EllipsisText from '@/components/common/EllipsisText';
 import RowActions from '@/components/common/RowActions';
 import TreePanel from '@/components/common/TreePanel';
 import { useDict } from '@/hooks/useDict';
+import { useTableScroll } from '@/hooks/useTableScroll';
 import { useUserStore } from '@/stores/userStore';
 import { dictOptions } from '@/utils/dict';
 import { hasPermi } from '@/utils/permission';
@@ -34,6 +35,7 @@ function openBusinessForm(row: FlowInstanceVO, type: 'update' | 'view') {
 
 export default function WorkflowMyDocumentPage() {
   const actionRef = useRef<ActionType | undefined>(undefined);
+  const { tableScroll } = useTableScroll(1240);
   const userInfo = useUserStore(state => state.userInfo);
   const dicts = useDict('wf_business_status');
   const [categoryOptions, setCategoryOptions] = useState<CategoryTreeVO[]>([]);
@@ -167,7 +169,7 @@ export default function WorkflowMyDocumentPage() {
             actionRef={actionRef}
             rowKey="id"
             columns={columns}
-            scroll={{ x: 1240 }}
+            scroll={tableScroll}
             search={{ labelWidth: 120 }}
             form={{ onReset: resetSearch }}
             pagination={{ defaultPageSize: 10, showSizeChanger: true }}

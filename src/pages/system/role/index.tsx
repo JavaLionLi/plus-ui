@@ -29,6 +29,7 @@ import { useDateRangeQuery } from '@/hooks/useDateRangeQuery';
 import { useDict } from '@/hooks/useDict';
 import { useTableExport } from '@/hooks/useTableExport';
 import { useTableSelection } from '@/hooks/useTableSelection';
+import { useTableScroll } from '@/hooks/useTableScroll';
 import { useUserStore } from '@/stores/userStore';
 import { dictOptions } from '@/utils/dict';
 import { confirmAction } from '@/utils/modal';
@@ -48,6 +49,7 @@ const defaultRoleForm: RoleForm = {
 
 export default function SystemRolePage() {
   const actionRef = useRef<ActionType | undefined>(undefined);
+  const { tableScroll } = useTableScroll(1132);
   const [form] = Form.useForm<RoleForm>();
   const userInfo = useUserStore(state => state.userInfo);
   const dicts = useDict('sys_normal_disable');
@@ -233,7 +235,7 @@ export default function SystemRolePage() {
         actionRef={actionRef}
         rowKey="roleId"
         columns={columns}
-        scroll={{ x: 1132 }}
+        scroll={tableScroll}
         search={{ labelWidth: 90 }}
         pagination={{ defaultPageSize: 10, showSizeChanger: true }}
         rowSelection={{

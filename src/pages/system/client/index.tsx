@@ -22,6 +22,7 @@ import RowActions from '@/components/common/RowActions';
 import { useDict } from '@/hooks/useDict';
 import { useTableExport } from '@/hooks/useTableExport';
 import { useTableSelection } from '@/hooks/useTableSelection';
+import { useTableScroll } from '@/hooks/useTableScroll';
 import { useUserStore } from '@/stores/userStore';
 import { dictOptions } from '@/utils/dict';
 import { confirmAction } from '@/utils/modal';
@@ -42,6 +43,7 @@ function getRuleList(ruleList?: string[], ruleValue?: string) {
 
 export default function SystemClientPage() {
   const actionRef = useRef<ActionType | undefined>(undefined);
+  const { tableScroll } = useTableScroll(1580);
   const [form] = Form.useForm<ClientForm>();
   const userInfo = useUserStore(state => state.userInfo);
   const dicts = useDict('sys_normal_disable', 'sys_grant_type', 'sys_device_type');
@@ -210,7 +212,7 @@ export default function SystemClientPage() {
         rowKey="id"
         columns={columns}
         search={{ labelWidth: 95 }}
-        scroll={{ x: 1580 }}
+        scroll={tableScroll}
         rowSelection={{ selectedRowKeys: ids, onChange: handleSelectionChange }}
         request={async params => {
           const query = toPageQuery(params);

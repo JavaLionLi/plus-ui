@@ -8,6 +8,7 @@ import DictTag from '@/components/common/DictTag';
 import EllipsisText from '@/components/common/EllipsisText';
 import RowActions from '@/components/common/RowActions';
 import { useDict } from '@/hooks/useDict';
+import { useTableScroll } from '@/hooks/useTableScroll';
 import { useUserStore } from '@/stores/userStore';
 import { dictOptions } from '@/utils/dict';
 import { hasPermi } from '@/utils/permission';
@@ -16,6 +17,7 @@ import { toPageQuery, toTableData } from '@/utils/ruoyi';
 
 export default function MonitorOnlinePage() {
   const actionRef = useRef<ActionType | undefined>(undefined);
+  const { tableScroll } = useTableScroll(1320);
   const userInfo = useUserStore(state => state.userInfo);
   const dicts = useDict('sys_device_type');
   const canForceLogout = hasPermi(userInfo, ['monitor:online:forceLogout']);
@@ -119,7 +121,7 @@ export default function MonitorOnlinePage() {
         actionRef={actionRef}
         rowKey="tokenId"
         columns={columns}
-        scroll={{ x: 1320 }}
+        scroll={tableScroll}
         search={{ labelWidth: 90 }}
         request={async params => {
           const res = await listOnline(toPageQuery(params));

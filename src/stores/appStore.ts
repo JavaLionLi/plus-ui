@@ -17,6 +17,7 @@ export interface LayoutSettingsValue {
   fixedHeader: boolean;
   sidebarLogo: boolean;
   dynamicTitle: boolean;
+  fullHeightTable: boolean;
 }
 
 export const layoutSettingsStorageKey = 'layout-setting-react';
@@ -33,7 +34,8 @@ export const defaultLayoutSettings: LayoutSettingsValue = {
   tagsIcon: true,
   fixedHeader: true,
   sidebarLogo: true,
-  dynamicTitle: true
+  dynamicTitle: true,
+  fullHeightTable: true
 };
 
 export function loadLayoutSettings(): LayoutSettingsValue {

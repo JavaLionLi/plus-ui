@@ -14,6 +14,7 @@ import { useDateRangeQuery } from '@/hooks/useDateRangeQuery';
 import { useDict } from '@/hooks/useDict';
 import { useTableExport } from '@/hooks/useTableExport';
 import { useTableSelection } from '@/hooks/useTableSelection';
+import { useTableScroll } from '@/hooks/useTableScroll';
 import { useUserStore } from '@/stores/userStore';
 import { dictOptions } from '@/utils/dict';
 import { hasPermi } from '@/utils/permission';
@@ -27,6 +28,7 @@ function dictText(dicts: DictData[] | undefined, value?: string | number) {
 
 export default function MonitorOperlogPage() {
   const actionRef = useRef<ActionType | undefined>(undefined);
+  const { tableScroll } = useTableScroll(1680);
   const userInfo = useUserStore(state => state.userInfo);
   const dicts = useDict('sys_oper_type', 'sys_common_status', 'sys_device_type');
   const { ids, handleSelectionChange, clearSelection } = useTableSelection<OperLogVO>(row => row.operId);
@@ -163,7 +165,7 @@ export default function MonitorOperlogPage() {
         rowKey="operId"
         columns={columns}
         search={{ labelWidth: 90 }}
-        scroll={{ x: 1680 }}
+        scroll={tableScroll}
         rowSelection={{ selectedRowKeys: ids, onChange: handleSelectionChange }}
         request={async (params, sort) => {
           const { operTimeRange, ...tableParams } = params;

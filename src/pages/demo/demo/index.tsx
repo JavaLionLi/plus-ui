@@ -16,6 +16,7 @@ import { addDemo, delDemo, getDemo, listDemo, updateDemo } from '@/api/demo/demo
 import RowActions from '@/components/common/RowActions';
 import { useTableExport } from '@/hooks/useTableExport';
 import { useTableSelection } from '@/hooks/useTableSelection';
+import { useTableScroll } from '@/hooks/useTableScroll';
 import { useUserStore } from '@/stores/userStore';
 import { hasPermi } from '@/utils/permission';
 import { toPageQuery, toTableData } from '@/utils/ruoyi';
@@ -24,6 +25,7 @@ const defaultDemoForm: DemoForm = {};
 
 export default function DemoDemoPage() {
   const actionRef = useRef<ActionType | undefined>(undefined);
+  const { tableScroll } = useTableScroll(760);
   const [form] = Form.useForm<DemoForm>();
   const userInfo = useUserStore(state => state.userInfo);
   const { ids, selectedOne, handleSelectionChange, clearSelection } = useTableSelection<DemoVO>(row => row.id);
@@ -103,7 +105,7 @@ export default function DemoDemoPage() {
         actionRef={actionRef}
         rowKey="id"
         columns={columns}
-        scroll={{ x: 760 }}
+        scroll={tableScroll}
         search={{ labelWidth: 90 }}
         pagination={{ defaultPageSize: 10, showSizeChanger: true }}
         rowSelection={{ selectedRowKeys: ids, onChange: handleSelectionChange }}

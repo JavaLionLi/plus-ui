@@ -20,6 +20,7 @@ import { addType, delType, getType, listType, refreshCache, updateType } from '@
 import EllipsisText from '@/components/common/EllipsisText';
 import RowActions from '@/components/common/RowActions';
 import { useTableExport } from '@/hooks/useTableExport';
+import { useTableScroll } from '@/hooks/useTableScroll';
 import { useTableSelection } from '@/hooks/useTableSelection';
 import { useDictStore } from '@/stores/dictStore';
 import { useUserStore } from '@/stores/userStore';
@@ -53,6 +54,8 @@ function tagColor(listClass?: string) {
 export default function SystemDictPage() {
   const typeActionRef = useRef<ActionType | undefined>(undefined);
   const dataActionRef = useRef<ActionType | undefined>(undefined);
+  const { tableScroll: typeTableScroll, tableWrapperRef: typeTableWrapperRef } = useTableScroll(702);
+  const { tableScroll: dataTableScroll, tableWrapperRef: dataTableWrapperRef } = useTableScroll(816);
   const [typeForm] = Form.useForm<DictTypeForm>();
   const [dataForm] = Form.useForm<DictDataForm>();
   const userInfo = useUserStore(state => state.userInfo);
@@ -264,12 +267,12 @@ export default function SystemDictPage() {
   return (
     <PageContainer title="字典管理">
       <div className="dict-grid">
-        <section className="dict-panel">
+        <section ref={typeTableWrapperRef} className="dict-panel">
           <ProTable<DictTypeVO, DictTypeQuery>
             actionRef={typeActionRef}
             rowKey="dictId"
             columns={typeColumns}
-            scroll={{ x: 702 }}
+            scroll={typeTableScroll}
             search={{ labelWidth: 90 }}
             rowClassName={row => (row.dictId === currentDict?.dictId ? 'dict-row-current' : '')}
             rowSelection={{ selectedRowKeys: typeIds, onChange: handleTypeSelectionChange }}
@@ -334,12 +337,12 @@ export default function SystemDictPage() {
           />
         </section>
 
-        <section className="dict-panel">
+        <section ref={dataTableWrapperRef} className="dict-panel">
           <ProTable<DictData, DictDataQuery>
             actionRef={dataActionRef}
             rowKey="dictCode"
             columns={dataColumns}
-            scroll={{ x: 816 }}
+            scroll={dataTableScroll}
             search={{ labelWidth: 90 }}
             params={{ dictType: currentDict?.dictType }}
             rowSelection={{ selectedRowKeys: dataIds, onChange: handleDataSelectionChange }}

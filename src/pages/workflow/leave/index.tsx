@@ -19,6 +19,7 @@ import RowActions from '@/components/common/RowActions';
 import { useDict } from '@/hooks/useDict';
 import { useTableExport } from '@/hooks/useTableExport';
 import { useTableSelection } from '@/hooks/useTableSelection';
+import { useTableScroll } from '@/hooks/useTableScroll';
 import { useUserStore } from '@/stores/userStore';
 import { dictOptions } from '@/utils/dict';
 import { hasPermi } from '@/utils/permission';
@@ -42,6 +43,7 @@ function editableStatus(status?: string) {
 
 export default function WorkflowLeavePage() {
   const actionRef = useRef<ActionType | undefined>(undefined);
+  const { tableScroll } = useTableScroll(1160);
   const userInfo = useUserStore(state => state.userInfo);
   const dicts = useDict('wf_business_status');
   const { ids, handleSelectionChange, clearSelection } = useTableSelection<LeaveVO>(row => row.id);
@@ -148,7 +150,7 @@ export default function WorkflowLeavePage() {
         actionRef={actionRef}
         rowKey="id"
         columns={columns}
-        scroll={{ x: 1160 }}
+        scroll={tableScroll}
         search={{ labelWidth: 100 }}
         rowSelection={{ selectedRowKeys: ids, onChange: handleSelectionChange }}
         request={async params => {

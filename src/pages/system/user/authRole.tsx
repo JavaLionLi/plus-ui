@@ -5,6 +5,7 @@ import { type MouseEvent, useEffect, useMemo, useState } from 'react';
 import type { RoleVO } from '@/api/system/role/types';
 import type { UserVO } from '@/api/system/user/types';
 import { getAuthRole, updateAuthRole } from '@/api/system/user';
+import { useTableScroll } from '@/hooks/useTableScroll';
 function getUserId(pathname: string) {
   return pathname.split('/').filter(Boolean).at(-1) || '';
 }
@@ -19,6 +20,7 @@ function isSelectionControl(target: EventTarget | null) {
 export default function UserAuthRolePage() {
   const location = useLocation();
   const userId = getUserId(location.pathname);
+  const { tableScroll } = useTableScroll(1010);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<UserVO>();
   const [roles, setRoles] = useState<RoleVO[]>([]);
@@ -84,7 +86,7 @@ export default function UserAuthRolePage() {
         loading={loading}
         rowKey="roleId"
         columns={columns}
-        scroll={{ x: 1010 }}
+        scroll={tableScroll}
         dataSource={roles}
         search={false}
         pagination={{ defaultPageSize: 10, showSizeChanger: true }}

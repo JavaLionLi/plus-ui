@@ -22,6 +22,7 @@ import IconSelect from '@/components/common/IconSelect';
 import RowActions from '@/components/common/RowActions';
 import { useDict } from '@/hooks/useDict';
 import { useLoading } from '@/hooks/useLoading';
+import { useTableScroll } from '@/hooks/useTableScroll';
 import { useUserStore } from '@/stores/userStore';
 import { routeIcon } from '@/utils/menu';
 import { dictOptions } from '@/utils/dict';
@@ -56,6 +57,7 @@ function toTreeNodes(nodes: MenuTreeOption[]): DataNode[] {
 
 export default function SystemMenuPage() {
   const actionRef = useRef<ActionType | undefined>(undefined);
+  const { tableScroll } = useTableScroll(1120);
   const [form] = Form.useForm<MenuForm>();
   const userInfo = useUserStore(state => state.userInfo);
   const dicts = useDict('sys_show_hide', 'sys_normal_disable', 'sys_yes_no');
@@ -200,7 +202,7 @@ export default function SystemMenuPage() {
         actionRef={actionRef}
         rowKey="menuId"
         columns={columns}
-        scroll={{ x: 1120 }}
+        scroll={tableScroll}
         pagination={false}
         search={{ labelWidth: 90 }}
         expandable={{ defaultExpandAllRows: false }}

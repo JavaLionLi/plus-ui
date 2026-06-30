@@ -23,6 +23,7 @@ import TreePanel from '@/components/common/TreePanel';
 import { useDict } from '@/hooks/useDict';
 import { useTableExport } from '@/hooks/useTableExport';
 import { useTableSelection } from '@/hooks/useTableSelection';
+import { useTableScroll } from '@/hooks/useTableScroll';
 import { useUserStore } from '@/stores/userStore';
 import { dictOptions } from '@/utils/dict';
 import { hasPermi } from '@/utils/permission';
@@ -47,6 +48,7 @@ function toTreeSelectData(nodes: DeptTreeVO[]): TreeSelectNode[] {
 
 export default function SystemPostPage() {
   const actionRef = useRef<ActionType | undefined>(undefined);
+  const { tableScroll } = useTableScroll(960);
   const [form] = Form.useForm<PostForm>();
   const userInfo = useUserStore(state => state.userInfo);
   const dicts = useDict('sys_normal_disable');
@@ -182,7 +184,7 @@ export default function SystemPostPage() {
             actionRef={actionRef}
             rowKey="postId"
             columns={columns}
-            scroll={{ x: 960 }}
+            scroll={tableScroll}
             search={{ labelWidth: 90 }}
             rowSelection={{ selectedRowKeys: selectedIds, onChange: handleSelectionChange }}
             request={async params => {

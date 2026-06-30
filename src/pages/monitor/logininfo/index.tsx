@@ -10,6 +10,7 @@ import { useDateRangeQuery } from '@/hooks/useDateRangeQuery';
 import { useDict } from '@/hooks/useDict';
 import { useTableExport } from '@/hooks/useTableExport';
 import { useTableSelection } from '@/hooks/useTableSelection';
+import { useTableScroll } from '@/hooks/useTableScroll';
 import { useUserStore } from '@/stores/userStore';
 import { dictOptions } from '@/utils/dict';
 import { hasPermi } from '@/utils/permission';
@@ -18,6 +19,7 @@ import { toPageQuery, toTableData, withTableSort } from '@/utils/ruoyi';
 
 export default function MonitorLoginInfoPage() {
   const actionRef = useRef<ActionType | undefined>(undefined);
+  const { tableScroll } = useTableScroll(1352);
   const userInfo = useUserStore(state => state.userInfo);
   const dicts = useDict('sys_device_type', 'sys_common_status');
   const { ids, selectedRows, selectedOne, handleSelectionChange, clearSelection } = useTableSelection<LoginInfoVO>(
@@ -130,7 +132,7 @@ export default function MonitorLoginInfoPage() {
         actionRef={actionRef}
         rowKey="infoId"
         columns={columns}
-        scroll={{ x: 1352 }}
+        scroll={tableScroll}
         search={{ labelWidth: 90 }}
         rowSelection={{ selectedRowKeys: ids, onChange: handleSelectionChange }}
         request={async (params, sort) => {

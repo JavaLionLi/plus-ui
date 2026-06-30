@@ -14,6 +14,7 @@ import RowActions from '@/components/common/RowActions';
 import UserSelect from '@/components/common/UserSelect';
 import UserNameDisplay from '@/components/workflow/UserNameDisplay';
 import { useDict } from '@/hooks/useDict';
+import { useTableScroll } from '@/hooks/useTableScroll';
 import { dictOptions } from '@/utils/dict';
 import { toPageQuery, toTableData } from '@/utils/ruoyi';
 
@@ -48,6 +49,7 @@ function openBusinessForm(row: FlowTaskVO, type: 'approval' | 'view') {
 
 export default function WorkflowTaskListPage({ type }: WorkflowTaskListPageProps) {
   const actionRef = useRef<ActionType | undefined>(undefined);
+  const { tableScroll } = useTableScroll(1460);
   const dicts = useDict('wf_business_status', 'wf_task_status');
   const [selectedApplicants, setSelectedApplicants] = useState<UserVO[]>([]);
   const [applicantOpen, { setTrue: openApplicantModal, setFalse: closeApplicantModal }] = useBoolean(false);
@@ -210,7 +212,7 @@ export default function WorkflowTaskListPage({ type }: WorkflowTaskListPageProps
         actionRef={actionRef}
         rowKey="id"
         columns={columns}
-        scroll={{ x: 1460 }}
+        scroll={tableScroll}
         search={{ labelWidth: 100 }}
         form={{ onReset: resetSearch }}
         request={async params => {

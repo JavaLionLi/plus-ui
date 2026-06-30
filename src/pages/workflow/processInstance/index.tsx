@@ -34,6 +34,7 @@ import UserSelect from '@/components/common/UserSelect';
 import { useDict } from '@/hooks/useDict';
 import { useLoading } from '@/hooks/useLoading';
 import { useSearchReset } from '@/hooks/useSearchReset';
+import { useTableScroll } from '@/hooks/useTableScroll';
 import { useUserStore } from '@/stores/userStore';
 import { dictOptions } from '@/utils/dict';
 import { confirmAction } from '@/utils/modal';
@@ -60,6 +61,7 @@ function openBusinessForm(row: FlowInstanceVO) {
 
 export default function WorkflowProcessInstancePage() {
   const actionRef = useRef<ActionType | undefined>(undefined);
+  const { tableScroll } = useTableScroll(1430);
   const [invalidForm] = Form.useForm<{ comment?: string }>();
   const [variableForm] = Form.useForm<{ key?: string; value?: string }>();
   const userInfo = useUserStore(state => state.userInfo);
@@ -311,7 +313,7 @@ export default function WorkflowProcessInstancePage() {
             actionRef={actionRef}
             rowKey="id"
             columns={columns}
-            scroll={{ x: 1430 }}
+            scroll={tableScroll}
             search={{ labelWidth: 110 }}
             form={{ onReset: resetSearch }}
             pagination={{ defaultPageSize: 10, showSizeChanger: true }}

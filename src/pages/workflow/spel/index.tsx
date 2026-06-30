@@ -19,6 +19,7 @@ import EllipsisText from '@/components/common/EllipsisText';
 import RowActions from '@/components/common/RowActions';
 import { useDict } from '@/hooks/useDict';
 import { useTableSelection } from '@/hooks/useTableSelection';
+import { useTableScroll } from '@/hooks/useTableScroll';
 import { useUserStore } from '@/stores/userStore';
 import { dictOptions } from '@/utils/dict';
 import { hasPermi } from '@/utils/permission';
@@ -53,6 +54,7 @@ function buildViewSpel(values: Pick<SpelForm, 'componentName' | 'methodName' | '
 
 export default function WorkflowSpelPage() {
   const actionRef = useRef<ActionType | undefined>(undefined);
+  const { tableScroll } = useTableScroll(1110);
   const [form] = Form.useForm<SpelForm>();
   const userInfo = useUserStore(state => state.userInfo);
   const dicts = useDict('sys_normal_disable');
@@ -162,7 +164,7 @@ export default function WorkflowSpelPage() {
         actionRef={actionRef}
         rowKey="id"
         columns={columns}
-        scroll={{ x: 1110 }}
+        scroll={tableScroll}
         search={{ labelWidth: 90 }}
         rowSelection={{ selectedRowKeys: ids, onChange: handleSelectionChange }}
         request={async params => {

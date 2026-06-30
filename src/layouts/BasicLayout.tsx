@@ -181,7 +181,8 @@ export default function BasicLayout() {
   const proLayoutClassName =
     [
       layoutSettings.fixedHeader ? undefined : 'layout-header-static-react',
-      effectiveNavDark ? 'layout-nav-dark-react' : 'layout-nav-light-react'
+      effectiveNavDark ? 'layout-nav-dark-react' : 'layout-nav-light-react',
+      layoutSettings.fullHeightTable ? 'layout-full-height-table-react' : undefined
     ]
       .filter(Boolean)
       .join(' ') || undefined;

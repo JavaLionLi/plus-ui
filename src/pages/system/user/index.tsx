@@ -36,6 +36,7 @@ import { useDateRangeQuery } from '@/hooks/useDateRangeQuery';
 import { useDict } from '@/hooks/useDict';
 import { useTableExport } from '@/hooks/useTableExport';
 import { useTableSelection } from '@/hooks/useTableSelection';
+import { useTableScroll } from '@/hooks/useTableScroll';
 import { useUserStore } from '@/stores/userStore';
 import { dictOptions } from '@/utils/dict';
 import { confirmAction } from '@/utils/modal';
@@ -70,6 +71,7 @@ function toTreeSelectData(depts: DeptTreeVO[]): TreeSelectNode[] {
 
 export default function SystemUserPage() {
   const actionRef = useRef<ActionType | undefined>(undefined);
+  const { tableScroll } = useTableScroll(1220);
   const [form] = Form.useForm<UserForm>();
   const userInfo = useUserStore(state => state.userInfo);
   const dicts = useDict('sys_normal_disable', 'sys_user_gender');
@@ -352,7 +354,7 @@ export default function SystemUserPage() {
             actionRef={actionRef}
             rowKey="userId"
             columns={columns}
-            scroll={{ x: 1220 }}
+            scroll={tableScroll}
             search={{ labelWidth: 90 }}
             pagination={{ defaultPageSize: 10, showSizeChanger: true }}
             rowSelection={{
