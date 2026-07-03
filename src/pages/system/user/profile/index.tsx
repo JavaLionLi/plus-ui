@@ -329,7 +329,7 @@ export default function Profile() {
           <Card title="个人信息">
             <Space orientation="vertical" size={18} style={{ width: '100%' }}>
               <div style={{ textAlign: 'center' }}>
-                <Avatar size={112} src={user.avatar || defaultAvatar} />
+                <Avatar size={112} src={user.avatarUrl || defaultAvatar} />
                 <div style={{ marginTop: 12 }}>
                   <Upload {...uploadProps}>
                     <Button icon={<UploadOutlined />} loading={avatarUploading}>

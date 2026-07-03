@@ -8,7 +8,8 @@ export interface UserInfo {
     userId: string | number;
     userName: string;
     nickName?: string;
-    avatar?: string;
+    avatar?: string | number;
+    avatarUrl?: string;
     deptName?: string;
   };
   roles: string[];
@@ -26,6 +27,7 @@ export interface UserForm {
   gender?: string;
   status?: string;
   remark?: string;
+  avatar?: string | number;
   postIds?: Array<string | number>;
   roleIds?: Array<string | number>;
 }
@@ -68,7 +70,8 @@ export interface UserVO extends BaseEntity {
   email?: string;
   phoneNumber?: string;
   gender?: string;
-  avatar?: string;
+  avatar?: string | number;
+  avatarUrl?: string;
   status?: string;
   deptName?: string;
   roles?: RoleVO[];

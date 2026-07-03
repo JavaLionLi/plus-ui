@@ -454,7 +454,7 @@ export default function BasicLayout() {
         )}
         subMenuItemRender={(item, _dom) => menuNode(item as RuntimeMenuItem)}
         avatarProps={{
-          src: userInfo?.user.avatar || defaultAvatar,
+          src: userInfo?.user.avatarUrl || defaultAvatar,
           title: userInfo?.user.nickName || userInfo?.user.userName,
           render: (_, dom) => (
             <Dropdown menu={{ items: userMenu }} placement="bottomRight" trigger={['click']}>

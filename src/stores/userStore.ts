@@ -17,7 +17,7 @@ export const useUserStore = create<UserState>(set => ({
             ...userInfo,
             user: {
               ...userInfo.user,
-              avatar: userInfo.user.avatar || defaultAvatar
+              avatarUrl: userInfo.user.avatarUrl || defaultAvatar
             }
           }
         : undefined
