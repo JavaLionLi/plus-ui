@@ -17,8 +17,8 @@ description: 在当前 plus-ui-react 前端项目中按真实 React + TypeScript
    - 系统复杂页优先看 `src/pages/system/user/index.tsx`、`system/role`、`system/post`、`system/config`。
    - workflow 业务页优先看 `src/pages/workflow/*` 与 `src/api/workflow/*` 同类页面。
 4. 新增或维护代码生成能力时，优先阅读当前仓库 `gen/api.ts.ftl`、`gen/types.ts.ftl`、`gen/index.tsx.ftl`、`gen/index-tree.tsx.ftl`。这些是 React 版内置 FreeMarker 生成模板，页面模板必须输出当前项目 React/TSX 风格。
-5. 需要从 Vue 版本迁移经验时，参考 `D:\git-sources\Plus相关\plus-ui-new\.codex\skills\frontend-crud-coding` 和 `.claude\agents`，只吸收任务分型、增量修改和自检原则。
-6. 新增标准页面前，可以对照后端工程 `D:\git-sources\Plus相关\RuoYi-Vue-Plus-boot4\ruoyi-modules\ruoyi-gen\src\main\resources\fm` 确认字段、权限和导出能力，但输出和 `gen/` 模板必须保持 React 项目风格。
+5. 需要从 Vue 版本迁移经验时，参考 Gitee 项目 `https://gitee.com/JavaLionLi/plus-ui` 的 `6.X-Vue` 分支，目录为 `.codex/skills/frontend-crud-coding` 和 `.claude/agents`，只吸收任务分型、增量修改和自检原则。
+6. 新增标准页面前，可以对照 Gitee 项目 `https://gitee.com/dromara/RuoYi-Vue-Plus` 的 `6.X` 分支，目录为 `ruoyi-modules/ruoyi-gen/src/main/resources/fm`，确认字段、权限和导出能力，但输出和 `gen/` 模板必须保持 React 项目风格。
 7. 新增代码时通常同步维护 `src/api/<module>/<business>/index.ts`、`types.ts`、`src/pages/<module>/<business>/index.tsx`；如果是生成模板优化，同步维护 `gen/` 对应 `.ftl`。
 8. 增强已有页面时只做增量修改，保留原页面的树筛选、导入导出、列显隐、权限、字典、弹窗、抽屉和路由跳转能力。
 9. 修改完成后按影响范围运行验证：优先 `pnpm exec tsc --noEmit` 或 `pnpm lint`；大范围页面、公共组件、构建配置变更再跑 `pnpm build`。
@@ -36,8 +36,8 @@ description: 在当前 plus-ui-react 前端项目中按真实 React + TypeScript
 1. 目标目录下最近似页面、API、types 的真实实现。
 2. 当前项目公共 hooks、组件、工具、样式和请求封装约定。
 3. 当前项目内置 `gen/*.ftl` React 代码生成模板。
-4. Vue 参考项目 `.codex` / `.claude` 中的任务分型和工作流。
-5. 关联后端工程 generator 模板。
+4. Gitee 项目 `plus-ui` 的 `6.X-Vue` 分支 `.codex` / `.claude` 中的任务分型和工作流。
+5. Gitee 项目 `RuoYi-Vue-Plus` 的 `6.X` 分支 generator 模板。
 6. 通用 React / Ant Design ProComponents 习惯。
 
 也就是说：
