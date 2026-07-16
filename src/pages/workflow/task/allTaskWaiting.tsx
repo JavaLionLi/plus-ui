@@ -2,7 +2,7 @@ import { BellOutlined, EyeOutlined, SettingOutlined, SwapOutlined, UserAddOutlin
 import { ModalForm, PageContainer, ProTable, type ActionType, type ProColumns } from '@ant-design/pro-components';
 import { useBoolean } from 'ahooks';
 import { Badge, Button, Form, message, Tabs } from 'antd';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState, type Key } from 'react';
 import type { UserVO } from '@/api/system/user/types';
 import type { PageResult, R } from '@/api/types';
 import type { FlowTaskVO, TaskQuery } from '@/api/workflow/task/types';
@@ -23,7 +23,9 @@ import { confirmTitleSafe } from '@/utils/modal';
 import { toPageQuery, toTableData } from '@/utils/ruoyi';
 type AllTaskTab = 'waiting' | 'finish';
 type UserSelectMode = 'applicant' | 'assignee';
-
+type TaskTableRow = FlowTaskVO & {
+  tableRowKey: string;
+};
 
 function requestAllTaskList(tab: AllTaskTab, query: TaskQuery): Promise<R<PageResult<FlowTaskVO>>> {
   if (tab === 'waiting') return pageByAllTaskWait(query);
@@ -46,7 +48,8 @@ export default function WorkflowAllTaskWaitingPage() {
   const [urgeForm] = Form.useForm<{ message: string; messageType: string[] }>();
   const dicts = useDict('wf_business_status', 'wf_task_status', 'sys_normal_disable');
   const [activeTab, setActiveTab] = useState<AllTaskTab>('waiting');
-  const [selectedRows, setSelectedRows] = useState<FlowTaskVO[]>([]);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
+  const [selectedRows, setSelectedRows] = useState<TaskTableRow[]>([]);
   const [selectedApplicants, setSelectedApplicants] = useState<UserVO[]>([]);
   const [userModalOpen, { setTrue: openUserModal, setFalse: closeUserModal }] = useBoolean(false);
   const [userSelectMode, setUserSelectMode] = useState<UserSelectMode>('applicant');
@@ -56,7 +59,7 @@ export default function WorkflowAllTaskWaitingPage() {
 
   const businessStatusOptions = useMemo(() => dictOptions(dicts.wf_business_status), [dicts.wf_business_status]);
   const taskStatusOptions = useMemo(() => dictOptions(dicts.wf_task_status), [dicts.wf_task_status]);
-  const selectedTaskIds = selectedRows.map(item => item.id).filter(Boolean);
+  const selectedTaskIds = [...new Set(selectedRows.map(item => item.id).filter(Boolean))];
   const selectedApplicantIds = selectedApplicants.map(item => item.userId).filter(Boolean) as Array<string | number>;
   const resetSearch = useSearchReset(
     actionRef,
@@ -65,6 +68,7 @@ export default function WorkflowAllTaskWaitingPage() {
 
   const changeTab = (key: string) => {
     setActiveTab(key as AllTaskTab);
+    setSelectedRowKeys([]);
     setSelectedRows([]);
     setTimeout(() => actionRef.current?.reloadAndRest?.(), 0);
   };
@@ -102,6 +106,7 @@ export default function WorkflowAllTaskWaitingPage() {
       await updateAssignee(selectedTaskIds, userId);
       message.success('操作成功');
       closeUserModal();
+      setSelectedRowKeys([]);
       setSelectedRows([]);
       actionRef.current?.reload();
       return;
@@ -118,6 +123,8 @@ export default function WorkflowAllTaskWaitingPage() {
     await urgeTask({ ...values, taskIdList: selectedTaskIds });
     message.success('操作成功');
     urgeForm.resetFields();
+    setSelectedRowKeys([]);
+    setSelectedRows([]);
     actionRef.current?.reload();
     return true;
   };
@@ -127,7 +134,7 @@ export default function WorkflowAllTaskWaitingPage() {
     openMeddleModal();
   };
 
-  const columns: ProColumns<FlowTaskVO>[] = [
+  const columns: ProColumns<TaskTableRow>[] = [
     {
       title: '业务编码',
       dataIndex: 'businessCode',
@@ -172,6 +179,7 @@ export default function WorkflowAllTaskWaitingPage() {
     {
       title: '任务名称',
       dataIndex: 'nodeName',
+      fieldProps: { id: 'workflow-all-task-node-name' },
       width: 150,
       render: (_, row) => <EllipsisText value={row.nodeName} maxWidth={130} />
     },
@@ -208,7 +216,7 @@ export default function WorkflowAllTaskWaitingPage() {
             search: false,
             width: 120,
             fieldProps: { options: taskStatusOptions },
-            render: (_: unknown, row: FlowTaskVO) => (
+            render: (_: unknown, row: TaskTableRow) => (
               <DictTag options={dicts.wf_task_status} value={row.flowTaskStatus} />
             )
           }
@@ -246,17 +254,20 @@ export default function WorkflowAllTaskWaitingPage() {
           { key: 'finish', label: '已办任务' }
         ]}
       />
-      <ProTable<FlowTaskVO, TaskQuery>
+      <ProTable<TaskTableRow, TaskQuery>
         actionRef={actionRef}
-        rowKey="id"
+        rowKey="tableRowKey"
         columns={columns}
         scroll={tableScroll}
         search={{ labelWidth: 100 }}
         form={{ onReset: resetSearch }}
         pagination={{ defaultPageSize: 10, showSizeChanger: true }}
         rowSelection={{
-          selectedRowKeys: selectedTaskIds,
-          onChange: (_, rows) => setSelectedRows(rows)
+          selectedRowKeys,
+          onChange: (keys, rows) => {
+            setSelectedRowKeys(keys);
+            setSelectedRows(rows);
+          }
         }}
         request={async params => {
           const query = toPageQuery(params);
@@ -264,7 +275,14 @@ export default function WorkflowAllTaskWaitingPage() {
             ...query,
             createByIds: selectedApplicantIds
           });
-          return toTableData(res);
+          const tableData = toTableData(res);
+          return {
+            ...tableData,
+            data: tableData.data.map((row, index) => ({
+              ...row,
+              tableRowKey: `${activeTab}:${query.pageNum || 1}:${index}`
+            }))
+          };
         }}
         toolbar={{ title: activeTab === 'waiting' ? '全部待办任务' : '全部已办任务' }}
         toolBarRender={() => [
@@ -319,7 +337,7 @@ export default function WorkflowAllTaskWaitingPage() {
         form={urgeForm}
         layout="vertical"
         initialValues={{ messageType: ['1'] }}
-        modalProps={{ destroyOnHidden: true, onCancel: closeUrgeModal }}
+        modalProps={{ forceRender: true, onCancel: closeUrgeModal }}
         onOpenChange={open => !open && closeUrgeModal()}
         onFinish={submitUrge}
       >

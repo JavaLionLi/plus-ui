@@ -30,7 +30,6 @@ const pageTitle: Record<TaskListType, string> = {
   copy: '抄送任务'
 };
 
-
 function requestTaskList(type: TaskListType, query: TaskQuery): Promise<R<PageResult<FlowTaskVO>>> {
   if (type === 'wait') return pageByTaskWait(query);
   if (type === 'finish') return pageByTaskFinish(query);
@@ -98,6 +97,7 @@ export default function WorkflowTaskListPage({ type }: WorkflowTaskListPageProps
     {
       title: '任务名称',
       dataIndex: 'nodeName',
+      fieldProps: { id: `workflow-task-${type}-node-name` },
       width: 150,
       render: (_, row) => <EllipsisText value={row.nodeName} maxWidth={130} />
     },

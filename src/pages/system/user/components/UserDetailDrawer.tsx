@@ -40,7 +40,7 @@ export default function UserDetailDrawer({ open, userId, genderOptions, onClose 
   };
 
   return (
-    <Drawer title="用户信息详情" open={open} width={680} onClose={closeDrawer} destroyOnHidden>
+    <Drawer title="用户信息详情" open={open} size={680} onClose={closeDrawer} destroyOnHidden>
       <ProDescriptions
         loading={loading}
         column={2}

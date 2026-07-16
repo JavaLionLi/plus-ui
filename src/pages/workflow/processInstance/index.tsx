@@ -43,7 +43,6 @@ import { toPageQuery, toTableData } from '@/utils/ruoyi';
 
 type InstanceTab = 'running' | 'finish';
 
-
 function requestInstanceList(tab: InstanceTab, query: FlowInstanceQuery): Promise<R<PageResult<FlowInstanceVO>>> {
   if (tab === 'running') return pageByRunning(query);
   return pageByFinish(query);
@@ -152,7 +151,7 @@ export default function WorkflowProcessInstancePage() {
   const openVariable = async (row: FlowInstanceVO) => {
     setVariableRow(row);
     openVariableModal();
-    variableForm.resetFields();
+    if (canVariable) variableForm.resetFields();
     await withVariableLoading(async () => {
       const res = await instanceVariable(row.id);
       setVariableText(res.data.variable || '');
@@ -207,6 +206,7 @@ export default function WorkflowProcessInstancePage() {
     {
       title: '任务名称',
       dataIndex: 'nodeName',
+      fieldProps: { id: 'workflow-process-instance-node-name' },
       width: 150,
       render: (_, row) => <EllipsisText value={row.nodeName} maxWidth={130} />
     },
@@ -367,7 +367,7 @@ export default function WorkflowProcessInstancePage() {
         open={invalidOpen}
         form={invalidForm}
         layout="vertical"
-        modalProps={{ destroyOnHidden: true, onCancel: closeInvalidModal }}
+        modalProps={{ forceRender: true, onCancel: closeInvalidModal }}
         onOpenChange={open => !open && closeInvalidModal()}
         onFinish={submitInvalid}
       >
@@ -379,14 +379,7 @@ export default function WorkflowProcessInstancePage() {
         />
       </ModalForm>
 
-      <Modal
-        title="流程变量"
-        open={variableOpen}
-        width={800}
-        onCancel={closeVariableModal}
-        footer={null}
-        destroyOnHidden
-      >
+      <Modal title="流程变量" open={variableOpen} width={800} forceRender onCancel={closeVariableModal} footer={null}>
         <Card
           loading={variableLoading}
           title={variableRow?.flowName ? `流程定义名称：${variableRow.flowName}` : '流程变量'}

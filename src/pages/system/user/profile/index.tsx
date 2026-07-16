@@ -19,8 +19,8 @@ import {
   Upload,
   type UploadProps
 } from 'antd';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import Cropper, { type Area, type Point } from 'react-easy-crop';
+import { useCallback, useEffect, useMemo, useState, type ComponentType } from 'react';
+import CropperModule, { type Area, type CropperProps, type Point } from 'react-easy-crop';
 import type { OnlineVO } from '@/api/monitor/online/types';
 import type { SocialAuthVO } from '@/api/system/social/types';
 import type { UserInfoVO, UserProfileForm } from '@/api/system/user/types';
@@ -37,9 +37,13 @@ import defaultAvatar from '@/assets/images/profile.jpg';
 import DictTag from '@/components/common/DictTag';
 import { useDict } from '@/hooks/useDict';
 import { useLoading } from '@/hooks/useLoading';
-import { dictOptions } from '@/utils/dict';
 import { usePermissionStore } from '@/stores/permissionStore';
+import { dictOptions } from '@/utils/dict';
 import { getUploadErrorMessage, validateUploadFile } from '@/utils/upload';
+
+// react-easy-crop 6.2.x 的 CommonJS 类型声明遗漏了默认导出，运行时仍为默认组件。
+type CropperComponentProps = Partial<CropperProps> & Pick<CropperProps, 'crop' | 'onCropChange'>;
+const Cropper = CropperModule as unknown as ComponentType<CropperComponentProps>;
 
 const socialProviders = [
   { source: 'wechat', label: '微信', icon: wechatIcon },

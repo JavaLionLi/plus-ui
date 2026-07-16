@@ -31,9 +31,19 @@ function sortNotices(notices: NoticeItem[]) {
   return [...notices].sort((a, b) => Number(b.timestamp || 0) - Number(a.timestamp || 0));
 }
 
+function dedupeNotices(notices: NoticeItem[]) {
+  const messageIds = new Set<string>();
+  return notices.filter(notice => {
+    const messageId = String(notice.messageId);
+    if (messageIds.has(messageId)) return false;
+    messageIds.add(messageId);
+    return true;
+  });
+}
+
 export const useNoticeStore = create<NoticeState>(set => ({
   notices: [],
-  setNotices: notices => set({ notices: sortNotices(notices) }),
+  setNotices: notices => set({ notices: sortNotices(dedupeNotices(notices)) }),
   addNotice: notice =>
     set(state => {
       const key = noticeKey(notice);

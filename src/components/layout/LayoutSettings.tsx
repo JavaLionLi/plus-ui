@@ -55,7 +55,7 @@ export default function LayoutSettings({ open, value, onChange, onOpenChange }: 
     <Drawer
       title="布局设置"
       open={open}
-      width={320}
+      size={320}
       onClose={() => onOpenChange(false)}
       className="layout-settings-drawer"
     >

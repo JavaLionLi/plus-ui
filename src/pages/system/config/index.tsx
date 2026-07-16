@@ -166,7 +166,7 @@ export default function SystemConfigPage() {
           <div className="system-config-page">
             <Tabs
               activeKey={activeConfigType}
-              tabPosition="left"
+              tabPlacement="start"
               className="system-config-page__tabs"
               items={configTypeTabs}
               onChange={changeConfigType}
@@ -211,7 +211,7 @@ export default function SystemConfigPage() {
         form={form}
         layout="vertical"
         initialValues={{ configType: 'Y' }}
-        modalProps={{ destroyOnHidden: true, onCancel: closeModal }}
+        modalProps={{ forceRender: true, onCancel: closeModal }}
         onOpenChange={open => !open && closeModal()}
         onFinish={submit}
       >

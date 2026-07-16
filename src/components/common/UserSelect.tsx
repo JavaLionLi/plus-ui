@@ -173,7 +173,7 @@ export default function UserSelect({
   ];
 
   return (
-    <Modal title={title} open={open} width="80%" onOk={confirm} onCancel={() => onOpenChange(false)} destroyOnHidden>
+    <Modal title={title} open={open} width="80%" onOk={confirm} onCancel={() => onOpenChange(false)} forceRender>
       <div className={`user-select-react${treeCollapsed ? ' is-tree-collapsed' : ''}`}>
         <div className="user-select-tree-react">
           <div className="user-select-tree-head">

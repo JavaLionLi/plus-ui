@@ -130,6 +130,7 @@ export default function MessageBox({ userId }: MessageBoxProps) {
           {currentItems.length ? (
             <List
               dataSource={currentItems}
+              rowKey={item => String(item.messageId)}
               renderItem={item => (
                 <List.Item className="message-box-item" onClick={() => readMessage(item)}>
                   <div className="message-box-item-main">
@@ -162,7 +163,7 @@ export default function MessageBox({ userId }: MessageBoxProps) {
       trigger="click"
       content={content}
       arrow={false}
-      overlayInnerStyle={{ width: 340 }}
+      styles={{ container: { width: 340 } }}
     >
       <Tooltip title="消息盒子" open={tooltipOpen && !open} onOpenChange={setTooltipOpen}>
         <Badge className="message-box-badge" count={unreadCount} size="small" overflowCount={99} offset={[-5, 5]}>
