@@ -4,6 +4,7 @@
   "private": true,
   "description": "React + Ant Design version of RuoYi-Vue-Plus UI",
   "type": "module",
+  "packageManager": "pnpm@10.34.5",
   "scripts": {
     "build": "pnpm build:prod",
     "build:dev": "cross-env UMI_ENV=development BABEL_POLYFILL=none max build",
@@ -61,6 +62,6 @@
   },
   "engines": {
     "node": ">=20.19.0",
-    "pnpm": ">=11.0.0"
+    "pnpm": ">=10.0.0"
   }
 }
