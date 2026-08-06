@@ -7,14 +7,15 @@
   "packageManager": "pnpm@10.34.5",
   "scripts": {
     "build": "pnpm build:prod",
-    "build:dev": "cross-env UMI_ENV=development BABEL_POLYFILL=none max build",
-    "build:prod": "cross-env UMI_ENV=production BABEL_POLYFILL=none max build",
+    "build:dev": "pnpm run setup:umi && cross-env UMI_ENV=development BABEL_POLYFILL=none max build",
+    "build:prod": "pnpm run setup:umi && cross-env UMI_ENV=production BABEL_POLYFILL=none max build",
     "dev": "cross-env UMI_ENV=development MOCK=none BABEL_POLYFILL=none max dev",
     "fmt": "oxfmt .",
-    "lint": "oxlint src config vite.config.ts && cross-env UMI_ENV=development BABEL_POLYFILL=none max setup && tsc --noEmit",
+    "lint": "oxlint src config vite.config.ts && pnpm run setup:umi && tsc --noEmit",
     "lint:fix": "oxlint --fix src config vite.config.ts",
     "openapi": "max openapi",
     "preview": "max preview --port 8000",
+    "setup:umi": "cross-env UMI_ENV=development BABEL_POLYFILL=none max setup",
     "start": "cross-env UMI_ENV=development MOCK=none BABEL_POLYFILL=none max dev"
   },
   "dependencies": {
