@@ -34,8 +34,8 @@ export function useTableScroll(options: TableScrollX | TableScrollOptions) {
 
   const refreshTableScroll = useCallback(() => {
     if (!fullHeightTable || disabled || typeof window === 'undefined') {
+      // tableY 仅在启用时参与 memo 计算 这里无需同步重置
       clearTableBodyHeight();
-      setTableY(undefined);
       return;
     }
 

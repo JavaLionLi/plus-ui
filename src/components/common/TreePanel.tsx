@@ -1,7 +1,7 @@
 import type { DataNode, EventDataNode } from 'antd/es/tree';
 import { LeftOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Card, Input, Tree } from 'antd';
-import { useEffect, useMemo, useState, type Key } from 'react';
+import { useMemo, useState, type Key } from 'react';
 import { collectTreeKeys } from '@/utils/ruoyi';
 
 export interface TreePanelProps<T extends object = Record<string, unknown>> {
@@ -94,16 +94,12 @@ export default function TreePanel<T extends object = Record<string, unknown>>({
   );
   const allTreeKeys = useMemo(() => collectTreeKeys(treeData, node => node.key), [treeData]);
   const mergedCollapsed = collapsed ?? innerCollapsed;
-
-  useEffect(() => {
-    if (collapsed !== undefined) {
-      setInnerCollapsed(collapsed);
-    }
-  }, [collapsed]);
-
-  useEffect(() => {
+  // 数据变化时默认展开全部 通过渲染期对比 prev 派生 而非 effect 中 setState
+  const [prevAllTreeKeys, setPrevAllTreeKeys] = useState(allTreeKeys);
+  if (allTreeKeys !== prevAllTreeKeys) {
+    setPrevAllTreeKeys(allTreeKeys);
     setExpandedKeys(allTreeKeys);
-  }, [allTreeKeys]);
+  }
 
   const toggleCollapsed = () => {
     const nextCollapsed = !mergedCollapsed;

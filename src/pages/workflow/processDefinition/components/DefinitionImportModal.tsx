@@ -1,6 +1,6 @@
 import { UploadOutlined } from '@ant-design/icons';
 import { message, Modal, Space, TreeSelect, Upload, type UploadProps } from 'antd';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { CategoryTreeVO } from '@/api/workflow/category/types';
 import { importDefinition } from '@/api/workflow/definition';
 import { buildAccept, getUploadErrorMessage, validateUploadFile } from '@/utils/upload';
@@ -22,13 +22,8 @@ export default function DefinitionImportModal({
   onCancel,
   onSuccess
 }: DefinitionImportModalProps) {
-  const [uploadCategory, setUploadCategory] = useState<string | number>();
-
-  useEffect(() => {
-    if (open) {
-      setUploadCategory(initialCategory);
-    }
-  }, [initialCategory, open]);
+  // 父组件通过 key 重挂载打开弹窗 这里的初值即为每次打开时的 initialCategory 无需 effect 同步
+  const [uploadCategory, setUploadCategory] = useState<string | number | undefined>(initialCategory);
 
   const handleImportDefinition: UploadProps['customRequest'] = async options => {
     const file = options.file as File;

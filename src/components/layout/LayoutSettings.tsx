@@ -1,6 +1,6 @@
 import { CheckOutlined, ReloadOutlined, SaveOutlined } from '@ant-design/icons';
 import { Button, Divider, Drawer, Input, message, Segmented, Slider, Space, Switch } from 'antd';
-import { useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { defaultLayoutSettings, useAppStore, type LayoutSettingsValue, type NavLayout } from '@/stores/appStore';
 
 interface LayoutSettingsProps {
@@ -21,22 +21,17 @@ function SettingRow({ label, children }: { label: string; children: React.ReactN
 
 export default function LayoutSettings({ open, value, onChange, onOpenChange }: LayoutSettingsProps) {
   const resetLayoutSettings = useAppStore(state => state.resetLayoutSettings);
-  const preferredSideThemeRef = useRef(value.sideTheme);
-
-  useEffect(() => {
-    if (!value.darkMode) {
-      preferredSideThemeRef.current = value.sideTheme;
-    }
-  }, [value.darkMode, value.sideTheme]);
+  // 记住非暗色模式下选中的主题 仅在事件回调中更新 避免渲染期读取 ref
+  const [preferredSideTheme, setPreferredSideTheme] = useState(value.sideTheme);
 
   const patchValue = (patch: Partial<LayoutSettingsValue>) => {
     if (patch.sideTheme) {
-      preferredSideThemeRef.current = patch.sideTheme;
+      setPreferredSideTheme(patch.sideTheme);
     }
 
     const next = { ...value, ...patch };
     if (patch.darkMode === false) {
-      next.sideTheme = preferredSideThemeRef.current;
+      next.sideTheme = preferredSideTheme;
     }
     if (patch.tagsView === false) {
       next.tagsViewPersist = false;
@@ -46,10 +41,11 @@ export default function LayoutSettings({ open, value, onChange, onOpenChange }: 
 
   const resetSettings = () => {
     resetLayoutSettings();
+    setPreferredSideTheme(defaultLayoutSettings.sideTheme);
     onChange(defaultLayoutSettings);
     message.success('配置已重置');
   };
-  const selectedSideTheme = value.darkMode ? preferredSideThemeRef.current : value.sideTheme;
+  const selectedSideTheme = value.darkMode ? preferredSideTheme : value.sideTheme;
 
   return (
     <Drawer

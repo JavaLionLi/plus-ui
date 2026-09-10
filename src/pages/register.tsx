@@ -83,6 +83,8 @@ export default function Register() {
   }, []);
 
   useEffect(() => {
+    // 挂载时加载验证码属于与外部系统同步的合理场景
+    // oxlint-disable-next-line react/set-state-in-effect
     loadCaptcha().catch(() => setCaptcha({ captchaEnabled: false }));
   }, [loadCaptcha]);
 

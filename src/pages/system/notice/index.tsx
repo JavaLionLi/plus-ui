@@ -123,6 +123,8 @@ export default function SystemNoticePage() {
   useEffect(() => {
     const noticeId = new URLSearchParams(location.search).get('noticeId');
     if (noticeId) {
+      // URL 深链同步打开公告详情属于与外部状态对齐的合理场景
+      // oxlint-disable-next-line react/set-state-in-effect
       openDetail(noticeId);
     }
   }, [location.search, openDetail]);

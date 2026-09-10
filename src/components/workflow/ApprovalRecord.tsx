@@ -2,7 +2,7 @@ import { DownloadOutlined } from '@ant-design/icons';
 import { ProTable, type ProColumns } from '@ant-design/pro-components';
 import { useRequest } from 'ahooks';
 import { Button, Modal, Popover, Spin, Table, Tabs } from 'antd';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { OssVO } from '@/api/system/oss/types';
 import type { FlowHistoryVO } from '@/api/workflow/task/types';
 import { downloadOss, listByIds } from '@/api/system/oss';
@@ -52,19 +52,21 @@ export default function ApprovalRecord({ businessId, open, onOpenChange, width =
     }
   );
 
-  useEffect(() => {
-    if (!open || !businessId) {
-      if (!open) {
-        setRecordList([]);
-        setInstanceId(undefined);
-      }
-      return;
-    }
-
+  // 打开时清空旧数据并加载 打开弹窗同步外部状态属于合理场景
+  const resetAndLoad = useCallback(async (nextBusinessId?: string | number) => {
     setRecordList([]);
     setInstanceId(undefined);
-    loadRecords(businessId);
-  }, [businessId, loadRecords, open]);
+    if (nextBusinessId) {
+      await loadRecords(nextBusinessId);
+    }
+  }, [loadRecords]);
+
+  useEffect(() => {
+    if (!open) return;
+    // 打开弹窗时同步清空旧数据属于与外部状态对齐的合理场景
+    // oxlint-disable-next-line react/set-state-in-effect
+    void resetAndLoad(businessId);
+  }, [businessId, open, resetAndLoad]);
 
   const downloadAttachment = async (row: OssVO) => {
     const blob = await downloadOss(row.ossId);

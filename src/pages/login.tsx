@@ -124,6 +124,8 @@ export default function Login() {
 
   useEffect(() => {
     if (getToken()) return;
+    // 挂载时加载验证码属于与外部系统同步的合理场景
+    // oxlint-disable-next-line react/set-state-in-effect
     loadCaptcha().catch(() => {
       setCaptcha({ captchaEnabled: false });
     });
@@ -135,7 +137,7 @@ export default function Login() {
 
   const doSocialLogin = async (source: string) => {
     const res = await authRouterUrl(source);
-    window.location.href = res.data;
+    window.location.assign(res.data);
   };
 
   return (

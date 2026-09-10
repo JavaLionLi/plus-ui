@@ -27,14 +27,20 @@ export default function UserAuthRolePage() {
   const [roleIds, setRoleIds] = useState<Array<string | number>>([]);
 
   useEffect(() => {
-    setLoading(true);
-    getAuthRole(userId)
-      .then(res => {
+    const loadAuthRole = async () => {
+      setLoading(true);
+      try {
+        const res = await getAuthRole(userId);
         setUser(res.data.user);
         setRoles(res.data.roles || []);
         setRoleIds((res.data.roles || []).filter(role => role.flag).map(role => role.roleId));
-      })
-      .finally(() => setLoading(false));
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadAuthRole();
+    // userId 来自路由参数 变化时需重新加载
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies
   }, [userId]);
 
   const columns: ProColumns<RoleVO>[] = useMemo(

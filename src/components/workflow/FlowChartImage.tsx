@@ -10,19 +10,21 @@ const maxScale = 3;
 
 export default function FlowChartImage({ imgUrl }: FlowChartImageProps) {
   const wrapperRef = useRef<HTMLButtonElement>(null);
-  const dragRef = useRef({ dragging: false, x: 0, y: 0 });
+  const dragRef = useRef({ x: 0, y: 0 });
+  const [dragging, setDragging] = useState(false);
   const [scale, setScale] = useState(1);
   const [translate, setTranslate] = useState({ x: 0, y: 0 });
 
   const transformStyle = useMemo(
     () => ({
       transform: `translate(${translate.x}px, ${translate.y}px) scale(${scale})`,
-      transition: dragRef.current.dragging ? 'none' : 'transform 0.2s ease'
+      transition: dragging ? 'none' : 'transform 0.2s ease'
     }),
-    [scale, translate]
+    [dragging, scale, translate]
   );
 
   const resetTransform = () => {
+    setDragging(false);
     setScale(1);
     setTranslate({ x: 0, y: 0 });
   };
@@ -37,19 +39,20 @@ export default function FlowChartImage({ imgUrl }: FlowChartImageProps) {
   const handleMouseDown = (event: MouseEvent<HTMLButtonElement>) => {
     if (scale <= 1) return;
     event.preventDefault();
-    dragRef.current = { dragging: true, x: event.clientX, y: event.clientY };
+    dragRef.current = { x: event.clientX, y: event.clientY };
+    setDragging(true);
   };
 
   const handleMouseMove = (event: MouseEvent<HTMLButtonElement>) => {
-    if (!dragRef.current.dragging) return;
+    if (!dragging) return;
     const deltaX = event.clientX - dragRef.current.x;
     const deltaY = event.clientY - dragRef.current.y;
-    dragRef.current = { dragging: true, x: event.clientX, y: event.clientY };
+    dragRef.current = { x: event.clientX, y: event.clientY };
     setTranslate(prev => ({ x: prev.x + deltaX, y: prev.y + deltaY }));
   };
 
   const stopDrag = () => {
-    dragRef.current.dragging = false;
+    setDragging(false);
   };
 
   if (!imgUrl) {

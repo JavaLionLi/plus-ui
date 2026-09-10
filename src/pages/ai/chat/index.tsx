@@ -14,11 +14,10 @@ function buildChatUrl(openId: string, trustedCredential: string) {
 export default function AiChatPage() {
   const [chatUrl, setChatUrl] = useState('');
   const [loadError, setLoadError] = useState('');
-  const [loading, setLoading] = useState(false);
+  // 初始即为加载中 effect 首次触发时无需同步 setState
+  const [loading, setLoading] = useState(true);
 
   const loadChat = useCallback(async () => {
-    setLoading(true);
-    setLoadError('');
     try {
       const token = getToken();
       if (!token) {
@@ -44,6 +43,8 @@ export default function AiChatPage() {
   }, []);
 
   useEffect(() => {
+    // 挂载时加载 AI 聊天地址属于与外部系统同步的合理场景
+    // oxlint-disable-next-line react/set-state-in-effect
     loadChat();
   }, [loadChat]);
 
@@ -60,7 +61,15 @@ export default function AiChatPage() {
         ) : (
           <Empty className="ai-chat-empty" description={loadError || '正在加载 Snail AI'}>
             {loadError ? (
-              <Button type="primary" icon={<ReloadOutlined />} onClick={loadChat}>
+              <Button
+                type="primary"
+                icon={<ReloadOutlined />}
+                onClick={() => {
+                  setLoading(true);
+                  setLoadError('');
+                  loadChat();
+                }}
+              >
                 重新加载
               </Button>
             ) : null}

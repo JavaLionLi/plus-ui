@@ -9,7 +9,7 @@ import {
 } from '@ant-design/icons';
 import { useBoolean } from 'ahooks';
 import { Button, Form, Input, message, Modal, Select, Space, Table, Tag } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect, useEffectEvent, useState } from 'react';
 import type { UserVO } from '@/api/system/user/types';
 import type { FlowNextNodeVO, FlowTaskVO } from '@/api/workflow/task/types';
 import {
@@ -72,29 +72,31 @@ export default function SubmitVerify({ open, taskId, variables = emptyVariables,
   const [signatureOpen, { setTrue: openSignatureModal, setFalse: closeSignatureModal }] = useBoolean(false);
   const [signatureUsers, setSignatureUsers] = useState<SignatureUser[]>([]);
 
+  // useEffectEvent 让 variables 始终读到最新值 避免其引用变化触发重复加载
+  const loadTask = useEffectEvent(async (taskId: string | number) => {
+    setApprovalLoading(true);
+    approveForm.setFieldsValue({ message: '', messageType: ['1'], assigneeMap: {}, fileId: undefined });
+    setCopyUsers([]);
+    setAssigneeNames({});
+    setCurrentTask(undefined);
+    setNextNodes([]);
+    try {
+      const taskRes = await getTask(taskId);
+      setCurrentTask(taskRes.data);
+      setCopyUsers((taskRes.data.copyList || []).map(user => ({ userId: user.userId, nickName: user.nickName })));
+      const nextRes = await getNextNodeList({ taskId, variables });
+      setNextNodes(nextRes.data || []);
+    } finally {
+      setApprovalLoading(false);
+    }
+  });
+
   useEffect(() => {
     if (!open || !taskId) return;
-
-    const loadTask = async () => {
-      setApprovalLoading(true);
-      approveForm.setFieldsValue({ message: '', messageType: ['1'], assigneeMap: {}, fileId: undefined });
-      setCopyUsers([]);
-      setAssigneeNames({});
-      setCurrentTask(undefined);
-      setNextNodes([]);
-      try {
-        const taskRes = await getTask(taskId);
-        setCurrentTask(taskRes.data);
-        setCopyUsers((taskRes.data.copyList || []).map(user => ({ userId: user.userId, nickName: user.nickName })));
-        const nextRes = await getNextNodeList({ taskId, variables });
-        setNextNodes(nextRes.data || []);
-      } finally {
-        setApprovalLoading(false);
-      }
-    };
-
-    loadTask();
-  }, [approveForm, open, taskId, variables]);
+    // useEffectEvent 在 effect 中调用是 React 官方推荐用法
+    // oxlint-disable-next-line react/set-state-in-effect
+    loadTask(taskId);
+  }, [open, taskId]);
 
   const closeApprovalModal = () => {
     onOpenChange(false);

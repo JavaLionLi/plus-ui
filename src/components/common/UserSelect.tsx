@@ -3,7 +3,7 @@ import type { DataNode } from 'antd/es/tree';
 import { SearchOutlined } from '@ant-design/icons';
 import { useBoolean, useRequest } from 'ahooks';
 import { Button, Form, Input, Modal, Space, Table, Tag, Tree } from 'antd';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useEffectEvent, useMemo, useState } from 'react';
 import type { DeptTreeVO } from '@/api/system/dept/types';
 import type { UserQuery, UserVO } from '@/api/system/user/types';
 import { deptTreeSelect, listUser, optionSelect } from '@/api/system/user';
@@ -98,23 +98,38 @@ export default function UserSelect({
     setSelectedUsers(res.data || []);
   };
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: modal initialization is intentionally tied to open state.
-  useEffect(() => {
-    if (!open) {
-      form.resetFields();
-      setQuery({ pageNum: 1, pageSize: 10 });
-      setUsers([]);
-      setTotal(0);
-      setSelectedUsers([]);
-      return;
-    }
-
+  // useEffectEvent 读取最新的 value/data/query 等非响应式逻辑 只在 open 变化时执行
+  const initModal = useEffectEvent(() => {
     Promise.all([
       deptTreeSelect().then(res => setDeptOptions(res.data || [])),
       loadUsers({ pageNum: 1, pageSize: 10 }),
       initSelectedUsers()
     ]);
-  }, [open]);
+  });
+
+  // 关闭时重置弹窗状态
+  const resetModal = useEffectEvent(() => {
+    form.resetFields();
+    setQuery({ pageNum: 1, pageSize: 10 });
+    setUsers([]);
+    setTotal(0);
+    setSelectedUsers([]);
+  });
+
+  useEffect(() => {
+    if (!open) {
+      // useEffectEvent 在 effect 中调用是 React 官方推荐用法
+      // oxlint-disable-next-line react/set-state-in-effect
+      resetModal();
+      return;
+    }
+
+    // useEffectEvent 在 effect 中调用是 React 官方推荐用法
+    // oxlint-disable-next-line react/set-state-in-effect
+    initModal();
+    // initModal/resetModal 为 useEffectEvent 引用稳定 无需作为依赖
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies
+  }, [initModal, open, resetModal]);
 
   const handleQuery = async () => {
     const values = form.getFieldsValue();

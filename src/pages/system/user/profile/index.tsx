@@ -275,7 +275,7 @@ export default function Profile() {
 
   const bindAuth = async (source: string) => {
     const res = await authRouterUrl(source);
-    window.location.href = res.data;
+    window.location.assign(res.data);
   };
 
   const deviceColumns: ProColumns<OnlineVO>[] = [

@@ -61,7 +61,6 @@ export default function WorkflowSpelPage() {
   const { ids, selectedOne, handleSelectionChange, clearSelection } = useTableSelection<SpelVO>(row => row.id);
   const [modalOpen, { setTrue: openModal, setFalse: closeModal }] = useBoolean(false);
   const [modalTitle, setModalTitle] = useState('');
-  const [preview, setPreview] = useState('');
 
   const canAdd = hasPermi(userInfo, ['workflow:spel:add']);
   const canEdit = hasPermi(userInfo, ['workflow:spel:edit']);
@@ -69,17 +68,17 @@ export default function WorkflowSpelPage() {
   const statusOptions = useMemo(() => dictOptions(dicts.sys_normal_disable), [dicts.sys_normal_disable]);
   const watchedValues = Form.useWatch([], form);
 
+  // preview 由表单值派生 无需独立 state
+  const preview = useMemo(() => buildViewSpel(watchedValues || {}), [watchedValues]);
+
   useEffect(() => {
-    const nextPreview = buildViewSpel(watchedValues || {});
-    setPreview(nextPreview);
-    form.setFieldValue('viewSpel', nextPreview);
-  }, [form, watchedValues]);
+    form.setFieldValue('viewSpel', preview);
+  }, [form, preview]);
 
   const openAdd = () => {
     form.resetFields();
     form.setFieldsValue(defaultSpelForm);
     setModalTitle('添加流程spel表达式定义');
-    setPreview('');
     openModal();
   };
 
@@ -90,7 +89,6 @@ export default function WorkflowSpelPage() {
     form.resetFields();
     form.setFieldsValue(res.data);
     setModalTitle('修改流程spel表达式定义');
-    setPreview(res.data.viewSpel || '');
     openModal();
   };
 

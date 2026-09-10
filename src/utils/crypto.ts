@@ -1,6 +1,5 @@
-import * as CryptoJSModule from 'crypto-js';
-
-const CryptoJS = ('default' in CryptoJSModule ? CryptoJSModule.default : CryptoJSModule) as typeof CryptoJSModule;
+import { utf8ToBytes } from '@noble/ciphers/utils.js';
+import { ecb } from '@noble/ciphers/aes.js';
 
 function generateRandomString() {
   const array = new Uint8Array(32);
@@ -10,29 +9,36 @@ function generateRandomString() {
     .slice(0, 32);
 }
 
-export function generateAesKey(): CryptoJSModule.lib.WordArray {
-  return CryptoJS.enc.Utf8.parse(generateRandomString());
+function bytesToBase64(bytes: Uint8Array) {
+  return btoa(String.fromCharCode(...bytes));
 }
 
-export function encryptBase64(str: CryptoJSModule.lib.WordArray) {
-  return CryptoJS.enc.Base64.stringify(str);
+function base64ToBytes(base64: string) {
+  return Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+}
+
+/**
+ * 生成 AES-256 密钥 (32 字节随机字符串编码) 兼容后端 SecureUtil.aes(key)
+ */
+export function generateAesKey(): Uint8Array {
+  return utf8ToBytes(generateRandomString());
+}
+
+export function encryptBase64(bytes: Uint8Array) {
+  return bytesToBase64(bytes);
 }
 
 export function decryptBase64(str: string) {
-  return CryptoJS.enc.Base64.parse(str);
+  return base64ToBytes(str);
 }
 
-export function encryptWithAes(message: string, aesKey: CryptoJSModule.lib.WordArray) {
-  return CryptoJS.AES.encrypt(message, aesKey, {
-    mode: CryptoJS.mode.ECB,
-    padding: CryptoJS.pad.Pkcs7
-  }).toString();
+/**
+ * AES-256-ECB + PKCS7 填充 输出 Base64 密文 与后端 AES/ECB/PKCS5Padding 格式兼容
+ */
+export function encryptWithAes(message: string, aesKey: Uint8Array) {
+  return bytesToBase64(ecb(aesKey).encrypt(utf8ToBytes(message)));
 }
 
-export function decryptWithAes(message: string, aesKey: CryptoJSModule.lib.WordArray) {
-  const decrypted = CryptoJS.AES.decrypt(message, aesKey, {
-    mode: CryptoJS.mode.ECB,
-    padding: CryptoJS.pad.Pkcs7
-  });
-  return decrypted.toString(CryptoJS.enc.Utf8);
+export function decryptWithAes(message: string, aesKey: Uint8Array) {
+  return new TextDecoder().decode(ecb(aesKey).decrypt(base64ToBytes(message)));
 }

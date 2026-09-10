@@ -240,5 +240,6 @@ service.interceptors.response.use(
 );
 
 export default function request<T = unknown, D = unknown>(config: RequestConfig<D>): Promise<T> {
-  return service.request<T, T, D>(config);
+  // axios 1.20 泛型返回为条件类型 AxiosResponseResult 需要断言 响应拦截器已返回 response.data
+  return service.request<T, T, D>(config) as Promise<T>;
 }

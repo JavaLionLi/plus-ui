@@ -120,6 +120,8 @@ export default function WorkflowProcessDefinitionPage() {
   useEffect(() => {
     const nextTab = getExplicitActiveTabFromSearch(location.search);
     if (!nextTab) return;
+    // URL 查询参数同步页签属于与外部状态对齐的合理场景
+    // oxlint-disable-next-line react/set-state-in-effect
     switchTab(nextTab);
   }, [location.search, switchTab]);
 
@@ -414,6 +416,7 @@ export default function WorkflowProcessDefinitionPage() {
       />
 
       <DefinitionImportModal
+        key={uploadOpen ? 'open' : 'closed'}
         open={uploadOpen}
         categoryOptions={categoryOptions}
         initialCategory={category}

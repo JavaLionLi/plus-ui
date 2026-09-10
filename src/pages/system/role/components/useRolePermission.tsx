@@ -1,7 +1,7 @@
 import type { DataNode } from 'antd/es/tree';
 import { useBoolean } from 'ahooks';
 import { Checkbox, message, type FormInstance } from 'antd';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useEffectEvent, useMemo, useState } from 'react';
 import type { DeptTreeVO } from '@/api/system/dept/types';
 import type { MenuTreeOption } from '@/api/system/menu/types';
 import type { RoleForm } from '@/api/system/role/types';
@@ -104,39 +104,37 @@ export function useRolePermission({ open, roleId, form, onSuccess }: UseRolePerm
     buttonAllKeys.every(key => hasId(buttonCheckedKeys, key));
   const deptAllChecked = deptAllKeys.length > 0 && deptAllKeys.every(key => deptCheckedKeys.includes(key));
 
+  // useEffectEvent 隔离 form 实例等非响应式逻辑 依赖项只保留 open/roleId
+  const loadPermission = useEffectEvent(async (roleId: string | number) => {
+    setLoading(true);
+    setActiveTab('menu');
+    try {
+      const [roleRes, menuRes, deptRes] = await Promise.all([getRole(roleId), roleMenuTreeselect(roleId), deptTreeSelect(roleId)]);
+      form.setFieldsValue({
+        ...defaultRoleForm,
+        ...roleRes.data
+      });
+      setMenuConnect(roleRes.data.menuCheckStrictly ?? true);
+      setDeptConnect(roleRes.data.deptCheckStrictly ?? true);
+      const nextMenuTree = menuRes.data.menus || [];
+      const nextMenuMeta = buildMenuPermissionMeta(nextMenuTree);
+      const checkedKeys = menuRes.data.checkedKeys || [];
+      setMenuTree(nextMenuTree);
+      setDeptTree(deptRes.data.depts || []);
+      setMenuCheckedKeys(checkedKeys.filter(key => !hasId(nextMenuMeta.buttonIds, key)));
+      setButtonCheckedKeys(checkedKeys.filter(key => hasId(nextMenuMeta.buttonIds, key)));
+      setDeptCheckedKeys(deptRes.data.checkedKeys || []);
+    } finally {
+      setLoading(false);
+    }
+  });
+
   useEffect(() => {
     if (!open || !roleId) return;
-
-    const loadPermission = async () => {
-      setLoading(true);
-      setActiveTab('menu');
-      try {
-        const [roleRes, menuRes, deptRes] = await Promise.all([
-          getRole(roleId),
-          roleMenuTreeselect(roleId),
-          deptTreeSelect(roleId)
-        ]);
-        form.setFieldsValue({
-          ...defaultRoleForm,
-          ...roleRes.data
-        });
-        setMenuConnect(roleRes.data.menuCheckStrictly ?? true);
-        setDeptConnect(roleRes.data.deptCheckStrictly ?? true);
-        const nextMenuTree = menuRes.data.menus || [];
-        const nextMenuMeta = buildMenuPermissionMeta(nextMenuTree);
-        const checkedKeys = menuRes.data.checkedKeys || [];
-        setMenuTree(nextMenuTree);
-        setDeptTree(deptRes.data.depts || []);
-        setMenuCheckedKeys(checkedKeys.filter(key => !hasId(nextMenuMeta.buttonIds, key)));
-        setButtonCheckedKeys(checkedKeys.filter(key => hasId(nextMenuMeta.buttonIds, key)));
-        setDeptCheckedKeys(deptRes.data.checkedKeys || []);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadPermission();
-  }, [form, open, roleId]);
+    // useEffectEvent 在 effect 中调用是 React 官方推荐用法
+    // oxlint-disable-next-line react/set-state-in-effect
+    loadPermission(roleId);
+  }, [open, roleId]);
 
   const resetPermission = () => {
     form.resetFields();
