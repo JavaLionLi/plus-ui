@@ -6,7 +6,7 @@ import createComponents from './components';
 import createSvgIconsPlugin from './svg-icon';
 import createCompression from './compression';
 import createSetupExtend from './setup-extend';
-import { viteCheckTransitionPlugin } from "./check-transition";
+import { viteCheckTransitionPlugin } from './check-transition';
 
 export default (viteEnv: any, isBuild = false): [] => {
   const vitePlugins: any = [];

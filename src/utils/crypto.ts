@@ -1,6 +1,4 @@
-import * as CryptoJSModule from 'crypto-js';
-
-const CryptoJS = ('default' in CryptoJSModule ? CryptoJSModule.default : CryptoJSModule) as typeof CryptoJSModule;
+import { ecb } from '@noble/ciphers/aes.js';
 
 /**
  * 随机生成32位的字符串
@@ -14,41 +12,58 @@ const generateRandomString = (): string => {
     .slice(0, 32);
 };
 
+const encoder = new TextEncoder();
+const decoder = new TextDecoder();
+
+const bytesToBase64 = (bytes: Uint8Array): string => {
+  let binary = '';
+  for (const byte of bytes) {
+    binary += String.fromCharCode(byte);
+  }
+  return btoa(binary);
+};
+
+const base64ToBytes = (str: string): Uint8Array => {
+  const binary = atob(str);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+};
+
 /**
  * 随机生成aes 密钥
- * @returns {string}
+ * @returns {Uint8Array}
  */
-export const generateAesKey = (): CryptoJSModule.lib.WordArray => {
-  return CryptoJS.enc.Utf8.parse(generateRandomString());
+export const generateAesKey = (): Uint8Array => {
+  return encoder.encode(generateRandomString());
 };
 
 /**
  * 加密base64
  * @returns {string}
  */
-export const encryptBase64 = (str: CryptoJSModule.lib.WordArray): string => {
-  return CryptoJS.enc.Base64.stringify(str);
+export const encryptBase64 = (bytes: Uint8Array): string => {
+  return bytesToBase64(bytes);
 };
 
 /**
  * 解密base64
  */
-export const decryptBase64 = (str: string) => {
-  return CryptoJS.enc.Base64.parse(str);
+export const decryptBase64 = (str: string): Uint8Array => {
+  return base64ToBytes(str);
 };
 
 /**
- * 使用密钥对数据进行加密
+ * 使用密钥对数据进行加密 (AES/ECB/PKCS7Padding 与后端保持一致)
  * @param message
  * @param aesKey
  * @returns {string}
  */
-export const encryptWithAes = (message: string, aesKey: CryptoJSModule.lib.WordArray): string => {
-  const encrypted = CryptoJS.AES.encrypt(message, aesKey, {
-    mode: CryptoJS.mode.ECB,
-    padding: CryptoJS.pad.Pkcs7
-  });
-  return encrypted.toString();
+export const encryptWithAes = (message: string, aesKey: Uint8Array): string => {
+  const encrypted = ecb(aesKey).encrypt(encoder.encode(message));
+  return bytesToBase64(encrypted);
 };
 
 /**
@@ -57,10 +72,7 @@ export const encryptWithAes = (message: string, aesKey: CryptoJSModule.lib.WordA
  * @param aesKey
  * @returns {string}
  */
-export const decryptWithAes = (message: string, aesKey: CryptoJSModule.lib.WordArray): string => {
-  const decrypted = CryptoJS.AES.decrypt(message, aesKey, {
-    mode: CryptoJS.mode.ECB,
-    padding: CryptoJS.pad.Pkcs7
-  });
-  return decrypted.toString(CryptoJS.enc.Utf8);
+export const decryptWithAes = (message: string, aesKey: Uint8Array): string => {
+  const decrypted = ecb(aesKey).decrypt(base64ToBytes(message));
+  return decoder.decode(decrypted);
 };
