@@ -14,6 +14,7 @@ import { isHandledRequestError } from '@/api/request';
 import defaultAvatar from '@/assets/images/profile.jpg';
 import appLogo from '@/assets/logo/logo.png';
 import ExternalLinkButton from '@/components/layout/ExternalLinkButton';
+import KeepAliveTabs from '@/components/layout/KeepAliveTabs';
 import LayoutSettings from '@/components/layout/LayoutSettings';
 import LocaleSelect from '@/components/layout/LocaleSelect';
 import MenuSearch from '@/components/layout/MenuSearch';
@@ -489,9 +490,16 @@ export default function BasicLayout() {
           />
         )}
         {/* React 19.3 ViewTransition 页面切换过渡动画 不支持的浏览器自动降级为无动画 */}
-        <ViewTransition>
-          <Outlet key={`${location.pathname}${location.search}:${refreshKey}`} />
-        </ViewTransition>
+        {layoutSettings.tagsView ? (
+          /* Activity 标签页缓存 切换标签隐藏而非卸载 保留页面状态(对标 Vue keep-alive) */
+          <ViewTransition>
+            <KeepAliveTabs refreshKey={refreshKey} />
+          </ViewTransition>
+        ) : (
+          <ViewTransition>
+            <Outlet key={`${location.pathname}${location.search}:${refreshKey}`} />
+          </ViewTransition>
+        )}
       </ProLayout>
       <LayoutSettings
         open={settingsOpen}

@@ -59,6 +59,42 @@ function normalizeTags(tags: TagViewItem[]) {
   return tags.some(item => item.key === homeTag.key) ? tags : [homeTag, ...tags];
 }
 
+/** KeepAliveTabs 缓存页的路由快照(非响应式 模块级) */
+export interface CachedPageEntry {
+  location: {
+    pathname: string;
+    search: string;
+    hash: string;
+    state: unknown;
+    key: string;
+  };
+  /** 重挂载版本号 刷新时变化 */
+  version: number;
+}
+
+const cachedPages = new Map<string, CachedPageEntry>();
+
+/** 上一次渲染看到的刷新计数器 用于识别刷新动作 */
+let lastSeenRefreshKey: number | null = null;
+
+export const keepAliveCache = {
+  get: (key: string) => cachedPages.get(key),
+  /** 登记新访问标签的路由快照 */
+  register: (key: string, location: CachedPageEntry['location']) => {
+    if (cachedPages.has(key)) return;
+    cachedPages.set(key, { location, version: 0 });
+  },
+  /** refreshKey 变化时递增当前页版本号 触发 Activity 重挂载 */
+  noteRefresh: (activeKey: string, refreshKey: number) => {
+    if (lastSeenRefreshKey === refreshKey) return;
+    lastSeenRefreshKey = refreshKey;
+    const existing = cachedPages.get(activeKey);
+    if (existing) {
+      cachedPages.set(activeKey, { ...existing, version: existing.version + 1 });
+    }
+  }
+};
+
 export const useTagsViewStore = create<TagsViewState>((set, get) => ({
   tags: [homeTag, ...readPersistedTags().filter(item => item.key !== homeTag.key)],
   fullscreen: false,
@@ -82,6 +118,7 @@ export const useTagsViewStore = create<TagsViewState>((set, get) => ({
   },
   resetTags: () => {
     localStorage.removeItem(tagsStorageKey);
+    cachedPages.clear();
     set({ tags: [homeTag], fullscreen: false });
   },
   setFullscreen: fullscreen =>
