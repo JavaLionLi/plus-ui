@@ -7,7 +7,7 @@ import enUS from 'antd/locale/en_US';
 import zhCN from 'antd/locale/zh_CN';
 import 'dayjs/locale/zh-cn';
 import dayjs from 'dayjs';
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, ViewTransition } from 'react';
 import type { RuntimeMenuItem } from '@/api/types';
 import { logout } from '@/api/login';
 import { isHandledRequestError } from '@/api/request';
@@ -488,7 +488,10 @@ export default function BasicLayout() {
             onRefresh={() => setRefreshKey(value => value + 1)}
           />
         )}
-        <Outlet key={`${location.pathname}${location.search}:${refreshKey}`} />
+        {/* React 19.3 ViewTransition 页面切换过渡动画 不支持的浏览器自动降级为无动画 */}
+        <ViewTransition>
+          <Outlet key={`${location.pathname}${location.search}:${refreshKey}`} />
+        </ViewTransition>
       </ProLayout>
       <LayoutSettings
         open={settingsOpen}
